@@ -1,0 +1,28 @@
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+
+.page-header__back {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--fs-lg);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  color: var(--color-text);
+}
+
+.page-header__back:hover {
+  background: var(--color-surface-alt);
+}
+
+.page-header__text {
+  padding-top: var(--space-1);
+}

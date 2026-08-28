@@ -1,0 +1,43 @@
+.history__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.history__item {
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.history__tag {
+  align-self: flex-start;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-pill);
+}
+
+.history__tag--in {
+  background: var(--color-gold-soft);
+  color: var(--color-gold);
+}
+
+.history__tag--out {
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+.history__text {
+  font-weight: 600;
+}
+
+.history__meta {
+  font-size: var(--fs-xs);
+  color: var(--color-text-muted);
+}

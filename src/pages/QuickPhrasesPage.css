@@ -1,0 +1,25 @@
+.quick-phrases__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-3);
+}
+
+.quick-phrase {
+  padding: var(--space-4);
+  min-height: 64px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  font-weight: 600;
+  color: var(--color-text);
+  text-align: left;
+}
+
+.quick-phrase:hover {
+  border-color: var(--color-primary);
+}
+
+.quick-phrase:disabled {
+  opacity: 0.6;
+}

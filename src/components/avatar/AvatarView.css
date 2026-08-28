@@ -1,0 +1,33 @@
+.avatar-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+}
+
+.avatar-view__stage {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  max-width: 220px;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-alt);
+  border: 2px dashed var(--color-beige);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-view__glyph {
+  font-size: 3rem;
+  color: var(--color-text-muted);
+}
+
+.avatar-view__caption {
+  font-weight: 600;
+  text-align: center;
+}

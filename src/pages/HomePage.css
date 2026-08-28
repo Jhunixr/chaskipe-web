@@ -1,0 +1,79 @@
+.home__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.home__logo {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  font-weight: 700;
+  font-size: var(--fs-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 0.02em;
+}
+
+.home__name {
+  font-size: var(--fs-lg);
+  font-weight: 700;
+}
+
+.home__greeting {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.home__options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.home-option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+}
+
+.home-option:hover {
+  border-color: var(--color-primary);
+}
+
+.home-option__icon {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background: var(--color-primary-soft);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+}
+
+.home-option__body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.home-option__title {
+  font-weight: 600;
+}
+
+.home-option__chevron {
+  color: var(--color-text-muted);
+  font-size: var(--fs-xl);
+}
