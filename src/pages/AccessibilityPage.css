@@ -1,0 +1,49 @@
+.accessibility__text-size {
+  display: inline-flex;
+  gap: var(--space-2);
+}
+
+.accessibility__text-size button {
+  width: 40px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--color-border-strong);
+  background: var(--color-surface);
+  font-weight: 800;
+  color: var(--color-ink);
+}
+
+.accessibility__text-size button:disabled {
+  opacity: 0.4;
+}
+
+.accessibility__slider {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.accessibility__range {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: calc(var(--fs-lg) * var(--text-scale));
+}
+
+.accessibility__range input[type='range'] {
+  flex: 1;
+  accent-color: var(--color-primary);
+  height: 6px;
+}
+
+.accessibility__save {
+  margin-top: var(--space-2);
+  background-image: repeating-linear-gradient(
+    90deg,
+    transparent 0 10px,
+    rgba(255, 255, 255, 0.15) 10px 14px
+  );
+  background-position: bottom;
+  background-size: 100% 8px;
+  background-repeat: no-repeat;
+}

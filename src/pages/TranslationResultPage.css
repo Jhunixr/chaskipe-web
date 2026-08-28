@@ -1,26 +1,105 @@
-.result-card {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  align-items: flex-start;
+.result {
+  position: relative;
+  text-align: center;
 }
 
-.result-card__status {
+.result__hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) 0 var(--space-2);
+}
+
+.result__check {
+  width: 76px;
+  height: 76px;
+  border-radius: var(--radius-pill);
+  background: var(--color-success);
+  color: var(--color-text-inverse);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 20px rgba(46, 125, 81, 0.28);
+}
+
+.result__text {
+  font-size: calc(var(--fs-3xl) * var(--text-scale));
+}
+
+.result__status {
   display: flex;
   align-items: center;
   gap: var(--space-2);
 }
 
-.result-card__badge {
-  font-size: var(--fs-xs);
-  font-weight: 600;
-  padding: 2px var(--space-2);
+.result__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: calc(var(--fs-xs) * var(--text-scale));
+  font-weight: 700;
+  padding: 3px var(--space-3);
   border-radius: var(--radius-pill);
   background: var(--color-success-soft);
   color: var(--color-success);
 }
 
-.result-card__text {
-  font-size: var(--fs-2xl);
-  font-weight: 700;
+.result__audio {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-card);
+}
+
+.result__audio-btn {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-pill);
+  border: none;
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.result__audio-track {
+  flex: 1;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-alt);
+  overflow: hidden;
+}
+
+.result__audio-fill {
+  display: block;
+  width: 66%;
+  height: 100%;
+  background: var(--color-primary);
+}
+
+.result__audio-time {
+  flex-shrink: 0;
+}
+
+.result__actions {
+  text-align: left;
+}
+
+.result__actions-row {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.result__mascot {
+  display: flex;
+  justify-content: center;
+  padding-top: var(--space-2);
+  opacity: 0.85;
 }

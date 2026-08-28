@@ -1,3 +1,8 @@
+export { SplashPage } from './SplashPage'
+export { OnboardingPage } from './OnboardingPage'
+export { LoginPage } from './LoginPage'
+export { RegisterPage } from './RegisterPage'
+
 export { HomePage } from './HomePage'
 export { CameraPreparationPage } from './CameraPreparationPage'
 export { SignToTextPage } from './SignToTextPage'

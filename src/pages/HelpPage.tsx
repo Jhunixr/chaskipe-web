@@ -1,76 +1,92 @@
-import { Card, PageHeader } from '@/components/ui'
+import { useState } from 'react'
 
+import { Mascot, Mountains } from '@/components/brand'
+import { Button, Card, Icon, type IconName, PageHeader } from '@/components/ui'
+
+import './HelpPage.css'
 import './pages.css'
 
 interface HelpTopic {
   title: string
   body: string
+  icon: IconName
 }
 
 const TOPICS: HelpTopic[] = [
   {
     title: 'Como usar la camara',
     body: 'Busca un lugar con buena luz, muestra ambas manos y manten el rostro visible dentro del recuadro.',
+    icon: 'camera',
   },
   {
     title: 'Como responder con el avatar',
     body: 'Escribe tu mensaje en "Texto a senas". En una version futura el avatar reproducira la secuencia en LSP.',
+    icon: 'user',
   },
   {
     title: 'Consejos para mejores resultados',
     body: 'Realiza las senas a un ritmo constante, evita fondos con mucho movimiento y acerca las manos a la camara.',
-  },
-]
-
-const FAQ: HelpTopic[] = [
-  {
-    title: '¿La app ya reconoce senas?',
-    body: 'Todavia no. Esta version muestra la interfaz; el reconocimiento con MediaPipe e IA llega en fases posteriores.',
+    icon: 'help',
   },
   {
-    title: '¿La LSP es igual al espanol escrito?',
-    body: 'No. La Lengua de Senas Peruana tiene su propia gramatica. Las equivalencias mostradas son demostrativas.',
-  },
-  {
-    title: '¿Se graban mis videos?',
-    body: 'No se guardan videos automaticamente. Cualquier registro futuro requerira tu consentimiento.',
+    title: 'Preguntas frecuentes',
+    body: 'La app aun no reconoce senas ni genera avatar. La LSP no comparte la gramatica del espanol. No se graban videos sin consentimiento.',
+    icon: 'chat',
   },
 ]
 
 export function HelpPage() {
+  const [open, setOpen] = useState<number | null>(0)
+
   return (
-    <div className="page">
-      <PageHeader title="Ayuda" subtitle="Guia rapida y preguntas frecuentes." />
+    <div className="page help">
+      <PageHeader title="Ayuda y tutorial" />
 
-      <section className="page__section">
-        <h2 className="section-title">Guias</h2>
-        {TOPICS.map((topic) => (
-          <Card key={topic.title} className="stack-sm">
-            <h3>{topic.title}</h3>
-            <p className="text-muted text-sm">{topic.body}</p>
-          </Card>
-        ))}
-      </section>
+      <div className="help__art" aria-hidden="true">
+        <Mascot size={120} alt="" />
+        <Mountains />
+      </div>
 
-      <section className="page__section">
-        <h2 className="section-title">Preguntas frecuentes</h2>
-        {FAQ.map((item) => (
-          <Card key={item.title} className="stack-sm">
-            <h3>{item.title}</h3>
-            <p className="text-muted text-sm">{item.body}</p>
-          </Card>
-        ))}
-      </section>
+      <ul className="help__list">
+        {TOPICS.map((topic, index) => {
+          const isOpen = open === index
+          return (
+            <li key={topic.title}>
+              <Card className="card--flat help__topic">
+                <button
+                  type="button"
+                  className="help__topic-head"
+                  aria-expanded={isOpen}
+                  onClick={() => setOpen(isOpen ? null : index)}
+                >
+                  <Icon name={topic.icon} size={20} className="help__topic-icon" />
+                  <span className="help__topic-title">{topic.title}</span>
+                  <Icon
+                    name="chevron"
+                    size={18}
+                    className={`help__topic-chevron${
+                      isOpen ? ' help__topic-chevron--open' : ''
+                    }`}
+                  />
+                </button>
+                {isOpen && (
+                  <p className="help__topic-body text-sm text-muted">{topic.body}</p>
+                )}
+              </Card>
+            </li>
+          )
+        })}
+      </ul>
 
-      <section className="page__section">
-        <h2 className="section-title">Soporte</h2>
-        <Card className="stack-sm">
-          <p className="text-sm">
-            ¿Necesitas mas ayuda? Escribe a{' '}
-            <strong>soporte@chaskipe.example.pe</strong>
-          </p>
-        </Card>
-      </section>
+      <Button variant="secondary" fullWidth icon="help">
+        Contactar soporte
+      </Button>
+
+      <p className="disclaimer-note">
+        <Icon name="shield" size={16} />
+        Chaski Pe no reemplaza a un interprete profesional de Lengua de Senas
+        Peruana.
+      </p>
     </div>
   )
 }

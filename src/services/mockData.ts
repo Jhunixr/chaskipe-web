@@ -28,6 +28,7 @@ export const QUICK_PHRASE_GROUPS: QuickPhraseGroup[] = [
     phrases: [
       { id: 'ph-hola', text: 'Hola', category: 'saludos', isDemo: true },
       { id: 'ph-gracias', text: 'Gracias', category: 'saludos', isDemo: true },
+      { id: 'ph-por-favor', text: 'Por favor', category: 'saludos', isDemo: true },
     ],
   },
   {
@@ -121,3 +122,9 @@ export const DEMO_RESULT = {
   text: 'Necesito ayuda',
   isDemo: true,
 } as const
+
+/** Frase entrante de ejemplo en el flujo "texto a senas". */
+export const DEMO_INCOMING_PROMPT = '¿Como estas?'
+
+/** Respuesta de ejemplo prellenada en el campo de texto. */
+export const DEMO_REPLY_TEXT = 'Estoy bien, gracias.'

@@ -1,14 +1,20 @@
 import { useNavigate } from 'react-router-dom'
 
 import { ROUTES } from '@/app/routes'
-import { Button, Card, PageHeader } from '@/components/ui'
+import { CameraPlaceholder } from '@/components/camera/CameraPlaceholder'
+import { Button, Card, Icon, type IconName, PageHeader } from '@/components/ui'
 
 import './pages.css'
 
-const RECOMMENDATIONS = [
-  'Buena iluminacion',
-  'Muestra ambas manos',
-  'Manten el rostro visible',
+interface Recommendation {
+  text: string
+  icon: IconName
+}
+
+const RECOMMENDATIONS: Recommendation[] = [
+  { text: 'Buena iluminacion', icon: 'sun' },
+  { text: 'Muestra ambas manos', icon: 'hands' },
+  { text: 'Manten el rostro visible', icon: 'user' },
 ]
 
 export function CameraPreparationPage() {
@@ -16,17 +22,23 @@ export function CameraPreparationPage() {
 
   return (
     <div className="page">
-      <PageHeader
-        title="Antes de comenzar"
-        subtitle="Prepara el entorno para un mejor reconocimiento."
-      />
+      <PageHeader title="Antes de comenzar" />
+
+      <CameraPlaceholder />
 
       <Card>
         <ul className="recommendation-list">
-          {RECOMMENDATIONS.map((item, index) => (
-            <li key={item} className="recommendation-list__item">
-              <span className="recommendation-list__marker">{index + 1}</span>
-              <span>{item}</span>
+          {RECOMMENDATIONS.map((item) => (
+            <li key={item.text} className="recommendation-list__item">
+              <span className="recommendation-list__check">
+                <Icon name="check" size={16} />
+              </span>
+              <span className="recommendation-list__text">{item.text}</span>
+              <Icon
+                name={item.icon}
+                size={20}
+                className="recommendation-list__aside"
+              />
             </li>
           ))}
         </ul>
@@ -38,10 +50,20 @@ export function CameraPreparationPage() {
       </p>
 
       <div className="stack-sm">
-        <Button fullWidth onClick={() => navigate(ROUTES.signToText)}>
+        <Button
+          size="lg"
+          fullWidth
+          icon="camera"
+          onClick={() => navigate(ROUTES.signToText)}
+        >
           Abrir camara
         </Button>
-        <Button variant="secondary" fullWidth onClick={() => navigate(ROUTES.help)}>
+        <Button
+          variant="secondary"
+          fullWidth
+          icon="play"
+          onClick={() => navigate(ROUTES.help)}
+        >
           Ver tutorial
         </Button>
       </div>

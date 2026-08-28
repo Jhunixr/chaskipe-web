@@ -1,103 +1,141 @@
 import { useState } from 'react'
 
-import { Card, PageHeader } from '@/components/ui'
-import type { AccessibilitySettings } from '@/types'
+import { Button, Card, Icon, PageHeader, Toggle } from '@/components/ui'
+import { useTextScale } from '@/hooks/useTextScale'
 
+import './AccessibilityPage.css'
 import './pages.css'
 
-const DEFAULT_SETTINGS: AccessibilitySettings = {
-  textSize: 'normal',
-  voiceSpeed: 'normal',
-  avatarSpeed: 'normal',
-  subtitles: true,
-  language: 'es-PE',
-}
+type Speed = 'lenta' | 'normal' | 'rapida'
 
-/** FASE 1: solo interfaz. Las preferencias no se persisten todavia. */
+const SPEED_VALUE: Record<Speed, number> = { lenta: 0, normal: 1, rapida: 2 }
+const SPEED_FROM_VALUE: Record<number, Speed> = { 0: 'lenta', 1: 'normal', 2: 'rapida' }
+
+/**
+ * El tamano de texto SI se aplica en toda la app (useTextScale).
+ * El resto de opciones es solo interfaz en la FASE 1.
+ */
 export function AccessibilityPage() {
-  const [settings, setSettings] = useState<AccessibilitySettings>(DEFAULT_SETTINGS)
+  const { size, decrease, increase } = useTextScale()
+  const [voiceSpeed, setVoiceSpeed] = useState<Speed>('normal')
+  const [avatarSpeed, setAvatarSpeed] = useState<Speed>('normal')
+  const [darkMode, setDarkMode] = useState(false)
+  const [subtitles, setSubtitles] = useState(true)
 
   return (
-    <div className="page">
-      <PageHeader title="Accesibilidad" subtitle="Ajusta la app a tus necesidades." />
+    <div className="page accessibility">
+      <PageHeader title="Accesibilidad" />
 
-      <Card className="stack">
-        <label className="field">
-          <span className="field__label">Tamano de texto</span>
-          <select
-            className="field__select"
-            value={settings.textSize}
-            onChange={(event) =>
-              setSettings((prev) => ({
-                ...prev,
-                textSize: event.target.value as AccessibilitySettings['textSize'],
-              }))
-            }
-          >
-            <option value="normal">Normal</option>
-            <option value="grande">Grande</option>
-            <option value="muy-grande">Muy grande</option>
-          </select>
-        </label>
+      <Card className="stack-lg">
+        <div className="row-between">
+          <span className="field__label">Tamano del texto</span>
+          <div className="accessibility__text-size">
+            <button
+              type="button"
+              onClick={decrease}
+              disabled={size === 'normal'}
+              aria-label="Reducir tamano del texto"
+            >
+              A-
+            </button>
+            <button
+              type="button"
+              onClick={increase}
+              disabled={size === 'muy-grande'}
+              aria-label="Aumentar tamano del texto"
+            >
+              A+
+            </button>
+          </div>
+        </div>
 
-        <label className="field">
-          <span className="field__label">Velocidad de voz</span>
-          <select
-            className="field__select"
-            value={settings.voiceSpeed}
-            onChange={(event) =>
-              setSettings((prev) => ({
-                ...prev,
-                voiceSpeed: event.target.value as AccessibilitySettings['voiceSpeed'],
-              }))
-            }
-          >
-            <option value="lenta">Lenta</option>
-            <option value="normal">Normal</option>
-            <option value="rapida">Rapida</option>
-          </select>
-        </label>
+        <div className="accessibility__slider">
+          <span className="row field__label">
+            <Icon name="volume" size={18} />
+            Velocidad de voz
+          </span>
+          <div className="accessibility__range">
+            <span aria-hidden="true">🐢</span>
+            <input
+              type="range"
+              min={0}
+              max={2}
+              step={1}
+              value={SPEED_VALUE[voiceSpeed]}
+              onChange={(event) => {
+                const next = SPEED_FROM_VALUE[Number(event.target.value)]
+                if (next) setVoiceSpeed(next)
+              }}
+              aria-label="Velocidad de voz"
+            />
+            <span aria-hidden="true">🐇</span>
+          </div>
+        </div>
 
-        <label className="field">
-          <span className="field__label">Velocidad del avatar</span>
-          <select
-            className="field__select"
-            value={settings.avatarSpeed}
-            onChange={(event) =>
-              setSettings((prev) => ({
-                ...prev,
-                avatarSpeed: event.target.value as AccessibilitySettings['avatarSpeed'],
-              }))
-            }
-          >
-            <option value="lenta">Lenta</option>
-            <option value="normal">Normal</option>
-            <option value="rapida">Rapida</option>
-          </select>
-        </label>
+        <div className="accessibility__slider">
+          <span className="row field__label">
+            <Icon name="user" size={18} />
+            Velocidad del avatar
+          </span>
+          <div className="accessibility__range">
+            <span aria-hidden="true">🐢</span>
+            <input
+              type="range"
+              min={0}
+              max={2}
+              step={1}
+              value={SPEED_VALUE[avatarSpeed]}
+              onChange={(event) => {
+                const next = SPEED_FROM_VALUE[Number(event.target.value)]
+                if (next) setAvatarSpeed(next)
+              }}
+              aria-label="Velocidad del avatar"
+            />
+            <span aria-hidden="true">🐇</span>
+          </div>
+        </div>
 
-        <label className="row" style={{ justifyContent: 'space-between' }}>
-          <span className="field__label">Subtitulos</span>
-          <input
-            type="checkbox"
-            checked={settings.subtitles}
-            onChange={(event) =>
-              setSettings((prev) => ({ ...prev, subtitles: event.target.checked }))
-            }
+        <div className="row-between">
+          <span className="row field__label">
+            <Icon name="sun" size={18} />
+            Modo oscuro
+          </span>
+          <Toggle checked={darkMode} onChange={setDarkMode} label="Modo oscuro" />
+        </div>
+
+        <div className="row-between">
+          <span className="row field__label">
+            <Icon name="chat" size={18} />
+            Subtitulos siempre visibles
+          </span>
+          <Toggle
+            checked={subtitles}
+            onChange={setSubtitles}
+            label="Subtitulos siempre visibles"
           />
-        </label>
+        </div>
 
-        <label className="field">
-          <span className="field__label">Idioma</span>
-          <select className="field__select" value={settings.language} disabled>
-            <option value="es-PE">Espanol (Peru)</option>
-          </select>
-        </label>
+        <div className="row-between">
+          <span className="row field__label">
+            <Icon name="help" size={18} />
+            Idioma
+          </span>
+          <span className="link">Espanol</span>
+        </div>
       </Card>
 
       <p className="demo-note">
-        Estas opciones aun no se guardan ni afectan a toda la app.
+        El modo oscuro, la velocidad de voz/avatar y los subtitulos aun no se
+        guardan ni afectan a toda la app. El tamano de texto si se aplica.
       </p>
+
+      <Button size="lg" fullWidth className="accessibility__save">
+        Guardar cambios
+      </Button>
+      <span className="andean-rule" aria-hidden="true">
+        <span className="andean-rule__diamond" />
+        <span className="andean-rule__diamond" />
+      </span>
     </div>
   )
 }

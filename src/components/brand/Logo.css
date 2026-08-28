@@ -1,0 +1,51 @@
+.logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.logo--stack {
+  flex-direction: column;
+  text-align: center;
+  gap: var(--space-2);
+}
+
+.logo__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.logo--stack .logo__text {
+  align-items: center;
+}
+
+.logo__wordmark {
+  font-size: calc(var(--fs-xl) * var(--text-scale));
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--color-ink);
+  line-height: 1;
+}
+
+.logo__wordmark em {
+  font-style: normal;
+  color: var(--color-primary);
+}
+
+.logo--stack .logo__wordmark {
+  font-size: calc(var(--fs-3xl) * var(--text-scale));
+}
+
+.logo__tagline {
+  font-size: calc(var(--fs-xs) * var(--text-scale));
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+}
+
+.logo__full-image {
+  height: auto;
+  max-width: 240px;
+}

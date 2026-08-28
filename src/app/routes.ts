@@ -1,7 +1,14 @@
 /** Rutas centralizadas de la aplicacion. */
 
 export const ROUTES = {
-  home: '/',
+  // Flujo de entrada (solo UI, sin autenticacion real en FASE 1)
+  splash: '/',
+  onboarding: '/bienvenida',
+  login: '/iniciar-sesion',
+  register: '/crear-cuenta',
+
+  // App
+  home: '/inicio',
   cameraPreparation: '/camara/preparacion',
   signToText: '/senas-a-texto',
   translationResult: '/senas-a-texto/resultado',

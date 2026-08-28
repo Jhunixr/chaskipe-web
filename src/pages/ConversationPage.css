@@ -1,60 +1,155 @@
-.conversation__legend {
+.conversation__header {
   display: flex;
-  gap: var(--space-4);
-}
-
-.conversation__legend > span {
-  display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
-}
-
-.conversation__dot {
-  width: 10px;
-  height: 10px;
-  border-radius: var(--radius-pill);
-  display: inline-block;
-}
-
-.conversation__dot--in {
-  background: var(--color-gold);
-}
-
-.conversation__dot--out {
-  background: var(--color-primary);
-}
-
-.conversation__thread {
-  display: flex;
-  flex-direction: column;
+  justify-content: space-between;
   gap: var(--space-3);
 }
 
-.conversation__message {
-  max-width: 80%;
-  padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--color-border);
+.conversation__live {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 4px var(--space-3);
+  font-size: calc(var(--fs-xs) * var(--text-scale));
+  font-weight: 700;
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+  border-radius: var(--radius-pill);
+}
+
+.conversation__live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-pill);
+  background: var(--color-primary);
+  animation: conv-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes conv-pulse {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .conversation__live-dot {
+    animation: none;
+  }
+}
+
+.conversation__panel {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-card);
 }
 
-.conversation__message--in {
-  align-self: flex-start;
+.conversation__panel--in {
+  background: var(--color-primary-tint);
+  border-color: var(--color-primary-soft);
+}
+
+.conversation__panel--out {
+  background: var(--color-gold-soft);
+  border-color: var(--color-beige);
+}
+
+.conversation__panel-title {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: calc(var(--fs-xs) * var(--text-scale));
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.conversation__panel--in .conversation__panel-title {
+  color: var(--color-primary);
+}
+
+.conversation__panel--out .conversation__panel-title {
+  color: var(--color-warning);
+}
+
+.conversation__in-body {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.conversation__avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-pill);
   background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
 }
 
-.conversation__message--out {
-  align-self: flex-end;
-  background: var(--color-primary-soft);
+.conversation__detected {
+  font-size: calc(var(--fs-xl) * var(--text-scale));
+  font-weight: 800;
+  color: var(--color-ink);
 }
 
-.conversation__text {
-  font-weight: 600;
+.conversation__swap {
+  align-self: center;
+  width: 40px;
+  height: 40px;
+  margin: calc(var(--space-2) * -1) 0;
+  border-radius: var(--radius-pill);
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  box-shadow: var(--shadow-card);
 }
 
-.conversation__meta {
-  font-size: var(--fs-xs);
-  color: var(--color-text-muted);
+.conversation__reply {
+  padding: var(--space-3) var(--space-4);
+  font: inherit;
+  font-size: calc(var(--fs-lg) * var(--text-scale));
+  font-weight: 700;
+  color: var(--color-ink);
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.conversation__reply:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.conversation__out-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-1);
+}
+
+.conversation__icon-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  color: var(--color-text);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }

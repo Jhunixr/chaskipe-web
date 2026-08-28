@@ -1,0 +1,56 @@
+.sign-to-text__panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+}
+
+.sign-to-text__text {
+  font-size: calc(var(--fs-xl) * var(--text-scale));
+  font-weight: 800;
+  color: var(--color-ink);
+  min-height: 2.4rem;
+}
+
+.sign-to-text__audio {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.sign-to-text__play {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-pill);
+  border: none;
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sign-to-text__play:disabled {
+  opacity: 0.5;
+}
+
+.sign-to-text__track {
+  flex: 1;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-alt);
+  overflow: hidden;
+}
+
+.sign-to-text__track-fill {
+  display: block;
+  width: 38%;
+  height: 100%;
+  background: var(--color-primary);
+  border-radius: var(--radius-pill);
+}

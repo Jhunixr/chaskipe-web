@@ -4,13 +4,19 @@
   margin: 0 auto;
   background: var(--color-bg);
   position: relative;
+  overflow-x: hidden;
 }
 
 .app-shell__content {
-  padding: var(--space-5) var(--space-4);
+  padding: var(--space-5) var(--page-padding);
+  padding-top: calc(env(safe-area-inset-top) + var(--space-5));
   padding-bottom: calc(
-    var(--bottom-nav-height) + env(safe-area-inset-bottom) + var(--space-6)
+    var(--bottom-nav-height) + env(safe-area-inset-bottom) + var(--space-7)
   );
+}
+
+.app-shell--no-nav .app-shell__content {
+  padding-bottom: calc(env(safe-area-inset-bottom) + var(--space-6));
 }
 
 @media (min-width: 481px) {

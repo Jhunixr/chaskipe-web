@@ -1,0 +1,36 @@
+.auth {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding-top: var(--space-4);
+}
+
+.auth__brand {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-4) 0 var(--space-2);
+}
+
+.auth__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.auth__forgot {
+  align-self: flex-end;
+  font-size: calc(var(--fs-sm) * var(--text-scale));
+}
+
+.auth__switch {
+  text-align: center;
+}
+
+.auth__demo {
+  margin-top: var(--space-2);
+}
+
+/* Cabecera de "Crear cuenta" con titulo de dos tonos */
+.auth__title {
+  font-size: calc(var(--fs-3xl) * var(--text-scale));
+}

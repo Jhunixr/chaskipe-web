@@ -1,20 +1,22 @@
 import { NavLink } from 'react-router-dom'
 
 import { ROUTES } from '@/app/routes'
+import { Icon, type IconName } from '@/components/ui'
 
 import './BottomNav.css'
 
 interface NavItem {
   to: string
   label: string
-  icon: string
+  icon: IconName
+  end?: boolean
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { to: ROUTES.home, label: 'Inicio', icon: '⌂' },
-  { to: ROUTES.conversation, label: 'Conversacion', icon: '⇄' },
-  { to: ROUTES.quickPhrases, label: 'Frases', icon: '✦' },
-  { to: ROUTES.profile, label: 'Perfil', icon: '○' },
+  { to: ROUTES.home, label: 'Inicio', icon: 'home', end: true },
+  { to: ROUTES.conversation, label: 'Conversacion', icon: 'chat' },
+  { to: ROUTES.history, label: 'Historial', icon: 'clock' },
+  { to: ROUTES.profile, label: 'Perfil', icon: 'user' },
 ]
 
 export function BottomNav() {
@@ -24,16 +26,14 @@ export function BottomNav() {
         <NavLink
           key={item.to}
           to={item.to}
-          end={item.to === ROUTES.home}
+          end={item.end ?? false}
           className={({ isActive }) =>
             ['bottom-nav__item', isActive ? 'bottom-nav__item--active' : '']
               .filter(Boolean)
               .join(' ')
           }
         >
-          <span className="bottom-nav__icon" aria-hidden="true">
-            {item.icon}
-          </span>
+          <Icon name={item.icon} size={22} />
           <span className="bottom-nav__label">{item.label}</span>
         </NavLink>
       ))}

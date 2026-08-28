@@ -1,34 +1,48 @@
 /*
  * Chaski Pe - Sistema visual
- * Mobile first. Identidad peruana sutil.
+ * Mobile first. Identidad peruana sutil, apariencia de startup profesional.
  * Fondo crema, color principal rojo, tarjetas blancas, detalles beige/dorado moderados.
  */
 
 :root {
-  /* Paleta */
-  --color-bg: #faf4ea;
+  /* Paleta base */
+  --color-bg: #fbf5ec;
+  --color-bg-soft: #f6ecdd;
   --color-surface: #ffffff;
-  --color-surface-alt: #f5ecdd;
-  --color-border: #e8ddc9;
+  --color-surface-alt: #f7efe2;
+  --color-border: #ece0cd;
+  --color-border-strong: #ddcbb0;
 
-  --color-primary: #b3261e;
-  --color-primary-hover: #9a1f18;
-  --color-primary-soft: #f7e4e2;
+  /* Rojo (color principal) */
+  --color-primary: #c8221f;
+  --color-primary-hover: #ac1c19;
+  --color-primary-active: #911714;
+  --color-primary-soft: #f9e6e4;
+  --color-primary-tint: #fdf1f0;
 
+  /* Marron del wordmark (para titulos destacados) */
+  --color-ink: #3a2a22;
+
+  /* Detalles */
   --color-gold: #c8992e;
-  --color-gold-soft: #f6ecd6;
-  --color-beige: #e8ddc9;
+  --color-gold-soft: #f7edd7;
+  --color-beige: #e7dcc6;
 
-  --color-text: #2b2622;
-  --color-text-muted: #6f665c;
+  /* Texto */
+  --color-text: #2c2622;
+  --color-text-muted: #726657;
   --color-text-inverse: #ffffff;
 
+  /* Estados */
   --color-success: #2e7d51;
-  --color-success-soft: #e3f1e9;
+  --color-success-soft: #e4f1ea;
   --color-info: #345b8c;
+  --color-info-soft: #e6edf5;
+  --color-warning: #b5791b;
+  --color-warning-soft: #f9eed8;
 
   /* Tipografia */
-  --font-sans: 'Inter', 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue',
+  --font-sans: 'Nunito', 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue',
     Arial, sans-serif;
   --fs-xs: 0.75rem;
   --fs-sm: 0.875rem;
@@ -36,6 +50,10 @@
   --fs-lg: 1.125rem;
   --fs-xl: 1.375rem;
   --fs-2xl: 1.75rem;
+  --fs-3xl: 2.125rem;
+
+  /* Escala de texto accesible (la ajusta AccessibilityPage) */
+  --text-scale: 1;
 
   /* Espaciado */
   --space-1: 0.25rem;
@@ -45,20 +63,24 @@
   --space-5: 1.5rem;
   --space-6: 2rem;
   --space-7: 2.5rem;
+  --space-8: 3rem;
 
   /* Formas */
-  --radius-sm: 8px;
-  --radius-md: 14px;
-  --radius-lg: 20px;
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
+  --radius-xl: 28px;
   --radius-pill: 999px;
 
   /* Sombras (moderadas) */
-  --shadow-card: 0 1px 2px rgba(43, 38, 34, 0.04), 0 4px 12px rgba(43, 38, 34, 0.05);
-  --shadow-nav: 0 -1px 0 var(--color-border);
+  --shadow-card: 0 1px 2px rgba(58, 42, 34, 0.05), 0 6px 16px rgba(58, 42, 34, 0.06);
+  --shadow-raised: 0 2px 6px rgba(58, 42, 34, 0.08), 0 12px 28px rgba(58, 42, 34, 0.1);
+  --shadow-nav: 0 -1px 0 var(--color-border), 0 -8px 24px rgba(58, 42, 34, 0.05);
 
   /* Layout */
-  --app-max-width: 480px;
-  --bottom-nav-height: 64px;
+  --app-max-width: 460px;
+  --bottom-nav-height: 68px;
+  --page-padding: 1.25rem;
 }
 
 * {
@@ -74,7 +96,7 @@ body,
 body {
   margin: 0;
   font-family: var(--font-sans);
-  font-size: var(--fs-base);
+  font-size: calc(var(--fs-base) * var(--text-scale));
   line-height: 1.5;
   color: var(--color-text);
   background-color: var(--color-bg);
@@ -87,20 +109,22 @@ h2,
 h3,
 h4 {
   margin: 0;
-  font-weight: 700;
-  line-height: 1.25;
+  font-weight: 800;
+  line-height: 1.2;
+  color: var(--color-ink);
+  letter-spacing: -0.01em;
 }
 
 h1 {
-  font-size: var(--fs-2xl);
+  font-size: calc(var(--fs-2xl) * var(--text-scale));
 }
 
 h2 {
-  font-size: var(--fs-xl);
+  font-size: calc(var(--fs-xl) * var(--text-scale));
 }
 
 h3 {
-  font-size: var(--fs-lg);
+  font-size: calc(var(--fs-lg) * var(--text-scale));
 }
 
 p {
@@ -118,7 +142,14 @@ button {
   cursor: pointer;
 }
 
-ul {
+input,
+textarea,
+select {
+  font-family: inherit;
+}
+
+ul,
+ol {
   margin: 0;
   padding: 0;
   list-style: none;
