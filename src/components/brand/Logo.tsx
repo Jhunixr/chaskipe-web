@@ -1,4 +1,3 @@
-import { mascotAssets } from './mascotAssets'
 import { Mascot } from './Mascot'
 
 import './Logo.css'
@@ -12,26 +11,13 @@ interface LogoProps {
 }
 
 /**
- * Marca de Chaski Pe: mascota + wordmark "chaski" (marron) + "pe" (rojo).
- * Si existe el logo completo como imagen, lo usa tal cual.
+ * Marca de Chaski Pe: mascota (globo con el chaski) + wordmark tipografico
+ * "chaski" (marron) + "pe" (rojo), con lema y cenefa andina opcionales.
  */
 export function Logo({ layout = 'row', tagline = false, mascotSize = 40 }: LogoProps) {
-  if (mascotAssets.logo && layout === 'stack') {
-    return (
-      <div className="logo logo--stack">
-        <img
-          className="logo__full-image"
-          src={mascotAssets.logo}
-          alt="Chaski Pe"
-          width={mascotSize * 4}
-        />
-      </div>
-    )
-  }
-
   return (
     <div className={`logo logo--${layout}`}>
-      <Mascot size={mascotSize} alt="" />
+      <Mascot size={layout === 'stack' ? mascotSize : mascotSize} alt="" />
       <div className="logo__text">
         <span className="logo__wordmark">
           chaski<em>pe</em>

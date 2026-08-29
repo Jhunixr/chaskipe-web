@@ -9,22 +9,23 @@ interface MascotProps {
 }
 
 /**
- * Mascota del chaski. Usa la imagen de `mascotAssets.mascot` (o `logo`) si
- * existe; si no, dibuja un marcador SVG con el anillo tipo globo de dialogo
- * de la identidad de Chaski Pe.
+ * Mascota del chaski (el nino dentro del globo de dialogo).
+ * Usa `mascot.png` (recorte circular con fondo transparente); si no existe,
+ * dibuja un marcador SVG.
  */
 export function Mascot({ size = 96, alt = '' }: MascotProps) {
-  const src = mascotAssets.mascot ?? mascotAssets.logo
+  const decorative = alt === ''
 
-  if (src) {
+  if (mascotAssets.mascot) {
     return (
       <img
         className="mascot mascot--image"
-        src={src}
+        src={mascotAssets.mascot}
         width={size}
         height={size}
+        style={{ width: size, height: size }}
         alt={alt}
-        {...(alt === '' ? { 'aria-hidden': true } : {})}
+        {...(decorative ? { 'aria-hidden': true } : {})}
       />
     )
   }
@@ -35,9 +36,9 @@ export function Mascot({ size = 96, alt = '' }: MascotProps) {
       width={size}
       height={size}
       viewBox="0 0 96 96"
-      role={alt ? 'img' : 'presentation'}
-      aria-label={alt || undefined}
-      aria-hidden={alt ? undefined : true}
+      role={decorative ? 'presentation' : 'img'}
+      aria-label={decorative ? undefined : alt}
+      aria-hidden={decorative ? true : undefined}
       focusable="false"
     >
       <path
