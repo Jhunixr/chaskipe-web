@@ -10,6 +10,14 @@ export type LandmarkerStatus =
   | 'running' // bucle de deteccion activo
   | 'error'
 
+interface UseHandLandmarkerOptions {
+  /**
+   * Se invoca en cada frame detectado (incluidos los que no tienen manos).
+   * Util para grabar secuencias. Se guarda en un ref, no reinicia el bucle.
+   */
+  onFrame?: (frame: HandFrame) => void
+}
+
 interface UseHandLandmarkerResult {
   status: LandmarkerStatus
   errorMessage: string | null
@@ -33,7 +41,9 @@ const EMPTY: Landmark[][] = []
  *
  * FASE 3: solo deteccion. La interpretacion de senas es una fase posterior.
  */
-export function useHandLandmarker(): UseHandLandmarkerResult {
+export function useHandLandmarker(
+  options: UseHandLandmarkerOptions = {},
+): UseHandLandmarkerResult {
   const [status, setStatus] = useState<LandmarkerStatus>('idle')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [frame, setFrame] = useState<HandFrame | null>(null)
@@ -42,6 +52,12 @@ export function useHandLandmarker(): UseHandLandmarkerResult {
   const videoRef = useRef<HTMLVideoElement | null>(null)
   const lastVideoTimeRef = useRef<number>(-1)
   const runningRef = useRef(false)
+
+  // El callback se guarda en un ref para no reiniciar el bucle al cambiar.
+  const onFrameRef = useRef(options.onFrame)
+  useEffect(() => {
+    onFrameRef.current = options.onFrame
+  }, [options.onFrame])
 
   const load = useCallback(() => {
     setStatus((current) => (current === 'idle' || current === 'error' ? 'loading' : current))
@@ -88,13 +104,15 @@ export function useHandLandmarker(): UseHandLandmarkerResult {
           const now = performance.now()
           try {
             const result = landmarker.detectForVideo(el, now)
-            setFrame({
+            const next: HandFrame = {
               hands: (result.landmarks ?? EMPTY) as Landmark[][],
               handedness: (result.handedness ?? []).map(
                 (h) => h[0]?.categoryName ?? '',
               ),
               timestamp: now,
-            })
+            }
+            setFrame(next)
+            onFrameRef.current?.(next)
           } catch {
             // Un frame fallido no detiene el bucle.
           }

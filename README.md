@@ -1,7 +1,7 @@
 # Frontend — Chaski Pe
 
 Aplicacion movil (mobile first) construida con **React + TypeScript + Vite** y
-**React Router**. Estado actual: **FASE 3 — deteccion de manos con MediaPipe**
+**React Router**. Estado actual: **FASE 4 — captura de dataset de landmarks**
 (sin modelo de IA ni reconocimiento de senas todavia).
 
 ## Requisitos
@@ -74,6 +74,7 @@ Las imagenes reales van en `src/assets/mascot/`. Sin ellas, `<Mascot />` y
 | `/perfil`                   | Perfil                      | si           |
 | `/accesibilidad`            | Accesibilidad               | si           |
 | `/ayuda`                    | Ayuda y tutorial            | si           |
+| `/dev/dataset`              | Captura de dataset (interna, FASE 4) | si  |
 | `*`                         | 404                         | no           |
 
 ## TypeScript
@@ -103,6 +104,17 @@ Configuracion **estricta** (`strict: true` + `noUncheckedIndexedAccess`,
 - En **Senas a texto** se muestra el estado: "Cargando detector...",
   "Muestra las manos", "1/2 manos detectadas".
 - Primera carga: ~19 MB (wasm 11 MB + modelo 7.6 MB), luego queda en cache.
+
+## Captura de dataset (FASE 4)
+
+- Herramienta interna en `/dev/dataset` (`DatasetCollectorPage`).
+- Elegir sena (HOLA/GRACIAS/AYUDA/SI/NO) -> grabar ~2 s con la camara +
+  MediaPipe -> descargar un JSON por muestra.
+- Solo se guardan coordenadas de landmarks, **no video**. Consentimiento
+  obligatorio (checkbox) antes de poder grabar.
+- Formato: `frontend/src/types/dataset.ts` <-> `ai/data/DATASET_FORMAT.md`.
+- El JSON descargado se mueve a mano a `ai/data/raw/<ETIQUETA>/`.
+- `useHandLandmarker` acepta `onFrame` para acumular la secuencia grabada.
 
 ## Alcance actual
 

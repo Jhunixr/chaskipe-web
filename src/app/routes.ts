@@ -19,6 +19,9 @@ export const ROUTES = {
   profile: '/perfil',
   accessibility: '/accesibilidad',
   help: '/ayuda',
+
+  // Herramienta interna (FASE 4): captura de dataset de landmarks.
+  datasetCollector: '/dev/dataset',
 } as const
 
 export type RoutePath = (typeof ROUTES)[keyof typeof ROUTES]
