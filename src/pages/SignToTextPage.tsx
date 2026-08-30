@@ -2,9 +2,10 @@ import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { ROUTES } from '@/app/routes'
-import { CameraView } from '@/components/camera'
+import { CameraView, HandOverlay } from '@/components/camera'
 import { Button, Icon, PageHeader } from '@/components/ui'
 import { useCamera } from '@/hooks/useCamera'
+import { useHandLandmarker } from '@/hooks/useHandLandmarker'
 import { useSpeech } from '@/hooks/useSpeech'
 import { DEMO_RESULT } from '@/services/mockData'
 import type { RecognitionStatus } from '@/types'
@@ -13,31 +14,51 @@ import './SignToTextPage.css'
 import './pages.css'
 
 /**
- * FASE 2: la camara ya funciona (video en vivo).
- * El reconocimiento sigue simulado: "Analizar sena" produce un resultado DEMO.
- * MediaPipe y el modelo de IA llegan en fases posteriores.
+ * FASE 3: la camara funciona y MediaPipe detecta las manos (landmarks en vivo).
+ * El reconocimiento de senas sigue simulado: "Analizar sena" produce un
+ * resultado DEMO. El modelo de IA llega en la FASE 5.
  */
 export function SignToTextPage() {
   const navigate = useNavigate()
   const camera = useCamera('user')
+  const hands = useHandLandmarker()
   const [status, setStatus] = useState<RecognitionStatus>('idle')
   const { speak, speaking, cancel, supported } = useSpeech()
 
-  // Activar la camara una sola vez al entrar a la pantalla.
+  // Activar la camara una sola vez al entrar.
   const startedRef = useRef(false)
   useEffect(() => {
     if (startedRef.current) return
     startedRef.current = true
     camera.start()
-  }, [camera])
+    hands.load()
+  }, [camera, hands])
+
+  // Cuando la camara esta activa, iniciar la deteccion de manos sobre el video.
+  const detectionStartedRef = useRef(false)
+  useEffect(() => {
+    if (camera.status !== 'active' || detectionStartedRef.current) return
+    const video = camera.videoRef.current
+    if (!video) return
+    detectionStartedRef.current = true
+    hands.start(video)
+  }, [camera.status, camera.videoRef, hands])
 
   const detectedText = status === 'recognized' ? DEMO_RESULT.text : ''
   const cameraReady = camera.status === 'active'
+  const detecting = hands.status === 'running'
 
   const handleAnalyze = () => {
     setStatus('recognizing')
     window.setTimeout(() => setStatus('recognized'), 1100)
   }
+
+  let overlayStatus: string | undefined
+  if (status === 'recognizing') overlayStatus = 'Reconociendo...'
+  else if (detecting && hands.handCount > 0) {
+    overlayStatus = hands.handCount === 1 ? '1 mano detectada' : '2 manos detectadas'
+  } else if (detecting) overlayStatus = 'Muestra las manos'
+  else if (cameraReady && hands.status === 'loading') overlayStatus = 'Cargando detector...'
 
   return (
     <div className="page sign-to-text">
@@ -52,8 +73,18 @@ export function SignToTextPage() {
         onStart={camera.start}
         onRetry={camera.start}
         onToggleFacing={camera.toggleFacing}
-        overlayStatus={status === 'recognizing' ? 'Reconociendo...' : undefined}
+        overlayStatus={overlayStatus}
+        overlay={
+          <HandOverlay frame={hands.frame} mirrored={camera.facing === 'user'} />
+        }
       />
+
+      {hands.status === 'error' && (
+        <p className="disclaimer-note">
+          <Icon name="shield" size={16} />
+          {hands.errorMessage ?? 'No se pudo cargar el detector de manos.'}
+        </p>
+      )}
 
       <section className="sign-to-text__panel">
         <span className="section-title">Texto detectado</span>
@@ -85,8 +116,9 @@ export function SignToTextPage() {
       </section>
 
       <p className="demo-note">
-        Equivalencia demostrativa. La Lengua de Senas Peruana no comparte la
-        gramatica del espanol; debe validarse con personas usuarias o interpretes.
+        MediaPipe detecta la posicion de las manos, pero el reconocimiento de la
+        sena es demostrativo. La Lengua de Senas Peruana no comparte la gramatica
+        del espanol; debe validarse con personas usuarias o interpretes.
       </p>
 
       {status === 'recognized' ? (

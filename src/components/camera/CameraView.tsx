@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react'
+
 import { Button, Icon } from '@/components/ui'
 import type { CameraFacing, CameraStatus } from '@/hooks/useCamera'
 
@@ -14,11 +16,12 @@ interface CameraViewProps {
   onToggleFacing: () => void
   /** Texto de estado sobre el video (ej. "Reconociendo..."). */
   overlayStatus?: string | undefined
+  /** Capa opcional sobre el video (ej. landmarks de manos). */
+  overlay?: ReactNode
 }
 
 /**
- * Vista de camara con video en vivo.
- * FASE 2: solo muestra la camara. Sin deteccion de manos ni landmarks.
+ * Vista de camara con video en vivo y una capa de overlay opcional.
  */
 export function CameraView({
   status,
@@ -30,6 +33,7 @@ export function CameraView({
   onRetry,
   onToggleFacing,
   overlayStatus,
+  overlay,
 }: CameraViewProps) {
   const isActive = status === 'active'
   const isBusy = status === 'requesting'
@@ -55,6 +59,8 @@ export function CameraView({
         muted
         aria-label="Video de la camara"
       />
+
+      {isActive && overlay}
 
       {!isActive && (
         <div className="camera-view__state">

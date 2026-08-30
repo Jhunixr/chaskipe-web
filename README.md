@@ -1,8 +1,8 @@
 # Frontend — Chaski Pe
 
 Aplicacion movil (mobile first) construida con **React + TypeScript + Vite** y
-**React Router**. Estado actual: **FASE 2 — camara del dispositivo integrada**
-(sin MediaPipe ni IA todavia).
+**React Router**. Estado actual: **FASE 3 — deteccion de manos con MediaPipe**
+(sin modelo de IA ni reconocimiento de senas todavia).
 
 ## Requisitos
 
@@ -28,16 +28,18 @@ src/
 ├── components/
 │   ├── layout/        # AppLayout, BottomNav, FlowHeader
 │   ├── brand/         # Logo, Mascot, Mountains (identidad visual)
-│   ├── camera/        # CameraView (video en vivo, getUserMedia)
+│   ├── camera/        # CameraView (video), HandOverlay (landmarks)
 │   ├── avatar/        # AvatarView (sin Three.js todavia)
 │   └── ui/            # Button, Card, Icon, PageHeader, Stepper, Toggle,
 │                      # TextInput, PasswordInput, DemoBadge
 ├── pages/             # una carpeta de archivos por pantalla
-├── hooks/             # useCamera (getUserMedia), useSpeech, useTextScale
-├── services/          # mockData (datos de ejemplo)
-├── types/             # tipos de dominio
+├── hooks/             # useCamera, useHandLandmarker, useSpeech, useTextScale
+├── services/          # mockData, handLandmarker (carga de MediaPipe)
+├── types/             # tipos de dominio, handLandmarks
 ├── utils/             # formato de fechas / etiquetas
 └── styles/            # theme.css + utilities.css
+
+public/mediapipe/      # runtime wasm + modelo hand_landmarker.task (ver README ahi)
 ```
 
 ## Identidad visual
@@ -89,13 +91,27 @@ Configuracion **estricta** (`strict: true` + `noUncheckedIndexedAccess`,
 - La camara frontal se muestra en espejo.
 - Requiere `localhost` o HTTPS (requisito de `getUserMedia`).
 
+## Deteccion de manos (FASE 3)
+
+- `@mediapipe/tasks-vision` con **Hand Landmarker** (21 puntos por mano, 2 manos).
+- Assets locales en `public/mediapipe/` (wasm + `hand_landmarker.task`),
+  ver `public/mediapipe/README.md`. Funciona offline.
+- `useHandLandmarker`: carga el modelo y corre `detectForVideo` en un bucle
+  de `requestAnimationFrame` sobre el `<video>`.
+- `HandOverlay`: `<canvas>` que dibuja los landmarks sobre el video
+  (con el mismo espejo que la camara frontal).
+- En **Senas a texto** se muestra el estado: "Cargando detector...",
+  "Muestra las manos", "1/2 manos detectadas".
+- Primera carga: ~19 MB (wasm 11 MB + modelo 7.6 MB), luego queda en cache.
+
 ## Alcance actual
 
-- **No** hay MediaPipe, extraccion de landmarks ni modelo de IA. El boton
-  "Analizar sena" produce un resultado **DEMO** simulado.
+- **No** hay modelo de IA ni reconocimiento de senas. MediaPipe solo entrega
+  la posicion de las manos; el boton "Analizar sena" produce un resultado
+  **DEMO** simulado. El modelo llega en la FASE 5.
 - **No** hay autenticacion real: login/registro son de demostracion.
 - **No** hay backend ni avatar 3D.
-- Funciona de verdad: navegacion, camara en vivo, lectura por voz
-  (Web Speech API) y el ajuste de tamano de texto.
+- Funciona de verdad: navegacion, camara en vivo, deteccion de manos,
+  lectura por voz (Web Speech API) y el ajuste de tamano de texto.
 - Los datos de senas LSP son **DEMO** y estan marcados como tales; deben
   validarse con personas usuarias de LSP o interpretes.
