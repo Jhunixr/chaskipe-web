@@ -3,7 +3,8 @@ import { useCallback, useMemo, useState } from 'react'
 import { Mascot } from '@/components/brand'
 import { Icon, PageHeader } from '@/components/ui'
 import { useApiResource } from '@/hooks/useApiResource'
-import { deleteHistory, getHistory } from '@/services/api'
+import { useBackendHealth } from '@/hooks/useBackendHealth'
+import { deleteHistory, getHistory, persistenceNote } from '@/services/api'
 import { HISTORY_ENTRIES } from '@/services/mockData'
 import { directionLabel, formatDateTime } from '@/utils/format'
 
@@ -22,6 +23,7 @@ export function HistoryPage() {
     HISTORY_ENTRIES,
   )
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const health = useBackendHealth()
   // Momento de referencia para el filtro por rango (estable en el render).
   const [mountedAt] = useState(() => Date.now())
 
@@ -126,9 +128,7 @@ export function HistoryPage() {
 
       <p className="demo-note">
         <Icon name="shield" size={14} />
-        {source === 'api'
-          ? 'Historial guardado en el servidor (en memoria; se pierde al reiniciar el backend).'
-          : 'Sin conexion con el servidor: se muestran datos de ejemplo.'}
+        {persistenceNote(source, health.persistence)}
       </p>
     </div>
   )

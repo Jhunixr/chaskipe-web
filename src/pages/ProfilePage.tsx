@@ -12,7 +12,8 @@ import {
   TextInput,
 } from '@/components/ui'
 import { useApiResource } from '@/hooks/useApiResource'
-import { getProfile, updateProfile } from '@/services/api'
+import { useBackendHealth } from '@/hooks/useBackendHealth'
+import { getProfile, persistenceNote, updateProfile } from '@/services/api'
 import { DEMO_USER } from '@/services/mockData'
 
 import './ProfilePage.css'
@@ -34,6 +35,7 @@ export function ProfilePage() {
   const navigate = useNavigate()
   const fetcher = useCallback(() => getProfile(), [])
   const { data: profile, source, refetch } = useApiResource(fetcher, DEMO_USER)
+  const health = useBackendHealth()
 
   const [editing, setEditing] = useState(false)
   const [name, setName] = useState('')
@@ -54,7 +56,11 @@ export function ProfilePage() {
     setSaving(false)
     setEditing(false)
     if (res.source === 'api') {
-      setSavedNote('Perfil guardado en el servidor.')
+      setSavedNote(
+        health.persistence === 'postgresql'
+          ? 'Perfil guardado en el servidor (PostgreSQL).'
+          : 'Perfil guardado en el servidor.',
+      )
       refetch()
     } else {
       setSavedNote('Sin conexion: el cambio no se guardo en el servidor.')
@@ -153,9 +159,7 @@ export function ProfilePage() {
 
       <p className="demo-note">
         <Icon name="shield" size={14} />
-        {source === 'api'
-          ? 'Perfil sincronizado con el servidor (en memoria; se pierde al reiniciar el backend).'
-          : 'Sin conexion con el servidor: se muestra un perfil de ejemplo.'}
+        {persistenceNote(source, health.persistence)}
       </p>
     </div>
   )

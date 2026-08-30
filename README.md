@@ -1,8 +1,8 @@
 # Frontend — Chaski Pe
 
 Aplicacion movil (mobile first) construida con **React + TypeScript + Vite** y
-**React Router**. Estado actual: **FASE 7 — conectado al backend FastAPI**
-(perfil, historial, frases; con fallback a datos de ejemplo si no hay backend).
+**React Router**. Estado actual: **FASE 8 — conectado al backend (PostgreSQL)**
+para perfil, historial y frases; con fallback a datos de ejemplo si no hay backend.
 
 ## Requisitos
 

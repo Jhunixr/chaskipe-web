@@ -195,7 +195,14 @@ export function getConversationMessages() {
 
 // ---- Salud del backend ----
 
-export async function checkBackend(): Promise<boolean> {
+export type Persistence = 'postgresql' | 'memory' | 'unknown'
+
+export interface BackendHealth {
+  online: boolean
+  persistence: Persistence
+}
+
+export async function checkBackend(): Promise<BackendHealth> {
   try {
     const controller = new AbortController()
     const timer = window.setTimeout(() => controller.abort(), 2000)
@@ -203,8 +210,25 @@ export async function checkBackend(): Promise<boolean> {
       signal: controller.signal,
     })
     window.clearTimeout(timer)
-    return res.ok
+    if (!res.ok) return { online: false, persistence: 'unknown' }
+    const body = (await res.json()) as { persistence?: string }
+    const p =
+      body.persistence === 'postgresql' || body.persistence === 'memory'
+        ? body.persistence
+        : 'unknown'
+    return { online: true, persistence: p }
   } catch {
-    return false
+    return { online: false, persistence: 'unknown' }
   }
+}
+
+/** Frase para el aviso segun donde persisten los datos. */
+export function persistenceNote(source: Source, p: Persistence): string {
+  if (source === 'mock') {
+    return 'Sin conexion con el servidor: se muestran datos de ejemplo.'
+  }
+  if (p === 'postgresql') {
+    return 'Datos guardados en el servidor (PostgreSQL).'
+  }
+  return 'Datos guardados en el servidor (en memoria; se pierden al reiniciar el backend).'
 }
