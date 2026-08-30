@@ -120,19 +120,21 @@ Configuracion **estricta** (`strict: true` + `noUncheckedIndexedAccess`,
 - El JSON descargado se mueve a mano a `ai/data/raw/<ETIQUETA>/`.
 - `useHandLandmarker` acepta `onFrame` para acumular la secuencia grabada.
 
-## Reconocimiento de senas (FASE 5 + 6)
+## Reconocimiento de senas en tiempo real (FASE 5 + 6)
 
-- `signFeatures.ts` (= `ai/scripts/features.py`, verificado < 1e-6) resume la
-  grabacion en 381 features.
+- `signFeatures.ts` (= `ai/scripts/features.py`, verificado < 1e-6) resume una
+  ventana de landmarks en 381 features.
 - `signModel.ts` carga `public/models/sign/{model,scaler,labels}.json` y hace la
   inferencia **en el navegador** (MLP pequeno = multiplicacion de matrices, sin
   TensorFlow.js).
-- `useSignRecognition` orquesta: grabar ~2 s de landmarks -> features ->
-  prediccion, con umbral de confianza (60%) y comprobacion de manos (>=40% de
-  los frames).
-- **Senas a texto**: "Analizar sena" graba, reconoce y muestra la palabra +
-  confianza. Estados: "Grabando...", "Reconociendo...", "No estoy seguro (X%)",
-  "No se vieron las manos". La palabra pasa a la pantalla de resultado.
+- `useSignRecognition`: **analisis continuo**. Ventana deslizante de 2 s,
+  prediccion cada ~300 ms. Muestra el candidato en vivo y lo **confirma** cuando
+  la misma clase se mantiene >= 0.6 s por encima del 60 % de confianza. Tras
+  confirmar, pausa ~1.2 s para no repetir la misma sena.
+- **Senas a texto**: sin boton de disparo. Estados: "Muestra las manos",
+  "<sena>..." (candidato, con barra de "manten la sena"), "Reconocido: <sena>".
+  Botones: "Pausar analisis" / "Reanudar" / "Ver resultado" / "Reconocer otra".
+- La sena confirmada pasa a la pantalla de resultado (con voz).
 - El modelo se genera con los scripts de `ai/` (ver `ai/README.md`). Si no
   existe, la pantalla lo avisa.
 

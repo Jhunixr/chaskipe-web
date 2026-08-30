@@ -18,26 +18,27 @@ import './SignToTextPage.css'
 import './pages.css'
 
 /**
- * FASE 6: la camara y MediaPipe detectan las manos y "Analizar sena" ejecuta
- * el modelo (MLP) sobre ~2 s de landmarks.
+ * FASE 6: reconocimiento EN TIEMPO REAL.
  *
- * El modelo actual esta entrenado con datos SINTETICOS: no reconoce senas
- * reales. Se avisa en pantalla. El modelo real necesita un dataset validado
- * con personas usuarias de LSP o interpretes.
+ * La camara + MediaPipe alimentan una ventana deslizante de landmarks; el
+ * modelo (MLP) se ejecuta varias veces por segundo. El candidato se muestra en
+ * vivo y se confirma cuando se mantiene estable ~0.6 s.
+ *
+ * El modelo actual esta entrenado con datos SINTETICOS: reconoce, pero no son
+ * senas reales. Se avisa en pantalla.
  */
 export function SignToTextPage() {
   const navigate = useNavigate()
   const camera = useCamera('user')
   const recog = useSignRecognition()
 
-  // Alimenta cada frame de MediaPipe al reconocedor mientras graba.
   const handleFrame = useCallback(
     (frame: HandFrame) => recog.pushFrame(frame),
     [recog],
   )
   const hands = useHandLandmarker({ onFrame: handleFrame })
 
-  // Activar camara + modelos una sola vez al entrar.
+  // Activar camara + modelos una sola vez.
   const startedRef = useRef(false)
   useEffect(() => {
     if (startedRef.current) return
@@ -47,7 +48,7 @@ export function SignToTextPage() {
     recog.loadModel()
   }, [camera, hands, recog])
 
-  // Iniciar la deteccion de manos cuando la camara esta activa.
+  // Iniciar deteccion de manos cuando la camara esta activa.
   const detStartedRef = useRef(false)
   useEffect(() => {
     if (camera.status !== 'active' || detStartedRef.current) return
@@ -57,24 +58,30 @@ export function SignToTextPage() {
     hands.start(video)
   }, [camera.status, camera.videoRef, hands])
 
-  const cameraReady = camera.status === 'active'
-  const detectorRunning = hands.status === 'running'
+  // Arrancar el analisis en vivo cuando camara + detector + modelo estan listos.
+  const watchStartedRef = useRef(false)
+  useEffect(() => {
+    const ready =
+      camera.status === 'active' &&
+      hands.status === 'running' &&
+      (recog.phase === 'watching' || recog.phase === 'candidate')
+    if (ready && !watchStartedRef.current) {
+      watchStartedRef.current = true
+      recog.startWatching()
+    }
+  }, [camera.status, hands.status, recog])
+
   const modelMissing = recog.phase === 'model-missing'
-
-  const done = recog.phase === 'done' || recog.phase === 'low-confidence'
-  const result = recog.result
-  const detectedText =
-    done && result && recog.phase === 'done' ? phraseForLabel(result.label) : ''
-
-  const handleAnalyze = () => recog.start()
+  const confirmed = recog.confirmed
+  const candidate = recog.candidate
 
   const goToResult = () => {
-    if (!result) return
+    if (!confirmed) return
     const payload: RecognitionResult = {
-      label: result.label,
-      text: phraseForLabel(result.label),
-      confidence: result.confidence,
-      isSynthetic: result.isSynthetic,
+      label: confirmed.label,
+      text: phraseForLabel(confirmed.label),
+      confidence: confirmed.confidence,
+      isSynthetic: confirmed.isSynthetic,
       at: Date.now(),
     }
     saveRecognition(payload)
@@ -82,24 +89,19 @@ export function SignToTextPage() {
   }
 
   let overlayStatus: string | undefined
-  if (recog.phase === 'recording') {
-    overlayStatus = 'Grabando la sena...'
-  } else if (recog.phase === 'predicting') {
-    overlayStatus = 'Reconociendo...'
-  } else if (cameraReady && recog.phase === 'loading-model') {
+  if (recog.phase === 'confirmed' && confirmed) {
+    overlayStatus = `Reconocido: ${phraseForLabel(confirmed.label)}`
+  } else if (recog.phase === 'candidate' && candidate) {
+    overlayStatus = `${phraseForLabel(candidate.label)}...`
+  } else if (recog.phase === 'watching') {
+    overlayStatus = hands.handCount > 0 ? 'Analizando...' : 'Muestra las manos'
+  } else if (recog.phase === 'paused') {
+    overlayStatus = 'En pausa'
+  } else if (recog.phase === 'loading-model') {
     overlayStatus = 'Cargando modelo...'
-  } else if (detectorRunning && hands.handCount > 0) {
-    overlayStatus =
-      hands.handCount === 1 ? '1 mano detectada' : '2 manos detectadas'
-  } else if (detectorRunning) {
-    overlayStatus = 'Muestra las manos'
-  } else if (cameraReady && hands.status === 'loading') {
+  } else if (camera.status === 'active' && hands.status === 'loading') {
     overlayStatus = 'Cargando detector...'
   }
-
-  const busy = recog.phase === 'recording' || recog.phase === 'predicting'
-  const canAnalyze =
-    cameraReady && detectorRunning && !busy && !modelMissing
 
   return (
     <div className="page sign-to-text">
@@ -119,18 +121,6 @@ export function SignToTextPage() {
           <HandOverlay frame={hands.frame} mirrored={camera.facing === 'user'} />
         }
       />
-
-      {recog.phase === 'recording' && (
-        <div
-          className="sign-to-text__progress"
-          role="progressbar"
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-valuenow={Math.round(recog.progress * 100)}
-        >
-          <span style={{ width: `${recog.progress * 100}%` }} />
-        </div>
-      )}
 
       {hands.status === 'error' && (
         <p className="disclaimer-note">
@@ -157,27 +147,47 @@ export function SignToTextPage() {
       <section className="sign-to-text__panel">
         <span className="section-title">Texto detectado</span>
         <p className="sign-to-text__text">
-          {detectedText ? (
-            detectedText
+          {recog.phase === 'confirmed' && confirmed ? (
+            phraseForLabel(confirmed.label)
+          ) : recog.phase === 'candidate' && candidate ? (
+            <span className="sign-to-text__candidate">
+              {phraseForLabel(candidate.label)}
+            </span>
           ) : (
             <span className="text-muted">
-              {recog.phase === 'recording'
-                ? 'Haz la sena ahora...'
-                : recog.phase === 'predicting'
-                  ? 'Analizando...'
-                  : recog.phase === 'no-hands'
-                    ? 'No se vieron las manos. Intenta de nuevo.'
-                    : recog.phase === 'low-confidence'
-                      ? `No estoy seguro (${result ? Math.round(result.confidence * 100) : 0}%). Repite la sena.`
-                      : 'Aun no hay texto'}
+              {recog.phase === 'paused'
+                ? 'Analisis en pausa'
+                : recog.phase === 'watching'
+                  ? hands.handCount > 0
+                    ? 'Analizando...'
+                    : 'Muestra las manos a la camara'
+                  : 'Preparando...'}
             </span>
           )}
         </p>
 
-        {recog.phase === 'done' && result && (
+        {recog.phase === 'candidate' && candidate && (
+          <>
+            <div
+              className="sign-to-text__hold"
+              role="progressbar"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={Math.round(recog.holdProgress * 100)}
+              aria-label="Confirmando sena"
+            >
+              <span style={{ width: `${recog.holdProgress * 100}%` }} />
+            </div>
+            <p className="sign-to-text__confidence text-xs text-muted">
+              Manten la sena · {Math.round(candidate.confidence * 100)}%
+            </p>
+          </>
+        )}
+
+        {recog.phase === 'confirmed' && confirmed && (
           <p className="sign-to-text__confidence text-xs text-muted">
-            Confianza {Math.round(result.confidence * 100)}%
-            {result.isSynthetic ? ' · modelo de prueba (datos sinteticos)' : ''}
+            Confianza {Math.round(confirmed.confidence * 100)}%
+            {confirmed.isSynthetic ? ' · modelo de prueba (datos sinteticos)' : ''}
           </p>
         )}
       </section>
@@ -189,36 +199,31 @@ export function SignToTextPage() {
         vocabulario debe validarse con personas usuarias o interpretes.
       </p>
 
-      {recog.phase === 'done' && result ? (
+      {recog.phase === 'confirmed' && confirmed ? (
         <div className="stack-sm">
           <Button size="lg" fullWidth icon="check" onClick={goToResult}>
             Ver resultado
           </Button>
-          <Button variant="ghost" fullWidth icon="refresh" onClick={recog.reset}>
-            Nueva sena
+          <Button variant="ghost" fullWidth icon="refresh" onClick={recog.resume}>
+            Reconocer otra sena
           </Button>
         </div>
-      ) : recog.phase === 'low-confidence' || recog.phase === 'no-hands' ? (
-        <Button size="lg" fullWidth icon="refresh" onClick={handleAnalyze}>
-          Reintentar
+      ) : recog.phase === 'paused' ? (
+        <Button size="lg" fullWidth icon="camera" onClick={recog.resume}>
+          Reanudar analisis
         </Button>
       ) : (
         <Button
-          size="lg"
+          variant="secondary"
           fullWidth
-          icon="hands"
-          onClick={handleAnalyze}
-          disabled={!canAnalyze}
+          icon="pause"
+          onClick={recog.pause}
+          disabled={
+            modelMissing ||
+            !(recog.phase === 'watching' || recog.phase === 'candidate')
+          }
         >
-          {recog.phase === 'recording'
-            ? 'Grabando...'
-            : recog.phase === 'predicting'
-              ? 'Analizando...'
-              : modelMissing
-                ? 'Modelo no disponible'
-                : canAnalyze
-                  ? 'Analizar sena'
-                  : 'Preparando camara y modelo...'}
+          Pausar analisis
         </Button>
       )}
     </div>

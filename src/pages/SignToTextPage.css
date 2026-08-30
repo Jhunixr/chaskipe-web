@@ -20,19 +20,23 @@
   margin-top: calc(var(--space-1) * -1);
 }
 
-.sign-to-text__progress {
+.sign-to-text__candidate {
+  color: var(--color-primary);
+}
+
+.sign-to-text__hold {
   height: 8px;
   border-radius: var(--radius-pill);
   background: var(--color-surface-alt);
   overflow: hidden;
 }
 
-.sign-to-text__progress span {
+.sign-to-text__hold span {
   display: block;
   height: 100%;
   background: var(--color-primary);
   border-radius: var(--radius-pill);
-  transition: width 0.1s linear;
+  transition: width 0.15s linear;
 }
 
 .sign-to-text code {

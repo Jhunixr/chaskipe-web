@@ -58,7 +58,9 @@ export interface SignPrediction {
   isSynthetic: boolean
 }
 
-const BASE = `${import.meta.env.BASE_URL}models/sign`
+const BASE_URL =
+  typeof import.meta.env?.BASE_URL === 'string' ? import.meta.env.BASE_URL : '/'
+const BASE = `${BASE_URL}models/sign`
 
 interface LoadedModel {
   model: ModelJson
