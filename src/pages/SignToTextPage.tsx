@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { ROUTES } from '@/app/routes'
-import { CameraPlaceholder } from '@/components/camera/CameraPlaceholder'
+import { CameraView } from '@/components/camera'
 import { Button, Icon, PageHeader } from '@/components/ui'
+import { useCamera } from '@/hooks/useCamera'
 import { useSpeech } from '@/hooks/useSpeech'
 import { DEMO_RESULT } from '@/services/mockData'
 import type { RecognitionStatus } from '@/types'
@@ -12,15 +13,26 @@ import './SignToTextPage.css'
 import './pages.css'
 
 /**
- * FASE 1: interfaz unicamente. No hay acceso a la camara ni a MediaPipe.
- * "Analizar sena" simula el cambio de estado para revisar la UI.
+ * FASE 2: la camara ya funciona (video en vivo).
+ * El reconocimiento sigue simulado: "Analizar sena" produce un resultado DEMO.
+ * MediaPipe y el modelo de IA llegan en fases posteriores.
  */
 export function SignToTextPage() {
   const navigate = useNavigate()
+  const camera = useCamera('user')
   const [status, setStatus] = useState<RecognitionStatus>('idle')
   const { speak, speaking, cancel, supported } = useSpeech()
 
+  // Activar la camara una sola vez al entrar a la pantalla.
+  const startedRef = useRef(false)
+  useEffect(() => {
+    if (startedRef.current) return
+    startedRef.current = true
+    camera.start()
+  }, [camera])
+
   const detectedText = status === 'recognized' ? DEMO_RESULT.text : ''
+  const cameraReady = camera.status === 'active'
 
   const handleAnalyze = () => {
     setStatus('recognizing')
@@ -31,9 +43,16 @@ export function SignToTextPage() {
     <div className="page sign-to-text">
       <PageHeader title="Senas a texto" />
 
-      <CameraPlaceholder
-        status={status === 'recognizing' ? 'Reconociendo...' : undefined}
-        showLandmarks={status !== 'idle'}
+      <CameraView
+        status={camera.status}
+        errorMessage={camera.errorMessage}
+        facing={camera.facing}
+        canSwitch={camera.canSwitch}
+        videoRef={camera.videoRef}
+        onStart={camera.start}
+        onRetry={camera.start}
+        onToggleFacing={camera.toggleFacing}
+        overlayStatus={status === 'recognizing' ? 'Reconociendo...' : undefined}
       />
 
       <section className="sign-to-text__panel">
@@ -80,7 +99,12 @@ export function SignToTextPage() {
           >
             Ver resultado
           </Button>
-          <Button variant="ghost" fullWidth icon="refresh" onClick={() => setStatus('idle')}>
+          <Button
+            variant="ghost"
+            fullWidth
+            icon="refresh"
+            onClick={() => setStatus('idle')}
+          >
             Nueva sena
           </Button>
         </div>
@@ -90,9 +114,13 @@ export function SignToTextPage() {
           fullWidth
           icon="hands"
           onClick={handleAnalyze}
-          disabled={status === 'recognizing'}
+          disabled={status === 'recognizing' || !cameraReady}
         >
-          {status === 'recognizing' ? 'Analizando...' : 'Analizar sena'}
+          {status === 'recognizing'
+            ? 'Analizando...'
+            : cameraReady
+              ? 'Analizar sena'
+              : 'Activa la camara para analizar'}
         </Button>
       )}
     </div>

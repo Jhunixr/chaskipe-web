@@ -1,7 +1,8 @@
 # Frontend — Chaski Pe
 
 Aplicacion movil (mobile first) construida con **React + TypeScript + Vite** y
-**React Router**. Estado actual: **FASE 1 — estructura, identidad visual y pantallas base**.
+**React Router**. Estado actual: **FASE 2 — camara del dispositivo integrada**
+(sin MediaPipe ni IA todavia).
 
 ## Requisitos
 
@@ -27,12 +28,12 @@ src/
 ├── components/
 │   ├── layout/        # AppLayout, BottomNav, FlowHeader
 │   ├── brand/         # Logo, Mascot, Mountains (identidad visual)
-│   ├── camera/        # CameraPlaceholder (sin camara real todavia)
+│   ├── camera/        # CameraView (video en vivo, getUserMedia)
 │   ├── avatar/        # AvatarView (sin Three.js todavia)
 │   └── ui/            # Button, Card, Icon, PageHeader, Stepper, Toggle,
 │                      # TextInput, PasswordInput, DemoBadge
 ├── pages/             # una carpeta de archivos por pantalla
-├── hooks/             # useSpeech (Web Speech API), useTextScale
+├── hooks/             # useCamera (getUserMedia), useSpeech, useTextScale
 ├── services/          # mockData (datos de ejemplo)
 ├── types/             # tipos de dominio
 ├── utils/             # formato de fechas / etiquetas
@@ -78,11 +79,23 @@ Las imagenes reales van en `src/assets/mascot/`. Sin ellas, `<Mascot />` y
 Configuracion **estricta** (`strict: true` + `noUncheckedIndexedAccess`,
 `exactOptionalPropertyTypes`, etc.). Evitar `any`.
 
-## Alcance FASE 1
+## Camara (FASE 2)
 
-- Solo interfaz. **No** hay camara real, MediaPipe, IA, backend ni avatar 3D.
+- `useCamera` abre la camara del dispositivo con `getUserMedia` (video, sin audio).
+- `CameraView` muestra el video en vivo en **Preparar camara** y **Senas a texto**.
+- Maneja: permiso pendiente, permiso denegado, sin camara, camara ocupada,
+  navegador no compatible; con boton "Reintentar".
+- Alterna camara frontal/trasera si el dispositivo tiene mas de una.
+- La camara frontal se muestra en espejo.
+- Requiere `localhost` o HTTPS (requisito de `getUserMedia`).
+
+## Alcance actual
+
+- **No** hay MediaPipe, extraccion de landmarks ni modelo de IA. El boton
+  "Analizar sena" produce un resultado **DEMO** simulado.
 - **No** hay autenticacion real: login/registro son de demostracion.
-- Funciona de verdad: navegacion, lectura por voz (Web Speech API del
-  navegador) y el ajuste de tamano de texto.
+- **No** hay backend ni avatar 3D.
+- Funciona de verdad: navegacion, camara en vivo, lectura por voz
+  (Web Speech API) y el ajuste de tamano de texto.
 - Los datos de senas LSP son **DEMO** y estan marcados como tales; deben
   validarse con personas usuarias de LSP o interpretes.

@@ -1,8 +1,9 @@
 import { useNavigate } from 'react-router-dom'
 
 import { ROUTES } from '@/app/routes'
-import { CameraPlaceholder } from '@/components/camera/CameraPlaceholder'
+import { CameraView } from '@/components/camera'
 import { Button, Card, Icon, type IconName, PageHeader } from '@/components/ui'
+import { useCamera } from '@/hooks/useCamera'
 
 import './pages.css'
 
@@ -17,14 +18,28 @@ const RECOMMENDATIONS: Recommendation[] = [
   { text: 'Manten el rostro visible', icon: 'user' },
 ]
 
+/**
+ * FASE 2: permite probar la camara real antes de empezar.
+ * Sin MediaPipe ni deteccion todavia.
+ */
 export function CameraPreparationPage() {
   const navigate = useNavigate()
+  const camera = useCamera('user')
 
   return (
     <div className="page">
       <PageHeader title="Antes de comenzar" />
 
-      <CameraPlaceholder />
+      <CameraView
+        status={camera.status}
+        errorMessage={camera.errorMessage}
+        facing={camera.facing}
+        canSwitch={camera.canSwitch}
+        videoRef={camera.videoRef}
+        onStart={camera.start}
+        onRetry={camera.start}
+        onToggleFacing={camera.toggleFacing}
+      />
 
       <Card>
         <ul className="recommendation-list">
@@ -45,8 +60,8 @@ export function CameraPreparationPage() {
       </Card>
 
       <p className="demo-note">
-        La camara todavia no esta activa en esta version. Esta pantalla solo
-        muestra la preparacion.
+        La camara ya funciona, pero el reconocimiento de senas (MediaPipe e IA)
+        se agrega en fases posteriores.
       </p>
 
       <div className="stack-sm">
@@ -54,7 +69,10 @@ export function CameraPreparationPage() {
           size="lg"
           fullWidth
           icon="camera"
-          onClick={() => navigate(ROUTES.signToText)}
+          onClick={() => {
+            camera.stop()
+            navigate(ROUTES.signToText)
+          }}
         >
           Abrir camara
         </Button>
