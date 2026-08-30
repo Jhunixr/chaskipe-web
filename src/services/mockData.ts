@@ -117,12 +117,6 @@ export const CONVERSATION_MESSAGES: ConversationMessage[] = [
   },
 ]
 
-/** Resultado de ejemplo mostrado en la pantalla de resultado de traduccion. */
-export const DEMO_RESULT = {
-  text: 'Necesito ayuda',
-  isDemo: true,
-} as const
-
 /** Frase entrante de ejemplo en el flujo "texto a senas". */
 export const DEMO_INCOMING_PROMPT = '¿Como estas?'
 

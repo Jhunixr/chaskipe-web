@@ -166,11 +166,14 @@ export async function predictSign(frames: HandFrame[]): Promise<SignPrediction> 
   }
 }
 
-/** true si hay un modelo exportado disponible (comprueba model.json). */
+/**
+ * true si hay un modelo exportado disponible.
+ * Intenta cargarlo del todo (queda cacheado para `predictSign`).
+ */
 export async function signModelAvailable(): Promise<boolean> {
   try {
-    const r = await fetch(`${BASE}/model.json`, { method: 'HEAD' })
-    return r.ok
+    await loadSignModel()
+    return true
   } catch {
     return false
   }

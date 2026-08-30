@@ -1,8 +1,9 @@
 # Frontend — Chaski Pe
 
 Aplicacion movil (mobile first) construida con **React + TypeScript + Vite** y
-**React Router**. Estado actual: **FASE 4 — captura de dataset de landmarks**
-(sin modelo de IA ni reconocimiento de senas todavia).
+**React Router**. Estado actual: **FASE 6 — el modelo de IA esta conectado a
+"Senas a texto"** (modelo de prueba con datos sinteticos; aun no reconoce
+senas reales).
 
 ## Requisitos
 
@@ -33,13 +34,16 @@ src/
 │   └── ui/            # Button, Card, Icon, PageHeader, Stepper, Toggle,
 │                      # TextInput, PasswordInput, DemoBadge
 ├── pages/             # una carpeta de archivos por pantalla
-├── hooks/             # useCamera, useHandLandmarker, useSpeech, useTextScale
-├── services/          # mockData, handLandmarker (carga de MediaPipe)
-├── types/             # tipos de dominio, handLandmarks
+├── hooks/             # useCamera, useHandLandmarker, useSignRecognition,
+│                      # useSpeech, useTextScale
+├── services/          # handLandmarker (MediaPipe), signFeatures + signModel
+│                      # (clasificador MLP en el navegador), recognition, mockData
+├── types/             # tipos de dominio, handLandmarks, dataset
 ├── utils/             # formato de fechas / etiquetas
 └── styles/            # theme.css + utilities.css
 
 public/mediapipe/      # runtime wasm + modelo hand_landmarker.task (ver README ahi)
+public/models/sign/    # modelo de reconocimiento de senas exportado (ver README ahi)
 ```
 
 ## Identidad visual
@@ -116,14 +120,31 @@ Configuracion **estricta** (`strict: true` + `noUncheckedIndexedAccess`,
 - El JSON descargado se mueve a mano a `ai/data/raw/<ETIQUETA>/`.
 - `useHandLandmarker` acepta `onFrame` para acumular la secuencia grabada.
 
+## Reconocimiento de senas (FASE 5 + 6)
+
+- `signFeatures.ts` (= `ai/scripts/features.py`, verificado < 1e-6) resume la
+  grabacion en 381 features.
+- `signModel.ts` carga `public/models/sign/{model,scaler,labels}.json` y hace la
+  inferencia **en el navegador** (MLP pequeno = multiplicacion de matrices, sin
+  TensorFlow.js).
+- `useSignRecognition` orquesta: grabar ~2 s de landmarks -> features ->
+  prediccion, con umbral de confianza (60%) y comprobacion de manos (>=40% de
+  los frames).
+- **Senas a texto**: "Analizar sena" graba, reconoce y muestra la palabra +
+  confianza. Estados: "Grabando...", "Reconociendo...", "No estoy seguro (X%)",
+  "No se vieron las manos". La palabra pasa a la pantalla de resultado.
+- El modelo se genera con los scripts de `ai/` (ver `ai/README.md`). Si no
+  existe, la pantalla lo avisa.
+
 ## Alcance actual
 
-- **No** hay modelo de IA ni reconocimiento de senas. MediaPipe solo entrega
-  la posicion de las manos; el boton "Analizar sena" produce un resultado
-  **DEMO** simulado. El modelo llega en la FASE 5.
+- **El modelo actual esta entrenado con datos SINTETICOS**: reconoce, pero no
+  son senas reales. `labels.json` lo marca (`includesSynthetic: true`) y la
+  pantalla lo avisa. El modelo real necesita un dataset validado con personas
+  usuarias de LSP o interpretes.
 - **No** hay autenticacion real: login/registro son de demostracion.
 - **No** hay backend ni avatar 3D.
 - Funciona de verdad: navegacion, camara en vivo, deteccion de manos,
-  lectura por voz (Web Speech API) y el ajuste de tamano de texto.
-- Los datos de senas LSP son **DEMO** y estan marcados como tales; deben
-  validarse con personas usuarias de LSP o interpretes.
+  reconocimiento con el MLP, lectura por voz (Web Speech API), ajuste de texto.
+- Las equivalencias texto <-> sena son **demostrativas**; deben validarse con
+  personas usuarias de LSP o interpretes.

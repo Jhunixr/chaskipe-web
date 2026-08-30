@@ -16,6 +16,32 @@
   min-height: 2.4rem;
 }
 
+.sign-to-text__confidence {
+  margin-top: calc(var(--space-1) * -1);
+}
+
+.sign-to-text__progress {
+  height: 8px;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-alt);
+  overflow: hidden;
+}
+
+.sign-to-text__progress span {
+  display: block;
+  height: 100%;
+  background: var(--color-primary);
+  border-radius: var(--radius-pill);
+  transition: width 0.1s linear;
+}
+
+.sign-to-text code {
+  font-size: 0.85em;
+  background: var(--color-surface-alt);
+  padding: 1px 5px;
+  border-radius: 5px;
+}
+
 .sign-to-text__audio {
   display: flex;
   align-items: center;
