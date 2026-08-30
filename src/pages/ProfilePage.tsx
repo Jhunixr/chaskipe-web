@@ -1,8 +1,18 @@
+import { useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { ROUTES } from '@/app/routes'
 import { Mascot } from '@/components/brand'
-import { Card, Icon, type IconName, PageHeader } from '@/components/ui'
+import {
+  Button,
+  Card,
+  Icon,
+  type IconName,
+  PageHeader,
+  TextInput,
+} from '@/components/ui'
+import { useApiResource } from '@/hooks/useApiResource'
+import { getProfile, updateProfile } from '@/services/api'
 import { DEMO_USER } from '@/services/mockData'
 
 import './ProfilePage.css'
@@ -12,11 +22,9 @@ interface ProfileLink {
   label: string
   to: string
   icon: IconName
-  danger?: boolean
 }
 
 const LINKS: ProfileLink[] = [
-  { label: 'Editar perfil', to: ROUTES.profile, icon: 'edit' },
   { label: 'Preferencias', to: ROUTES.accessibility, icon: 'settings' },
   { label: 'Privacidad y datos', to: ROUTES.help, icon: 'shield' },
   { label: 'Ayuda y tutorial', to: ROUTES.help, icon: 'help' },
@@ -24,6 +32,34 @@ const LINKS: ProfileLink[] = [
 
 export function ProfilePage() {
   const navigate = useNavigate()
+  const fetcher = useCallback(() => getProfile(), [])
+  const { data: profile, source, refetch } = useApiResource(fetcher, DEMO_USER)
+
+  const [editing, setEditing] = useState(false)
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [saving, setSaving] = useState(false)
+  const [savedNote, setSavedNote] = useState<string | null>(null)
+
+  const startEditing = () => {
+    setName(profile.name)
+    setEmail(profile.email)
+    setSavedNote(null)
+    setEditing(true)
+  }
+
+  const handleSave = async () => {
+    setSaving(true)
+    const res = await updateProfile({ name: name.trim(), email: email.trim() })
+    setSaving(false)
+    setEditing(false)
+    if (res.source === 'api') {
+      setSavedNote('Perfil guardado en el servidor.')
+      refetch()
+    } else {
+      setSavedNote('Sin conexion: el cambio no se guardo en el servidor.')
+    }
+  }
 
   return (
     <div className="page profile">
@@ -34,9 +70,60 @@ export function ProfilePage() {
           <Mascot size={88} alt="" />
           <span className="profile__status" />
         </span>
-        <p className="profile__name">{DEMO_USER.name} Flores</p>
-        <p className="text-muted text-sm">{DEMO_USER.email}</p>
+        {!editing && (
+          <>
+            <p className="profile__name">{profile.name}</p>
+            <p className="text-muted text-sm">{profile.email}</p>
+          </>
+        )}
       </div>
+
+      {editing ? (
+        <Card className="stack-sm">
+          <TextInput
+            value={name}
+            onChange={setName}
+            icon="user"
+            label="Nombre"
+            autoComplete="name"
+          />
+          <TextInput
+            value={email}
+            onChange={setEmail}
+            type="email"
+            icon="mail"
+            label="Correo"
+            autoComplete="email"
+          />
+          <div className="profile__edit-actions">
+            <Button
+              icon="check"
+              onClick={handleSave}
+              disabled={saving || name.trim() === '' || email.trim() === ''}
+            >
+              Guardar
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={() => {
+                setEditing(false)
+                setName(profile.name)
+                setEmail(profile.email)
+              }}
+            >
+              Cancelar
+            </Button>
+          </div>
+        </Card>
+      ) : (
+        <Button variant="secondary" fullWidth icon="edit" onClick={startEditing}>
+          Editar perfil
+        </Button>
+      )}
+
+      {savedNote && (
+        <p className="text-xs text-muted text-center">{savedNote}</p>
+      )}
 
       <Card className="card--flat">
         <nav className="list-links" aria-label="Opciones de perfil">
@@ -65,7 +152,10 @@ export function ProfilePage() {
       </button>
 
       <p className="demo-note">
-        Perfil de ejemplo. La edicion y el cierre de sesion aun no persisten datos.
+        <Icon name="shield" size={14} />
+        {source === 'api'
+          ? 'Perfil sincronizado con el servidor (en memoria; se pierde al reiniciar el backend).'
+          : 'Sin conexion con el servidor: se muestra un perfil de ejemplo.'}
       </p>
     </div>
   )

@@ -7,6 +7,7 @@ import { Button, Icon, PageHeader } from '@/components/ui'
 import { useCamera } from '@/hooks/useCamera'
 import { useHandLandmarker } from '@/hooks/useHandLandmarker'
 import { useSignRecognition } from '@/hooks/useSignRecognition'
+import { addHistory } from '@/services/api'
 import {
   phraseForLabel,
   saveRecognition,
@@ -77,14 +78,17 @@ export function SignToTextPage() {
 
   const goToResult = () => {
     if (!confirmed) return
+    const text = phraseForLabel(confirmed.label)
     const payload: RecognitionResult = {
       label: confirmed.label,
-      text: phraseForLabel(confirmed.label),
+      text,
       confidence: confirmed.confidence,
       isSynthetic: confirmed.isSynthetic,
       at: Date.now(),
     }
     saveRecognition(payload)
+    // Guardar en el historial (si el backend no responde, se ignora).
+    void addHistory({ direction: 'sign-to-text', text, isDemo: true })
     navigate(ROUTES.translationResult, { state: payload })
   }
 

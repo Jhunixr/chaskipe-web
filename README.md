@@ -1,9 +1,8 @@
 # Frontend — Chaski Pe
 
 Aplicacion movil (mobile first) construida con **React + TypeScript + Vite** y
-**React Router**. Estado actual: **FASE 6 — el modelo de IA esta conectado a
-"Senas a texto"** (modelo de prueba con datos sinteticos; aun no reconoce
-senas reales).
+**React Router**. Estado actual: **FASE 7 — conectado al backend FastAPI**
+(perfil, historial, frases; con fallback a datos de ejemplo si no hay backend).
 
 ## Requisitos
 
@@ -35,9 +34,10 @@ src/
 │                      # TextInput, PasswordInput, DemoBadge
 ├── pages/             # una carpeta de archivos por pantalla
 ├── hooks/             # useCamera, useHandLandmarker, useSignRecognition,
-│                      # useSpeech, useTextScale
-├── services/          # handLandmarker (MediaPipe), signFeatures + signModel
-│                      # (clasificador MLP en el navegador), recognition, mockData
+│                      # useApiResource, useSpeech, useTextScale
+├── services/          # api (cliente REST con fallback a mock), handLandmarker,
+│                      # signFeatures + signModel (MLP en el navegador),
+│                      # recognition, mockData
 ├── types/             # tipos de dominio, handLandmarks, dataset
 ├── utils/             # formato de fechas / etiquetas
 └── styles/            # theme.css + utilities.css
@@ -138,15 +138,25 @@ Configuracion **estricta** (`strict: true` + `noUncheckedIndexedAccess`,
 - El modelo se genera con los scripts de `ai/` (ver `ai/README.md`). Si no
   existe, la pantalla lo avisa.
 
+## Backend (FASE 7)
+
+- `src/services/api.ts`: cliente REST hacia `VITE_API_URL` (por defecto
+  `http://localhost:8000`). **Fallback a mock**: si el backend no responde en
+  4 s, se usan los datos de ejemplo y la app sigue funcionando.
+- `useApiResource`: hook generico de carga con `refetch`.
+- Conectados: **Historial** (lista, borrar), **Perfil** (ver, editar -> PUT),
+  **Frases rapidas** (lista). Al confirmar una sena se guarda en el historial.
+- Copia `.env.example` a `.env` para cambiar la URL del backend.
+
 ## Alcance actual
 
-- **El modelo actual esta entrenado con datos SINTETICOS**: reconoce, pero no
-  son senas reales. `labels.json` lo marca (`includesSynthetic: true`) y la
-  pantalla lo avisa. El modelo real necesita un dataset validado con personas
-  usuarias de LSP o interpretes.
+- **El modelo esta entrenado con datos SINTETICOS**: reconoce, pero no son
+  senas reales. La pantalla lo avisa. Necesita un dataset validado con LSP.
+- El backend guarda **en memoria**: al reiniciarlo se pierden los cambios.
 - **No** hay autenticacion real: login/registro son de demostracion.
-- **No** hay backend ni avatar 3D.
+- **No** hay avatar 3D.
 - Funciona de verdad: navegacion, camara en vivo, deteccion de manos,
-  reconocimiento con el MLP, lectura por voz (Web Speech API), ajuste de texto.
+  reconocimiento en tiempo real con el MLP, perfil e historial via API,
+  lectura por voz (Web Speech API), ajuste de texto.
 - Las equivalencias texto <-> sena son **demostrativas**; deben validarse con
   personas usuarias de LSP o interpretes.

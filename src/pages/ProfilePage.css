@@ -37,6 +37,11 @@
   margin-top: var(--space-2);
 }
 
+.profile__edit-actions {
+  display: flex;
+  gap: var(--space-3);
+}
+
 .profile__logout {
   display: flex;
   align-items: center;

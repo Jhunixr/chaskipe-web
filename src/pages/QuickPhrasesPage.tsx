@@ -1,7 +1,9 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 
 import { Button, Icon, PageHeader } from '@/components/ui'
+import { useApiResource } from '@/hooks/useApiResource'
 import { useSpeech } from '@/hooks/useSpeech'
+import { getPhraseGroups } from '@/services/api'
 import { QUICK_PHRASE_GROUPS } from '@/services/mockData'
 import type { QuickPhraseCategory } from '@/types'
 
@@ -19,16 +21,21 @@ export function QuickPhrasesPage() {
   const [query, setQuery] = useState('')
   const [selected, setSelected] = useState<string | null>(null)
 
+  const fetcher = useCallback(() => getPhraseGroups(), [])
+  const { data: allGroups } = useApiResource(fetcher, QUICK_PHRASE_GROUPS)
+
   const groups = useMemo(() => {
     const term = query.trim().toLowerCase()
-    if (!term) return QUICK_PHRASE_GROUPS
-    return QUICK_PHRASE_GROUPS.map((group) => ({
-      ...group,
-      phrases: group.phrases.filter((phrase) =>
-        phrase.text.toLowerCase().includes(term),
-      ),
-    })).filter((group) => group.phrases.length > 0)
-  }, [query])
+    if (!term) return allGroups
+    return allGroups
+      .map((group) => ({
+        ...group,
+        phrases: group.phrases.filter((phrase) =>
+          phrase.text.toLowerCase().includes(term),
+        ),
+      }))
+      .filter((group) => group.phrases.length > 0)
+  }, [query, allGroups])
 
   return (
     <div className="page quick-phrases">
