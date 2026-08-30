@@ -1,37 +1,108 @@
-import { Mascot } from '@/components/brand'
+import { lazy, Suspense, useEffect, useImperativeHandle, useRef, useState } from 'react'
+
 import { Icon } from '@/components/ui'
+
+import type { Avatar3DHandle } from './Avatar3D'
 
 import './AvatarView.css'
 
+const Avatar3D = lazy(() =>
+  import('./Avatar3D').then((m) => ({ default: m.Avatar3D })),
+)
+
+export interface AvatarViewHandle {
+  /** Reproduce el gesto DEMO (marcador, no es una sena real). */
+  play: () => void
+  stop: () => void
+}
+
 interface AvatarViewProps {
-  /** Descripcion de la sena/secuencia que el avatar reproduciria. */
+  ref?: React.Ref<AvatarViewHandle>
+  /** Texto que el avatar "representaria" (se muestra como subtitulo). */
   caption?: string | undefined
-  /** Muestra la etiqueta "Mostrando en senas". */
+  /** true mientras reproduce un gesto. */
   playing?: boolean
 }
 
 /**
- * Area reservada para el avatar 3D que reproducira Lengua de Senas Peruana.
+ * Avatar 3D de Chaski Pe (FASE 9).
  *
- * FASE 1: sin Three.js ni modelos GLB/glTF. Solo marcador visual.
- * Las animaciones LSP deben validarse con personas usuarias o interpretes
- * antes de usarse (ver FASE 10).
+ * Escena Three.js con un avatar geometrico en reposo (respira, parpadea) que
+ * puede reproducir un **gesto DEMO**. Ese gesto NO representa ninguna sena de
+ * Lengua de Senas Peruana: es un marcador de posicion. Las animaciones de
+ * senas validadas con personas usuarias de LSP o interpretes son la FASE 10.
+ *
+ * El componente Three.js se carga de forma diferida (React.lazy).
  */
-export function AvatarView({ caption, playing = false }: AvatarViewProps) {
+export function AvatarView({ ref, caption, playing = false }: AvatarViewProps) {
+  const inner = useRef<Avatar3DHandle | null>(null)
+  const [gestureActive, setGestureActive] = useState(false)
+  const autoPlayedRef = useRef(false)
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      play: () => {
+        setGestureActive(true)
+        inner.current?.playDemoGesture()
+      },
+      stop: () => {
+        setGestureActive(false)
+        inner.current?.stop()
+      },
+    }),
+    [],
+  )
+
+  // Dispara el gesto una vez cuando `playing` pasa a true (el modelo 3D
+  // puede tardar en cargar; reintenta hasta que la ref exista).
+  useEffect(() => {
+    if (!playing || autoPlayedRef.current) return
+    const id = window.setInterval(() => {
+      if (inner.current) {
+        autoPlayedRef.current = true
+        setGestureActive(true)
+        inner.current.playDemoGesture()
+        window.clearInterval(id)
+      }
+    }, 120)
+    return () => window.clearInterval(id)
+  }, [playing])
+
+  const showDemo = gestureActive || playing
+
   return (
     <div className="avatar-view">
       <div className="avatar-view__stage">
-        {playing && (
+        {showDemo && (
           <span className="avatar-view__tag">
             <Icon name="hands" size={14} />
-            Mostrando en senas
+            Gesto DEMO · no validado
           </span>
         )}
-        <Mascot size={128} alt="Avatar de Lengua de Senas (vista previa no disponible)" />
+
+        <Suspense
+          fallback={
+            <div className="avatar-view__loading">
+              <span className="avatar-view__spinner" aria-hidden="true" />
+              <span className="text-xs text-muted">Cargando avatar 3D...</span>
+            </div>
+          }
+        >
+          <Avatar3D
+            ref={inner}
+            onGestureEnd={() => setGestureActive(false)}
+          />
+        </Suspense>
+
+        {caption && <p className="avatar-view__caption">{caption}</p>}
       </div>
-      {caption && <p className="avatar-view__caption">{caption}</p>}
-      <p className="avatar-view__note text-xs text-muted">
-        Avatar 3D disponible en una fase posterior
+
+      <p className="demo-note avatar-view__note">
+        <Icon name="shield" size={14} />
+        El avatar aun no representa senas reales. El movimiento es un marcador de
+        posicion; las animaciones de LSP deben validarse con personas usuarias o
+        interpretes.
       </p>
     </div>
   )

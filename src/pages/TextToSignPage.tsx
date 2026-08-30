@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 
-import { AvatarView } from '@/components/avatar/AvatarView'
+import { AvatarView, type AvatarViewHandle } from '@/components/avatar'
 import { FlowHeader } from '@/components/layout'
 import { Button, Card, Icon } from '@/components/ui'
+import { addHistory } from '@/services/api'
 import { useSpeech } from '@/hooks/useSpeech'
 import { DEMO_INCOMING_PROMPT, DEMO_REPLY_TEXT } from '@/services/mockData'
 
@@ -12,13 +13,21 @@ import './pages.css'
 type Stage = 'compose' | 'avatar'
 
 /**
- * FASE 1: estructura visual. No hay conversion real de espanol a LSP ni avatar 3D.
+ * FASE 9: avatar 3D real (Three.js) que reproduce un gesto DEMO.
+ *
+ * NO hay conversion real de espanol a LSP: el gesto es un marcador de posicion.
  * "Dictar respuesta" no captura audio todavia.
  */
 export function TextToSignPage() {
   const [stage, setStage] = useState<Stage>('compose')
   const [text, setText] = useState(DEMO_REPLY_TEXT)
   const { speak, speaking, cancel, supported } = useSpeech()
+  const avatarRef = useRef<AvatarViewHandle | null>(null)
+
+  const goToAvatar = () => {
+    setStage('avatar')
+    void addHistory({ direction: 'text-to-sign', text: text.trim(), isDemo: true })
+  }
 
   if (stage === 'avatar') {
     return (
@@ -27,28 +36,24 @@ export function TextToSignPage() {
 
         <p className="text-to-sign__label section-title">Respuesta en senas</p>
 
-        <AvatarView caption={text.trim() || undefined} playing />
-
-        <div className="text-to-sign__playback">
-          <span className="text-xs text-muted">0:02</span>
-          <span className="text-to-sign__track" aria-hidden="true">
-            <span className="text-to-sign__track-fill" />
-          </span>
-          <span className="text-xs text-muted">0:04</span>
-        </div>
+        <AvatarView ref={avatarRef} caption={text.trim() || undefined} playing />
 
         <div className="text-to-sign__controls">
-          <button type="button" className="chip">
+          <button
+            type="button"
+            className="chip"
+            onClick={() => avatarRef.current?.stop()}
+          >
             <Icon name="pause" size={16} />
-            Pausar
+            Detener
           </button>
-          <button type="button" className="chip" onClick={() => setStage('avatar')}>
+          <button
+            type="button"
+            className="chip"
+            onClick={() => avatarRef.current?.play()}
+          >
             <Icon name="refresh" size={16} />
             Repetir
-          </button>
-          <button type="button" className="chip">
-            <Icon name="clock" size={16} />
-            1x
           </button>
         </div>
 
@@ -63,12 +68,12 @@ export function TextToSignPage() {
           {speaking ? 'Pausar voz' : 'Escuchar voz'}
         </Button>
 
-        <p className="demo-note">
-          Animacion demostrativa. La correspondencia con LSP no ha sido validada
-          con personas usuarias ni interpretes.
-        </p>
-
-        <Button variant="ghost" fullWidth icon="back" onClick={() => setStage('compose')}>
+        <Button
+          variant="ghost"
+          fullWidth
+          icon="back"
+          onClick={() => setStage('compose')}
+        >
           Editar respuesta
         </Button>
       </div>
@@ -106,7 +111,7 @@ export function TextToSignPage() {
           fullWidth
           icon="send"
           disabled={text.trim() === ''}
-          onClick={() => setStage('avatar')}
+          onClick={goToAvatar}
         >
           Enviar al avatar
         </Button>

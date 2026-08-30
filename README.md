@@ -1,8 +1,8 @@
 # Frontend — Chaski Pe
 
 Aplicacion movil (mobile first) construida con **React + TypeScript + Vite** y
-**React Router**. Estado actual: **FASE 8 — conectado al backend (PostgreSQL)**
-para perfil, historial y frases; con fallback a datos de ejemplo si no hay backend.
+**React Router**. Estado actual: **FASE 9 — avatar 3D basico (Three.js)** en
+"Texto a senas"; backend PostgreSQL para perfil/historial/frases.
 
 ## Requisitos
 
@@ -29,12 +29,13 @@ src/
 │   ├── layout/        # AppLayout, BottomNav, FlowHeader
 │   ├── brand/         # Logo, Mascot, Mountains (identidad visual)
 │   ├── camera/        # CameraView (video), HandOverlay (landmarks)
-│   ├── avatar/        # AvatarView (sin Three.js todavia)
+│   ├── avatar/        # AvatarView + Avatar3D (Three.js, carga diferida),
+│   │                  # rig, animation, scene
 │   └── ui/            # Button, Card, Icon, PageHeader, Stepper, Toggle,
 │                      # TextInput, PasswordInput, DemoBadge
 ├── pages/             # una carpeta de archivos por pantalla
 ├── hooks/             # useCamera, useHandLandmarker, useSignRecognition,
-│                      # useApiResource, useSpeech, useTextScale
+│                      # useApiResource, useBackendHealth, useSpeech, useTextScale
 ├── services/          # api (cliente REST con fallback a mock), handLandmarker,
 │                      # signFeatures + signModel (MLP en el navegador),
 │                      # recognition, mockData
@@ -138,25 +139,35 @@ Configuracion **estricta** (`strict: true` + `noUncheckedIndexedAccess`,
 - El modelo se genera con los scripts de `ai/` (ver `ai/README.md`). Si no
   existe, la pantalla lo avisa.
 
-## Backend (FASE 7)
+## Backend (FASE 7 + 8)
 
 - `src/services/api.ts`: cliente REST hacia `VITE_API_URL` (por defecto
   `http://localhost:8000`). **Fallback a mock**: si el backend no responde en
   4 s, se usan los datos de ejemplo y la app sigue funcionando.
-- `useApiResource`: hook generico de carga con `refetch`.
+- `useApiResource` / `useBackendHealth`: hooks de carga y de estado del backend.
 - Conectados: **Historial** (lista, borrar), **Perfil** (ver, editar -> PUT),
-  **Frases rapidas** (lista). Al confirmar una sena se guarda en el historial.
+  **Frases rapidas** (lista). Al reconocer/enviar una sena se guarda en el
+  historial. El aviso indica si los datos estan en PostgreSQL, en memoria o
+  son de ejemplo.
 - Copia `.env.example` a `.env` para cambiar la URL del backend.
+
+## Avatar 3D (FASE 9)
+
+- `components/avatar/`: escena Three.js con un avatar **geometrico** (no un GLB)
+  que respira, parpadea y puede reproducir un **gesto DEMO no validado**.
+- `AvatarView` carga `Avatar3D` con `React.lazy`: el chunk de Three.js
+  (~530 KB) solo se descarga al entrar a "Texto a senas".
+- El gesto **no representa ninguna sena**. Un GLB con esqueleto y animaciones
+  de LSP validadas es la FASE 10.
 
 ## Alcance actual
 
 - **El modelo esta entrenado con datos SINTETICOS**: reconoce, pero no son
   senas reales. La pantalla lo avisa. Necesita un dataset validado con LSP.
-- El backend guarda **en memoria**: al reiniciarlo se pierden los cambios.
+- **El avatar no representa senas reales** (gesto DEMO).
 - **No** hay autenticacion real: login/registro son de demostracion.
-- **No** hay avatar 3D.
 - Funciona de verdad: navegacion, camara en vivo, deteccion de manos,
-  reconocimiento en tiempo real con el MLP, perfil e historial via API,
-  lectura por voz (Web Speech API), ajuste de texto.
+  reconocimiento en tiempo real con el MLP, avatar 3D en reposo, perfil e
+  historial via API (PostgreSQL), voz (Web Speech API), ajuste de texto.
 - Las equivalencias texto <-> sena son **demostrativas**; deben validarse con
   personas usuarias de LSP o interpretes.
