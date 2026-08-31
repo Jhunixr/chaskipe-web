@@ -11,13 +11,16 @@ import {
   sampleFileName,
   toSampleFrames,
 } from '@/services/datasetSample'
-import { INITIAL_VOCAB } from '@/types/dataset'
+import { CAPTURE_VOCAB } from '@/types/dataset'
 import type { HandFrame } from '@/types/handLandmarks'
 
 import './DatasetCollectorPage.css'
 import './pages.css'
 
-const RECORD_MS = 2000
+/** Poses estaticas: 1.2 s basta. Las senas con movimiento graban 2 s. */
+const STATIC_MS = 1200
+const DYNAMIC_MS = 2000
+const TARGET_PER_LETTER = 30
 
 type RecState = 'idle' | 'countdown' | 'recording' | 'review'
 
@@ -27,13 +30,15 @@ interface CapturedFrame {
 }
 
 /**
- * Herramienta interna (FASE 4) para capturar muestras del dataset de landmarks.
+ * Herramienta interna para capturar el dataset del **abecedario de la LSP**
+ * (deletreo manual). Elegir letra -> mirar el cartel de referencia -> grabar
+ * ~1 s con la camara + MediaPipe -> descargar JSON.
  *
- * Elegir sena -> grabar ~2 s con la camara + MediaPipe -> descargar JSON.
  * El archivo va, manualmente, a `ai/data/raw/<ETIQUETA>/`.
  * Ver `ai/data/DATASET_FORMAT.md`.
  *
- * No entrena nada. Los datos NO estan validados con personas usuarias de LSP.
+ * Las senas capturadas NO estan validadas con personas usuarias de LSP ni
+ * interpretes.
  */
 export function DatasetCollectorPage() {
   const camera = useCamera('user')
@@ -44,13 +49,13 @@ export function DatasetCollectorPage() {
   const [countdown, setCountdown] = useState(3)
   const [savedCount, setSavedCount] = useState<Record<string, number>>({})
   const [lastSummary, setLastSummary] = useState<string | null>(null)
-  /** Grabacion terminada: frames + relacion de aspecto del video. */
   const [recorded, setRecorded] = useState<{
     frames: CapturedFrame[]
     aspect: number
   }>({ frames: [], aspect: 0.75 })
 
-  const vocab = INITIAL_VOCAB[vocabIndex] ?? INITIAL_VOCAB[0]!
+  const vocab = CAPTURE_VOCAB[vocabIndex] ?? CAPTURE_VOCAB[0]!
+  const recordMs = vocab.dynamic ? DYNAMIC_MS : STATIC_MS
 
   const capturedRef = useRef<CapturedFrame[]>([])
   const recStartRef = useRef(0)
@@ -58,12 +63,14 @@ export function DatasetCollectorPage() {
 
   const handleFrame = useCallback((frame: HandFrame) => {
     if (!recordingRef.current) return
-    capturedRef.current.push({ frame, t: performance.now() - recStartRef.current })
+    capturedRef.current.push({
+      frame,
+      t: performance.now() - recStartRef.current,
+    })
   }, [])
 
   const hands = useHandLandmarker({ onFrame: handleFrame })
 
-  // Activar camara + modelo al montar.
   const startedRef = useRef(false)
   useEffect(() => {
     if (startedRef.current) return
@@ -72,7 +79,6 @@ export function DatasetCollectorPage() {
     hands.load()
   }, [camera, hands])
 
-  // Iniciar deteccion cuando la camara esta activa.
   const detStartedRef = useRef(false)
   useEffect(() => {
     if (camera.status !== 'active' || detStartedRef.current) return
@@ -96,10 +102,8 @@ export function DatasetCollectorPage() {
     clearTimers()
     setRecState('countdown')
     setCountdown(3)
-
-    // Cuenta regresiva de 3 a 1, luego grabar RECORD_MS.
-    timersRef.current.push(window.setTimeout(() => setCountdown(2), 700))
-    timersRef.current.push(window.setTimeout(() => setCountdown(1), 1400))
+    timersRef.current.push(window.setTimeout(() => setCountdown(2), 600))
+    timersRef.current.push(window.setTimeout(() => setCountdown(1), 1200))
     timersRef.current.push(
       window.setTimeout(() => {
         capturedRef.current = []
@@ -107,7 +111,7 @@ export function DatasetCollectorPage() {
         recordingRef.current = true
         setCountdown(0)
         setRecState('recording')
-      }, 2100),
+      }, 1800),
     )
     timersRef.current.push(
       window.setTimeout(() => {
@@ -117,17 +121,16 @@ export function DatasetCollectorPage() {
           v && v.videoWidth > 0 ? v.videoHeight / v.videoWidth : 0.75
         setRecorded({ frames: capturedRef.current.slice(), aspect })
         setRecState('review')
-      }, 2100 + RECORD_MS),
+      }, 1800 + recordMs),
     )
-  }, [clearTimers, camera.videoRef])
+  }, [clearTimers, camera.videoRef, recordMs])
 
-  // Limpiar timers al desmontar.
   useEffect(() => clearTimers, [clearTimers])
 
   const lastSample = useMemo(() => {
     const { frames: rec, aspect } = recorded
     if (recState !== 'review' || rec.length === 0) return null
-    const durationMs = rec[rec.length - 1]?.t ?? RECORD_MS
+    const durationMs = rec[rec.length - 1]?.t ?? recordMs
     const fps = durationMs > 0 ? (rec.length / durationMs) * 1000 : 0
     return buildSample({
       vocab,
@@ -139,10 +142,15 @@ export function DatasetCollectorPage() {
       consent,
       notes,
     })
-  }, [recState, recorded, vocab, camera.facing, consent, notes])
+  }, [recState, recorded, vocab, camera.facing, consent, notes, recordMs])
 
   const withHands = lastSample ? framesWithHands(lastSample) : 0
-  const goodSample = lastSample ? withHands >= lastSample.frames.length * 0.5 : false
+  const goodSample = lastSample
+    ? withHands >= lastSample.frames.length * 0.5 && withHands >= 3
+    : false
+
+  const savedForLetter = savedCount[vocab.label] ?? 0
+  const totalSaved = Object.values(savedCount).reduce((s, n) => s + n, 0)
 
   const handleSave = () => {
     if (!lastSample) return
@@ -163,30 +171,61 @@ export function DatasetCollectorPage() {
     setRecState('idle')
   }
 
+  const go = (delta: number) => {
+    if (recState !== 'idle') return
+    setVocabIndex((i) => (i + delta + CAPTURE_VOCAB.length) % CAPTURE_VOCAB.length)
+    setLastSummary(null)
+  }
+
   return (
     <div className="page collector">
-      <PageHeader title="Captura de dataset" />
+      <PageHeader title="Captura: abecedario LSP" />
 
       <p className="disclaimer-note">
         <Icon name="shield" size={16} />
-        Herramienta interna (FASE 4). Solo se guardan coordenadas de landmarks,
-        no video. Las senas capturadas <strong>no estan validadas</strong> con
+        Solo se guardan coordenadas de landmarks, no video. Las senas del
+        abecedario capturadas aqui <strong>no estan validadas</strong> con
         personas usuarias de LSP ni interpretes.
       </p>
 
-      <div className="collector__vocab" role="group" aria-label="Sena a capturar">
-        {INITIAL_VOCAB.map((item, i) => (
-          <button
-            key={item.label}
-            type="button"
-            className={`chip${i === vocabIndex ? ' chip--active' : ''}`}
-            onClick={() => setVocabIndex(i)}
-            disabled={recState !== 'idle'}
-          >
-            {item.word}
-          </button>
-        ))}
+      {/* Selector de letra */}
+      <div className="collector__letter-nav">
+        <button
+          type="button"
+          className="collector__nav-btn"
+          onClick={() => go(-1)}
+          disabled={recState !== 'idle'}
+          aria-label="Letra anterior"
+        >
+          <Icon name="back" size={20} />
+        </button>
+
+        <div className="collector__letter">
+          <span className="collector__letter-big">{vocab.word}</span>
+          <span className="text-xs text-muted">
+            {vocabIndex + 1} / {CAPTURE_VOCAB.length}
+            {vocab.dynamic ? ' · con movimiento' : ' · pose fija'}
+          </span>
+        </div>
+
+        <button
+          type="button"
+          className="collector__nav-btn"
+          onClick={() => go(1)}
+          disabled={recState !== 'idle'}
+          aria-label="Letra siguiente"
+        >
+          <Icon name="chevron" size={20} />
+        </button>
       </div>
+
+      <p className="collector__hint text-sm text-muted">
+        Haz la sena de <strong>{vocab.word}</strong> mirando el cartel del
+        abecedario LSP.
+        {vocab.dynamic
+          ? ' Esta letra lleva un movimiento: hazlo completo durante la grabacion.'
+          : ' Manten la mano quieta mientras graba.'}
+      </p>
 
       <CameraView
         status={camera.status}
@@ -204,7 +243,7 @@ export function DatasetCollectorPage() {
               ? `Prepara la sena: ${countdown}`
               : hands.handCount > 0
                 ? `${hands.handCount} mano(s)`
-                : 'Muestra las manos'
+                : 'Muestra la mano'
         }
         overlay={
           <HandOverlay frame={hands.frame} mirrored={camera.facing === 'user'} />
@@ -219,8 +258,8 @@ export function DatasetCollectorPage() {
             onChange={(e) => setConsent(e.target.checked)}
           />
           <span>
-            La persona frente a la camara dio su consentimiento para capturar los
-            landmarks de esta sena.
+            La persona frente a la camara dio su consentimiento para capturar
+            los landmarks.
           </span>
         </label>
         <label className="field">
@@ -228,7 +267,7 @@ export function DatasetCollectorPage() {
           <input
             className="input-group__field collector__notes"
             type="text"
-            placeholder="persona, variacion, contexto..."
+            placeholder="persona, mano usada, luz, variacion..."
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
           />
@@ -239,12 +278,13 @@ export function DatasetCollectorPage() {
         <Card className="stack-sm collector__review">
           <p className="section-title">Revisar muestra</p>
           <p className="text-sm">
-            <strong>{lastSample.word}</strong> · {lastSample.frames.length} frames
-            · {withHands} con manos · {lastSample.capture.fps} fps
+            <strong>{lastSample.word}</strong> · {lastSample.frames.length}{' '}
+            frames · {withHands} con manos · {lastSample.capture.fps} fps
           </p>
           {!goodSample && (
             <p className="demo-note">
-              Pocos frames con manos. Repite acercando las manos a la camara.
+              Pocos frames con la mano visible. Repite acercando la mano y
+              manteniendola en el encuadre.
             </p>
           )}
           <div className="collector__review-actions">
@@ -272,7 +312,7 @@ export function DatasetCollectorPage() {
                 ? 'Marca el consentimiento para grabar'
                 : !cameraReady || !detectorReady
                   ? 'Preparando camara y detector...'
-                  : `Grabar "${vocab.word}" (2 s)`}
+                  : `Grabar "${vocab.word}"`}
         </Button>
       )}
 
@@ -283,19 +323,23 @@ export function DatasetCollectorPage() {
       )}
 
       <Card className="card--flat stack-sm">
-        <p className="section-title">Guardados en esta sesion</p>
-        <ul className="collector__counts">
-          {INITIAL_VOCAB.map((item) => (
-            <li key={item.label}>
-              <span>{item.word}</span>
-              <strong>{savedCount[item.label] ?? 0}</strong>
-            </li>
-          ))}
-        </ul>
+        <div className="row-between">
+          <p className="section-title">
+            "{vocab.word}": {savedForLetter} / {TARGET_PER_LETTER}
+          </p>
+          <span className="text-xs text-muted">{totalSaved} en total</span>
+        </div>
+        <div className="collector__progress">
+          <span
+            style={{
+              width: `${Math.min(100, (savedForLetter / TARGET_PER_LETTER) * 100)}%`,
+            }}
+          />
+        </div>
         <p className="text-xs text-muted">
           Mueve cada archivo descargado a{' '}
-          <code>ai/data/raw/{vocab.label}/</code>. Formato en{' '}
-          <code>ai/data/DATASET_FORMAT.md</code>.
+          <code>ai/data/raw/{vocab.label}/</code>. Objetivo: ~
+          {TARGET_PER_LETTER} por letra, variando mano, distancia y luz.
         </p>
       </Card>
     </div>

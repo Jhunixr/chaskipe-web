@@ -58,12 +58,14 @@ interface UseSignRecognitionResult {
 }
 
 const DEFAULTS = {
-  windowMs: 2000,
-  intervalMs: 300,
-  minConfidence: 0.6,
+  // Deletreo del abecedario: ventana corta (poses fijas) y confirmacion
+  // rapida. El umbral de confianza es moderado porque hay muchas clases.
+  windowMs: 1200,
+  intervalMs: 250,
+  minConfidence: 0.55,
   minHandFrames: 0.4,
-  holdMs: 600,
-  cooldownMs: 1200,
+  holdMs: 550,
+  cooldownMs: 900,
 }
 
 /**

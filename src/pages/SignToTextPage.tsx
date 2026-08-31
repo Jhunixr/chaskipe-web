@@ -19,14 +19,15 @@ import './SignToTextPage.css'
 import './pages.css'
 
 /**
- * FASE 6: reconocimiento EN TIEMPO REAL.
+ * Reconocimiento EN TIEMPO REAL del **abecedario de la LSP** (deletreo manual).
  *
  * La camara + MediaPipe alimentan una ventana deslizante de landmarks; el
- * modelo (MLP) se ejecuta varias veces por segundo. El candidato se muestra en
- * vivo y se confirma cuando se mantiene estable ~0.6 s.
+ * modelo (MLP) se ejecuta varias veces por segundo. La letra candidata se
+ * muestra en vivo y se confirma cuando se mantiene estable ~0.6 s.
  *
- * El modelo actual esta entrenado con datos SINTETICOS: reconoce, pero no son
- * senas reales. Se avisa en pantalla.
+ * El deletreo manual NO es toda la LSP: la lengua tiene su propia gramatica y
+ * vocabulario. Las senas deben validarse con personas usuarias o interpretes.
+ * Si aun no hay un modelo entrenado, la pantalla lo avisa (ver `ai/README.md`).
  */
 export function SignToTextPage() {
   const navigate = useNavigate()
@@ -197,10 +198,10 @@ export function SignToTextPage() {
       </section>
 
       <p className="demo-note">
-        El modelo de reconocimiento esta entrenado con datos{' '}
-        <strong>sinteticos de prueba</strong>: aun no reconoce senas reales.
-        La Lengua de Senas Peruana no comparte la gramatica del espanol; el
-        vocabulario debe validarse con personas usuarias o interpretes.
+        Reconoce el <strong>abecedario de la LSP</strong> (deletreo manual). El
+        deletreo <strong>no es toda la LSP</strong>: la lengua tiene su propia
+        gramatica y vocabulario. Las senas deben validarse con personas
+        usuarias o interpretes.
       </p>
 
       {recog.phase === 'confirmed' && confirmed ? (
