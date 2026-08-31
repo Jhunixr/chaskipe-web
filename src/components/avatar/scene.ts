@@ -19,12 +19,27 @@ import { buildAvatar, type AvatarBones } from './rig'
 
 const BG = 0xfbf5ec
 
+/** Textura radial (blanco->transparente) para la sombra de contacto. */
+function makeRadialShadow(): THREE.CanvasTexture {
+  const c = document.createElement('canvas')
+  c.width = 128
+  c.height = 128
+  const ctx = c.getContext('2d')!
+  const g = ctx.createRadialGradient(64, 64, 4, 64, 64, 62)
+  g.addColorStop(0, 'rgba(60,40,30,0.9)')
+  g.addColorStop(1, 'rgba(60,40,30,0)')
+  ctx.fillStyle = g
+  ctx.fillRect(0, 0, 128, 128)
+  return new THREE.CanvasTexture(c)
+}
+
 export class SignAvatarScene {
   private renderer: THREE.WebGLRenderer
   private scene: THREE.Scene
   private camera: THREE.PerspectiveCamera
   private bones: AvatarBones
-  private clock = new THREE.Clock()
+  private startTime = performance.now()
+  private lastTime = performance.now()
   private frame = 0
   private disposed = false
 
@@ -39,41 +54,43 @@ export class SignAvatarScene {
       alpha: true,
     })
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-    this.renderer.shadowMap.enabled = true
-    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap
+    // Sin shadow map: usamos una sombra de contacto pintada (mas ligera y
+    // compatible con GPUs / renderers limitados).
+    this.renderer.shadowMap.enabled = false
 
     this.scene = new THREE.Scene()
     this.scene.background = new THREE.Color(BG)
 
-    this.camera = new THREE.PerspectiveCamera(32, 1, 0.1, 100)
-    this.camera.position.set(0, 0.55, 4.6)
-    this.camera.lookAt(0, 0.35, 0)
+    this.camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100)
+    this.camera.position.set(0, 0.9, 4.9)
+    this.camera.lookAt(0, 0.7, 0)
 
     // Luces
     const ambient = new THREE.HemisphereLight(0xffffff, 0xd9c7a8, 0.9)
     this.scene.add(ambient)
 
-    const key = new THREE.DirectionalLight(0xffffff, 1.4)
+    const key = new THREE.DirectionalLight(0xffffff, 1.5)
     key.position.set(2, 3, 3)
-    key.castShadow = true
-    key.shadow.mapSize.set(1024, 1024)
-    key.shadow.camera.near = 0.5
-    key.shadow.camera.far = 12
     this.scene.add(key)
 
     const fill = new THREE.DirectionalLight(0xffe6c8, 0.4)
     fill.position.set(-3, 1, 2)
     this.scene.add(fill)
 
-    // Suelo (recibe sombra)
-    const floor = new THREE.Mesh(
-      new THREE.CircleGeometry(3, 32),
-      new THREE.ShadowMaterial({ opacity: 0.12 }),
+    // Sombra de contacto simple (disco oscuro difuminado bajo el avatar).
+    const shadowTex = makeRadialShadow()
+    const contactShadow = new THREE.Mesh(
+      new THREE.PlaneGeometry(1.6, 1.6),
+      new THREE.MeshBasicMaterial({
+        map: shadowTex,
+        transparent: true,
+        depthWrite: false,
+        opacity: 0.35,
+      }),
     )
-    floor.rotation.x = -Math.PI / 2
-    floor.position.y = -0.57
-    floor.receiveShadow = true
-    this.scene.add(floor)
+    contactShadow.rotation.x = -Math.PI / 2
+    contactShadow.position.y = -0.56
+    this.scene.add(contactShadow)
 
     // Avatar
     const { object, bones } = buildAvatar()
@@ -116,8 +133,10 @@ export class SignAvatarScene {
     if (this.disposed) return
     this.frame = requestAnimationFrame(this.animate)
 
-    const dt = this.clock.getDelta()
-    const t = this.clock.elapsedTime
+    const now = performance.now()
+    const dt = Math.min((now - this.lastTime) / 1000, 0.1)
+    this.lastTime = now
+    const t = (now - this.startTime) / 1000
 
     applyIdle(this.bones, t)
 

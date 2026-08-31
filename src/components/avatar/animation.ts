@@ -25,10 +25,15 @@ export function applyIdle(bones: AvatarBones, t: number): void {
   // Parpadeo: cada ~3.5 s, cerrado durante ~120 ms.
   const phase = t % 3.5
   const blink = phase > 3.38 ? 1 : phase > 3.26 ? (phase - 3.26) / 0.12 : 0
-  const lidScale = blink > 0 ? Math.min(1, blink) : 0.001
+  const lidScale = blink > 0 ? Math.min(1, blink) : 0.02
   for (const lid of bones.eyelids) {
-    lid.scale.y = 0.001 + lidScale
+    lid.scale.y = 0.02 + lidScale
   }
+
+  // Balanceo muy sutil de los brazos en reposo (sobre la pose base 0.15).
+  const armSway = Math.sin(t * 0.8) * 0.03
+  bones.shoulderL.rotation.x = 0.15 + armSway
+  bones.shoulderR.rotation.x = 0.15 - armSway
 }
 
 // --- Sistema de poses / gestos ---
@@ -60,8 +65,8 @@ export interface Gesture {
 }
 
 const REST_POSE: Required<Pose> = {
-  shoulderL: { x: 0, y: 0, z: -0.28 },
-  shoulderR: { x: 0, y: 0, z: 0.28 },
+  shoulderL: { x: 0.15, y: 0, z: -0.3 },
+  shoulderR: { x: 0.15, y: 0, z: 0.3 },
   elbowL: { x: 0, y: 0, z: 0 },
   elbowR: { x: 0, y: 0, z: 0 },
   wristL: { x: 0, y: 0, z: 0 },
@@ -70,34 +75,48 @@ const REST_POSE: Required<Pose> = {
 }
 
 /**
- * Gesto DEMO: levanta ambas manos hacia el pecho y las mueve.
- * Marcador de posicion, NO es una sena.
+ * Gesto DEMO: el chaski saluda (levanta la mano derecha y la agita), como en
+ * el logo. Marcador de posicion, NO es una sena de LSP.
  */
 export const DEMO_GESTURE: Gesture = {
-  id: 'demo-placeholder',
-  durationMs: 2200,
+  id: 'demo-saludo',
+  durationMs: 2400,
   isDemo: true,
   keyframes: [
     { at: 0, pose: {} },
     {
-      at: 0.3,
+      at: 0.22,
       pose: {
-        shoulderL: { x: -1.1, y: 0, z: 0.2 },
-        shoulderR: { x: -1.1, y: 0, z: -0.2 },
-        elbowL: { x: -1.4, y: 0, z: 0 },
-        elbowR: { x: -1.4, y: 0, z: 0 },
-        neck: { x: 0.05, y: 0, z: 0 },
+        // brazo derecho arriba, junto a la cabeza
+        shoulderR: { x: -0.2, y: 0, z: -2.6 },
+        elbowR: { x: -0.3, y: 0, z: 0 },
+        neck: { x: 0, y: -0.15, z: 0 },
       },
     },
     {
-      at: 0.6,
+      at: 0.42,
       pose: {
-        shoulderL: { x: -0.9, y: 0, z: 0.35 },
-        shoulderR: { x: -0.9, y: 0, z: -0.35 },
-        elbowL: { x: -1.7, y: 0, z: 0 },
-        elbowR: { x: -1.7, y: 0, z: 0 },
-        wristL: { x: 0, y: 0, z: 0.4 },
+        shoulderR: { x: -0.2, y: 0, z: -2.75 },
+        elbowR: { x: -0.15, y: 0, z: 0.35 },
+        wristR: { x: 0, y: 0, z: 0.4 },
+        neck: { x: 0, y: -0.15, z: 0 },
+      },
+    },
+    {
+      at: 0.62,
+      pose: {
+        shoulderR: { x: -0.2, y: 0, z: -2.75 },
+        elbowR: { x: -0.15, y: 0, z: -0.35 },
         wristR: { x: 0, y: 0, z: -0.4 },
+        neck: { x: 0, y: -0.15, z: 0 },
+      },
+    },
+    {
+      at: 0.8,
+      pose: {
+        shoulderR: { x: -0.2, y: 0, z: -2.7 },
+        elbowR: { x: -0.2, y: 0, z: 0.2 },
+        neck: { x: 0, y: -0.1, z: 0 },
       },
     },
     { at: 1, pose: {} },
