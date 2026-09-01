@@ -58,14 +58,14 @@ interface UseSignRecognitionResult {
 }
 
 const DEFAULTS = {
-  // Deletreo del abecedario: ventana corta (poses fijas) y confirmacion
-  // rapida. El umbral de confianza es moderado porque hay muchas clases.
-  windowMs: 1200,
-  intervalMs: 250,
-  minConfidence: 0.55,
-  minHandFrames: 0.4,
-  holdMs: 550,
-  cooldownMs: 900,
+  // Ventana de 2.5 s: cubre senas con movimiento (HOLA, GRACIAS).
+  // Se predice cada ~300 ms y se confirma cuando la sena se mantiene ~0.7 s.
+  windowMs: 2500,
+  intervalMs: 300,
+  minConfidence: 0.6,
+  minHandFrames: 0.35,
+  holdMs: 700,
+  cooldownMs: 1200,
 }
 
 /**

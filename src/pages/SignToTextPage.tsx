@@ -19,15 +19,15 @@ import './SignToTextPage.css'
 import './pages.css'
 
 /**
- * Reconocimiento EN TIEMPO REAL del **abecedario de la LSP** (deletreo manual).
+ * Reconocimiento de **senas de la LSP** EN TIEMPO REAL.
  *
- * La camara + MediaPipe alimentan una ventana deslizante de landmarks; el
- * modelo (MLP) se ejecuta varias veces por segundo. La letra candidata se
- * muestra en vivo y se confirma cuando se mantiene estable ~0.6 s.
+ * La camara + MediaPipe alimentan una ventana deslizante de landmarks (2.5 s);
+ * el modelo (MLP) se ejecuta varias veces por segundo. La sena candidata se
+ * muestra en vivo y se confirma cuando se mantiene estable ~0.7 s.
  *
- * El deletreo manual NO es toda la LSP: la lengua tiene su propia gramatica y
- * vocabulario. Las senas deben validarse con personas usuarias o interpretes.
- * Si aun no hay un modelo entrenado, la pantalla lo avisa (ver `ai/README.md`).
+ * La LSP tiene su propia gramatica y vocabulario. Las senas deben validarse
+ * con personas usuarias o interpretes. Si aun no hay un modelo entrenado, la
+ * pantalla lo avisa (ver `ai/README.md`).
  */
 export function SignToTextPage() {
   const navigate = useNavigate()
@@ -198,10 +198,9 @@ export function SignToTextPage() {
       </section>
 
       <p className="demo-note">
-        Reconoce el <strong>abecedario de la LSP</strong> (deletreo manual). El
-        deletreo <strong>no es toda la LSP</strong>: la lengua tiene su propia
-        gramatica y vocabulario. Las senas deben validarse con personas
-        usuarias o interpretes.
+        Reconoce un vocabulario limitado de <strong>senas de la LSP</strong>.
+        La LSP tiene su propia gramatica y vocabulario; las senas deben
+        validarse con personas usuarias o interpretes.
       </p>
 
       {recog.phase === 'confirmed' && confirmed ? (

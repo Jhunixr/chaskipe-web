@@ -2,8 +2,9 @@
  * Tipos del dataset de landmarks.
  * Espejo del esquema de `ai/data/DATASET_FORMAT.md` (schemaVersion 1).
  *
- * FASE 4: captura de datos.
- * FASE 10: abecedario de la Lengua de Senas Peruana (LSP).
+ * Captura de senas de la Lengua de Senas Peruana (LSP). Cada grabacion es una
+ * secuencia temporal de landmarks (no una foto): sirve tanto para poses fijas
+ * como para senas con movimiento.
  */
 
 export const DATASET_SCHEMA_VERSION = 1
@@ -15,55 +16,29 @@ export interface VocabItem {
   /** Texto legible que se muestra en la interfaz. */
   word: string
   /**
-   * true si la sena lleva movimiento (no es una pose fija).
-   * En LSP el deletreo manual de J, Z, N (enye), LL y RR incluye un
-   * desplazamiento; el resto son poses estaticas.
+   * true si la sena lleva movimiento (se graba mas tiempo y se pide hacer el
+   * gesto completo). false = pose que se mantiene quieta.
    */
   dynamic?: boolean
 }
 
 /**
- * Abecedario de la LSP para el deletreo manual (dactilologia).
+ * Vocabulario de senas a reconocer.
  *
- * Referencia: cartel "El Alfabeto - Lengua de Senas Peruana" (Paz y Esperanza).
  * IMPORTANTE: estas senas deben validarse con personas usuarias de LSP o
- * interpretes. La orientacion de la muneca y la variacion regional no se
- * aprecian bien en una lamina.
+ * interpretes. La LSP tiene su propia gramatica y variacion regional.
+ *
+ * "REPOSO" es la mano/manos sin hacer ninguna sena: ayuda al modelo a no
+ * confundir cualquier movimiento con una sena.
  */
-export const LSP_ALPHABET: readonly VocabItem[] = [
-  { label: 'A', word: 'A' },
-  { label: 'B', word: 'B' },
-  { label: 'C', word: 'C' },
-  { label: 'D', word: 'D' },
-  { label: 'E', word: 'E' },
-  { label: 'F', word: 'F' },
-  { label: 'G', word: 'G' },
-  { label: 'H', word: 'H' },
-  { label: 'I', word: 'I' },
-  { label: 'J', word: 'J', dynamic: true },
-  { label: 'K', word: 'K' },
-  { label: 'L', word: 'L' },
-  { label: 'LL', word: 'LL', dynamic: true },
-  { label: 'M', word: 'M' },
-  { label: 'N', word: 'N' },
-  { label: 'ENYE', word: 'Ñ', dynamic: true },
-  { label: 'O', word: 'O' },
-  { label: 'P', word: 'P' },
-  { label: 'Q', word: 'Q' },
-  { label: 'R', word: 'R' },
-  { label: 'RR', word: 'RR', dynamic: true },
-  { label: 'S', word: 'S' },
-  { label: 'T', word: 'T' },
-  { label: 'U', word: 'U' },
-  { label: 'V', word: 'V' },
-  { label: 'W', word: 'W' },
-  { label: 'X', word: 'X' },
-  { label: 'Y', word: 'Y' },
-  { label: 'Z', word: 'Z', dynamic: true },
+export const SIGN_VOCAB: readonly VocabItem[] = [
+  { label: 'HOLA', word: 'Hola', dynamic: true },
+  { label: 'GRACIAS', word: 'Gracias', dynamic: true },
+  { label: 'REPOSO', word: 'Reposo (sin sena)', dynamic: false },
 ]
 
 /** Vocabulario activo de la herramienta de captura. */
-export const CAPTURE_VOCAB = LSP_ALPHABET
+export const CAPTURE_VOCAB = SIGN_VOCAB
 
 /** Una mano dentro de un frame. */
 export interface SampleHand {

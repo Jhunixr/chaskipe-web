@@ -17,10 +17,10 @@ import type { HandFrame } from '@/types/handLandmarks'
 import './DatasetCollectorPage.css'
 import './pages.css'
 
-/** Poses estaticas: 1.2 s basta. Las senas con movimiento graban 2 s. */
+/** Poses fijas: 1.2 s. Senas con movimiento: 2.5 s (para hacer el gesto completo). */
 const STATIC_MS = 1200
-const DYNAMIC_MS = 2000
-const TARGET_PER_LETTER = 30
+const DYNAMIC_MS = 2500
+const TARGET_PER_SIGN = 30
 
 type RecState = 'idle' | 'countdown' | 'recording' | 'review'
 
@@ -30,9 +30,9 @@ interface CapturedFrame {
 }
 
 /**
- * Herramienta interna para capturar el dataset del **abecedario de la LSP**
- * (deletreo manual). Elegir letra -> mirar el cartel de referencia -> grabar
- * ~1 s con la camara + MediaPipe -> descargar JSON.
+ * Herramienta interna para capturar el dataset de **senas de la LSP**.
+ * Elegir sena -> grabar (poses ~1 s, senas con movimiento ~2.5 s) con la
+ * camara + MediaPipe -> descargar JSON.
  *
  * El archivo va, manualmente, a `ai/data/raw/<ETIQUETA>/`.
  * Ver `ai/data/DATASET_FORMAT.md`.
@@ -149,7 +149,7 @@ export function DatasetCollectorPage() {
     ? withHands >= lastSample.frames.length * 0.5 && withHands >= 3
     : false
 
-  const savedForLetter = savedCount[vocab.label] ?? 0
+  const savedForSign = savedCount[vocab.label] ?? 0
   const totalSaved = Object.values(savedCount).reduce((s, n) => s + n, 0)
 
   const handleSave = () => {
@@ -179,23 +179,23 @@ export function DatasetCollectorPage() {
 
   return (
     <div className="page collector">
-      <PageHeader title="Captura: abecedario LSP" />
+      <PageHeader title="Captura de senas (LSP)" />
 
       <p className="disclaimer-note">
         <Icon name="shield" size={16} />
-        Solo se guardan coordenadas de landmarks, no video. Las senas del
-        abecedario capturadas aqui <strong>no estan validadas</strong> con
-        personas usuarias de LSP ni interpretes.
+        Solo se guardan coordenadas de landmarks, no video. Las senas
+        capturadas aqui <strong>no estan validadas</strong> con personas
+        usuarias de LSP ni interpretes.
       </p>
 
-      {/* Selector de letra */}
+      {/* Selector de sena */}
       <div className="collector__letter-nav">
         <button
           type="button"
           className="collector__nav-btn"
           onClick={() => go(-1)}
           disabled={recState !== 'idle'}
-          aria-label="Letra anterior"
+          aria-label="Sena anterior"
         >
           <Icon name="back" size={20} />
         </button>
@@ -213,18 +213,29 @@ export function DatasetCollectorPage() {
           className="collector__nav-btn"
           onClick={() => go(1)}
           disabled={recState !== 'idle'}
-          aria-label="Letra siguiente"
+          aria-label="Sena siguiente"
         >
           <Icon name="chevron" size={20} />
         </button>
       </div>
 
       <p className="collector__hint text-sm text-muted">
-        Haz la sena de <strong>{vocab.word}</strong> mirando el cartel del
-        abecedario LSP.
-        {vocab.dynamic
-          ? ' Esta letra lleva un movimiento: hazlo completo durante la grabacion.'
-          : ' Manten la mano quieta mientras graba.'}
+        {vocab.label === 'REPOSO' ? (
+          <>
+            Manten la(s) mano(s) en el encuadre <strong>sin hacer ninguna
+            sena</strong> (quietas o con movimiento neutro).
+          </>
+        ) : vocab.dynamic ? (
+          <>
+            Haz la sena de <strong>{vocab.word}</strong> con su movimiento
+            completo. Empieza y termina con la mano en el encuadre; tienes ~2,5 s.
+          </>
+        ) : (
+          <>
+            Haz la sena de <strong>{vocab.word}</strong> y manten la mano
+            quieta mientras graba.
+          </>
+        )}
       </p>
 
       <CameraView
@@ -325,21 +336,21 @@ export function DatasetCollectorPage() {
       <Card className="card--flat stack-sm">
         <div className="row-between">
           <p className="section-title">
-            "{vocab.word}": {savedForLetter} / {TARGET_PER_LETTER}
+            "{vocab.word}": {savedForSign} / {TARGET_PER_SIGN}
           </p>
           <span className="text-xs text-muted">{totalSaved} en total</span>
         </div>
         <div className="collector__progress">
           <span
             style={{
-              width: `${Math.min(100, (savedForLetter / TARGET_PER_LETTER) * 100)}%`,
+              width: `${Math.min(100, (savedForSign / TARGET_PER_SIGN) * 100)}%`,
             }}
           />
         </div>
         <p className="text-xs text-muted">
           Mueve cada archivo descargado a{' '}
           <code>ai/data/raw/{vocab.label}/</code>. Objetivo: ~
-          {TARGET_PER_LETTER} por letra, variando mano, distancia y luz.
+          {TARGET_PER_SIGN} por sena, variando mano, distancia, luz y velocidad.
         </p>
       </Card>
     </div>

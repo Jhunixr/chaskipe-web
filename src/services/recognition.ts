@@ -5,11 +5,11 @@
  * Se pasa por el `state` de React Router; ademas se guarda en sessionStorage
  * para que un refresco de la pagina de resultado no la deje vacia.
  *
- * FASE 10: el modelo reconoce **letras del abecedario de la LSP** (deletreo
- * manual). El deletreo NO es toda la LSP: la lengua tiene su propia gramatica
- * y vocabulario. Las senas deben validarse con personas usuarias o interpretes.
+ * El modelo reconoce senas del vocabulario (`SIGN_VOCAB`). La LSP tiene su
+ * propia gramatica; las senas deben validarse con personas usuarias o
+ * interpretes.
  */
-import { LSP_ALPHABET } from '@/types/dataset'
+import { SIGN_VOCAB } from '@/types/dataset'
 
 export interface RecognitionResult {
   /** Etiqueta del vocabulario (A, B, ..., ENYE). */
@@ -26,9 +26,19 @@ export interface RecognitionResult {
 
 const KEY = 'chaskipe:last-recognition'
 
-/** Texto legible para una etiqueta del abecedario. */
+/** Texto legible para una etiqueta de sena. */
+const READABLE: Record<string, string> = {
+  HOLA: 'Hola',
+  GRACIAS: 'Gracias',
+  REPOSO: '',
+}
+
 export function phraseForLabel(label: string): string {
-  return LSP_ALPHABET.find((v) => v.label === label)?.word ?? label
+  return (
+    READABLE[label] ??
+    SIGN_VOCAB.find((v) => v.label === label)?.word ??
+    label
+  )
 }
 
 export function saveRecognition(result: RecognitionResult): void {
