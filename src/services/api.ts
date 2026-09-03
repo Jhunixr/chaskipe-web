@@ -14,6 +14,11 @@ import {
   HISTORY_ENTRIES,
   QUICK_PHRASE_GROUPS,
 } from '@/services/mockData'
+import {
+  coercePreferences,
+  DEFAULT_PREFERENCES,
+  type Preferences,
+} from '@/types/preferences'
 import type {
   HistoryEntry,
   QuickPhraseGroup,
@@ -90,6 +95,64 @@ export async function updateProfile(
   } catch {
     // sin backend no se persiste; devolvemos lo que se intento guardar
     return { data: profile, source: 'mock' }
+  }
+}
+
+// ---- Preferencias de accesibilidad ----
+
+/** El backend usa snake_case; el frontend camelCase. */
+interface ApiPreferences {
+  theme: string
+  text_size: string
+  voice_speed: string
+  avatar_speed: string
+  subtitles: boolean
+  language: string
+}
+
+function fromApiPreferences(p: ApiPreferences): Preferences {
+  return coercePreferences({
+    theme: p.theme,
+    textSize: p.text_size,
+    voiceSpeed: p.voice_speed,
+    avatarSpeed: p.avatar_speed,
+    subtitles: p.subtitles,
+    language: p.language,
+  })
+}
+
+function toApiPreferences(p: Preferences): ApiPreferences {
+  return {
+    theme: p.theme,
+    text_size: p.textSize,
+    voice_speed: p.voiceSpeed,
+    avatar_speed: p.avatarSpeed,
+    subtitles: p.subtitles,
+    language: p.language,
+  }
+}
+
+export async function getPreferences(): Promise<Result<Preferences>> {
+  try {
+    const p = await request<ApiPreferences>('/preferences')
+    return { data: fromApiPreferences(p), source: 'api' }
+  } catch {
+    return { data: DEFAULT_PREFERENCES, source: 'mock' }
+  }
+}
+
+export async function updatePreferences(
+  prefs: Preferences,
+): Promise<Result<Preferences>> {
+  try {
+    const p = await request<ApiPreferences>('/preferences', {
+      method: 'PUT',
+      body: JSON.stringify(toApiPreferences(prefs)),
+    })
+    return { data: fromApiPreferences(p), source: 'api' }
+  } catch {
+    // Sin backend la preferencia igual vale: vive en localStorage.
+    return { data: prefs, source: 'mock' }
   }
 }
 

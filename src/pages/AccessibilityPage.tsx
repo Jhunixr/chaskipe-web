@@ -1,26 +1,46 @@
-import { useState } from 'react'
-
 import { Button, Card, Icon, PageHeader, Toggle } from '@/components/ui'
-import { useTextScale } from '@/hooks/useTextScale'
+import { usePreferences } from '@/hooks/usePreferences'
+import { useSpeech } from '@/hooks/useSpeech'
+import {
+  LANGUAGES,
+  type Speed,
+  type ThemePreference,
+} from '@/types/preferences'
 
 import './AccessibilityPage.css'
 import './pages.css'
 
-type Speed = 'lenta' | 'normal' | 'rapida'
+const SPEEDS: Speed[] = ['lenta', 'normal', 'rapida']
+const SPEED_LABEL: Record<Speed, string> = {
+  lenta: 'Lenta',
+  normal: 'Normal',
+  rapida: 'Rapida',
+}
 
-const SPEED_VALUE: Record<Speed, number> = { lenta: 0, normal: 1, rapida: 2 }
-const SPEED_FROM_VALUE: Record<number, Speed> = { 0: 'lenta', 1: 'normal', 2: 'rapida' }
+const THEMES: { value: ThemePreference; label: string; icon: 'sun' | 'user' }[] = [
+  { value: 'claro', label: 'Claro', icon: 'sun' },
+  { value: 'oscuro', label: 'Oscuro', icon: 'sun' },
+  { value: 'sistema', label: 'Sistema', icon: 'user' },
+]
 
 /**
- * El tamano de texto SI se aplica en toda la app (useTextScale).
- * El resto de opciones es solo interfaz en la FASE 1.
+ * Preferencias de accesibilidad. Todas se aplican de inmediato y se guardan
+ * en el navegador; "Guardar cambios" ademas las envia al servidor para que
+ * viajen entre dispositivos.
  */
 export function AccessibilityPage() {
-  const { size, decrease, increase } = useTextScale()
-  const [voiceSpeed, setVoiceSpeed] = useState<Speed>('normal')
-  const [avatarSpeed, setAvatarSpeed] = useState<Speed>('normal')
-  const [darkMode, setDarkMode] = useState(false)
-  const [subtitles, setSubtitles] = useState(true)
+  const { prefs, set, save, saveState, dirty } = usePreferences()
+  const { speak, supported } = useSpeech()
+
+  const canDecrease = prefs.textSize !== 'normal'
+  const canIncrease = prefs.textSize !== 'muy-grande'
+
+  const stepText = (delta: -1 | 1) => {
+    const order = ['normal', 'grande', 'muy-grande'] as const
+    const index = order.indexOf(prefs.textSize)
+    const next = order[index + delta]
+    if (next) set('textSize', next)
+  }
 
   return (
     <div className="page accessibility">
@@ -32,16 +52,16 @@ export function AccessibilityPage() {
           <div className="accessibility__text-size">
             <button
               type="button"
-              onClick={decrease}
-              disabled={size === 'normal'}
+              onClick={() => stepText(-1)}
+              disabled={!canDecrease}
               aria-label="Reducir tamano del texto"
             >
               A-
             </button>
             <button
               type="button"
-              onClick={increase}
-              disabled={size === 'muy-grande'}
+              onClick={() => stepText(1)}
+              disabled={!canIncrease}
               aria-label="Aumentar tamano del texto"
             >
               A+
@@ -50,9 +70,45 @@ export function AccessibilityPage() {
         </div>
 
         <div className="accessibility__slider">
-          <span className="row field__label">
-            <Icon name="volume" size={18} />
-            Velocidad de voz
+          <span className="row-between">
+            <span className="row field__label">
+              <Icon name="sun" size={18} />
+              Tema
+            </span>
+          </span>
+          <div className="segmented accessibility__segmented" role="radiogroup" aria-label="Tema">
+            {THEMES.map((t) => (
+              <button
+                key={t.value}
+                type="button"
+                role="radio"
+                aria-checked={prefs.theme === t.value}
+                className={`segmented__option${
+                  prefs.theme === t.value ? ' segmented__option--active' : ''
+                }`}
+                onClick={() => set('theme', t.value)}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="accessibility__slider">
+          <span className="row-between">
+            <span className="row field__label">
+              <Icon name="volume" size={18} />
+              Velocidad de voz
+            </span>
+            <button
+              type="button"
+              className="chip accessibility__try"
+              onClick={() => speak('Hola, asi se escucha la voz.')}
+              disabled={!supported}
+            >
+              <Icon name="volume" size={14} />
+              Probar
+            </button>
           </span>
           <div className="accessibility__range">
             <span aria-hidden="true">🐢</span>
@@ -61,12 +117,13 @@ export function AccessibilityPage() {
               min={0}
               max={2}
               step={1}
-              value={SPEED_VALUE[voiceSpeed]}
+              value={SPEEDS.indexOf(prefs.voiceSpeed)}
               onChange={(event) => {
-                const next = SPEED_FROM_VALUE[Number(event.target.value)]
-                if (next) setVoiceSpeed(next)
+                const next = SPEEDS[Number(event.target.value)]
+                if (next) set('voiceSpeed', next)
               }}
               aria-label="Velocidad de voz"
+              aria-valuetext={SPEED_LABEL[prefs.voiceSpeed]}
             />
             <span aria-hidden="true">🐇</span>
           </div>
@@ -84,23 +141,16 @@ export function AccessibilityPage() {
               min={0}
               max={2}
               step={1}
-              value={SPEED_VALUE[avatarSpeed]}
+              value={SPEEDS.indexOf(prefs.avatarSpeed)}
               onChange={(event) => {
-                const next = SPEED_FROM_VALUE[Number(event.target.value)]
-                if (next) setAvatarSpeed(next)
+                const next = SPEEDS[Number(event.target.value)]
+                if (next) set('avatarSpeed', next)
               }}
               aria-label="Velocidad del avatar"
+              aria-valuetext={SPEED_LABEL[prefs.avatarSpeed]}
             />
             <span aria-hidden="true">🐇</span>
           </div>
-        </div>
-
-        <div className="row-between">
-          <span className="row field__label">
-            <Icon name="sun" size={18} />
-            Modo oscuro
-          </span>
-          <Toggle checked={darkMode} onChange={setDarkMode} label="Modo oscuro" />
         </div>
 
         <div className="row-between">
@@ -109,31 +159,61 @@ export function AccessibilityPage() {
             Subtitulos siempre visibles
           </span>
           <Toggle
-            checked={subtitles}
-            onChange={setSubtitles}
+            checked={prefs.subtitles}
+            onChange={(value) => set('subtitles', value)}
             label="Subtitulos siempre visibles"
           />
         </div>
 
         <div className="row-between">
-          <span className="row field__label">
+          <label className="row field__label" htmlFor="accessibility-language">
             <Icon name="help" size={18} />
-            Idioma
-          </span>
-          <span className="link">Espanol</span>
+            Idioma de la voz
+          </label>
+          <select
+            id="accessibility-language"
+            className="field__select accessibility__language"
+            value={prefs.language}
+            onChange={(event) => set('language', event.target.value)}
+          >
+            {LANGUAGES.map((l) => (
+              <option key={l.value} value={l.value}>
+                {l.label}
+              </option>
+            ))}
+          </select>
         </div>
       </Card>
 
       <p className="demo-note">
-        El modo oscuro, la velocidad de voz/avatar y los subtitulos aun no se
-        guardan ni afectan a toda la app. El tamano de texto si se aplica.
+        <Icon name="shield" size={14} />
+        Los cambios se aplican al instante y se recuerdan en este navegador.
+        "Guardar cambios" los envia ademas al servidor.
       </p>
 
-      <Button size="lg" fullWidth className="accessibility__save">
-        Guardar cambios
+      <Button
+        size="lg"
+        fullWidth
+        icon={saveState === 'saved' ? 'check' : 'refresh'}
+        className="accessibility__save"
+        onClick={() => void save()}
+        disabled={saveState === 'saving' || !dirty}
+      >
+        {saveState === 'saving' ? 'Guardando...' : 'Guardar cambios'}
       </Button>
+
+      {saveState === 'saved' && (
+        <p className="text-xs text-center accessibility__saved">
+          Preferencias guardadas en el servidor.
+        </p>
+      )}
+      {saveState === 'local' && (
+        <p className="text-xs text-muted text-center">
+          Sin conexion con el servidor: se guardaron solo en este navegador.
+        </p>
+      )}
+
       <span className="andean-rule" aria-hidden="true">
-        <span className="andean-rule__diamond" />
         <span className="andean-rule__diamond" />
       </span>
     </div>

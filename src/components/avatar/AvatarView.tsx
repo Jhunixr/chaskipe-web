@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useImperativeHandle, useRef, useState } from 'react'
 
 import { Icon } from '@/components/ui'
+import { usePreferences } from '@/hooks/usePreferences'
 
 import type { Avatar3DHandle } from './Avatar3D'
 
@@ -38,6 +39,7 @@ export function AvatarView({ ref, caption, playing = false }: AvatarViewProps) {
   const inner = useRef<Avatar3DHandle | null>(null)
   const [gestureActive, setGestureActive] = useState(false)
   const autoPlayedRef = useRef(false)
+  const { prefs } = usePreferences()
 
   useImperativeHandle(
     ref,
@@ -70,6 +72,10 @@ export function AvatarView({ ref, caption, playing = false }: AvatarViewProps) {
   }, [playing])
 
   const showDemo = gestureActive || playing
+  // "Subtitulos siempre visibles": con la preferencia activa el texto se queda
+  // fijo; sin ella, solo acompana al gesto mientras se reproduce.
+  const showCaption =
+    caption !== undefined && caption !== '' && (prefs.subtitles || showDemo)
 
   return (
     <div className="avatar-view">
@@ -95,7 +101,7 @@ export function AvatarView({ ref, caption, playing = false }: AvatarViewProps) {
           />
         </Suspense>
 
-        {caption && <p className="avatar-view__caption">{caption}</p>}
+        {showCaption && <p className="avatar-view__caption">{caption}</p>}
       </div>
 
       <p className="demo-note avatar-view__note">

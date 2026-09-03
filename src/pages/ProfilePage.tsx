@@ -27,7 +27,7 @@ interface ProfileLink {
 
 const LINKS: ProfileLink[] = [
   { label: 'Preferencias', to: ROUTES.accessibility, icon: 'settings' },
-  { label: 'Privacidad y datos', to: ROUTES.help, icon: 'shield' },
+  { label: 'Privacidad y datos', to: ROUTES.privacy, icon: 'shield' },
   { label: 'Ayuda y tutorial', to: ROUTES.help, icon: 'help' },
 ]
 

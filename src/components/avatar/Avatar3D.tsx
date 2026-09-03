@@ -1,5 +1,8 @@
 import { useEffect, useImperativeHandle, useRef } from 'react'
 
+import { usePreferences } from '@/hooks/usePreferences'
+import { AVATAR_RATE } from '@/types/preferences'
+
 import { DEMO_GESTURE } from './animation'
 import { SignAvatarScene } from './scene'
 
@@ -21,6 +24,8 @@ interface Avatar3DProps {
 export function Avatar3D({ ref, onGestureEnd }: Avatar3DProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const sceneRef = useRef<SignAvatarScene | null>(null)
+  const { prefs } = usePreferences()
+  const gestureSpeed = AVATAR_RATE[prefs.avatarSpeed]
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -44,6 +49,11 @@ export function Avatar3D({ ref, onGestureEnd }: Avatar3DProps) {
       sceneRef.current = null
     }
   }, [])
+
+  // Aplicar la velocidad al montar y cada vez que cambie la preferencia.
+  useEffect(() => {
+    sceneRef.current?.setGestureSpeed(gestureSpeed)
+  }, [gestureSpeed])
 
   useImperativeHandle(
     ref,

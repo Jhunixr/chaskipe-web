@@ -1,0 +1,106 @@
+.privacy__lead {
+  font-family: var(--font-display);
+  font-size: calc(var(--fs-lg) * var(--text-scale));
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--color-ink);
+}
+
+.privacy__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.privacy__item {
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+}
+
+.privacy__head {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: none;
+  border: none;
+  text-align: left;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: calc(var(--fs-base) * var(--text-scale));
+  color: var(--color-ink);
+}
+
+.privacy__icon {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.privacy__title {
+  flex: 1;
+}
+
+.privacy__chevron {
+  color: var(--color-text-faint);
+  transition: transform 0.18s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.privacy__chevron--open {
+  transform: rotate(90deg);
+  color: var(--color-primary);
+}
+
+.privacy__body {
+  padding: 0 var(--space-4) var(--space-4);
+  padding-left: calc(var(--space-4) + 32px + var(--space-3));
+  line-height: 1.6;
+}
+
+.privacy__facts {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.privacy__fact {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--color-hairline);
+}
+
+.privacy__fact:last-child {
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.privacy__fact strong {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--color-ink);
+  text-align: right;
+}
+
+.privacy__zero {
+  color: var(--color-success);
+}
+
+.privacy code {
+  font-family: var(--font-sans);
+  font-size: 0.9em;
+  font-weight: 700;
+  background: color-mix(in srgb, var(--color-warning) 14%, transparent);
+  padding: 1px 5px;
+  border-radius: 5px;
+}

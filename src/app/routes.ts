@@ -18,6 +18,7 @@ export const ROUTES = {
   history: '/historial',
   profile: '/perfil',
   accessibility: '/accesibilidad',
+  privacy: '/privacidad',
   help: '/ayuda',
 
   // Herramienta interna (FASE 4): captura de dataset de landmarks.

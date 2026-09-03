@@ -103,6 +103,127 @@
 
   /* ---- Textura de papel (grano sutil sobre el fondo) ---- */
   --paper-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
+
+  color-scheme: light;
+}
+
+/*
+ * ---- Modo oscuro ----
+ * Misma direccion editorial, no un gris generico: la tinta marron pasa a ser
+ * el fondo y el crema pasa a ser el texto. El rojo se aclara para mantener
+ * contraste AA sobre superficies oscuras (el #b4231f del modo claro no lo
+ * alcanza), y el dorado gana luminosidad.
+ *
+ * `.theme-dark` lo pone el hook useTheme en <html>. Se define una sola vez y
+ * se reutiliza para la preferencia del sistema mas abajo.
+ */
+.theme-dark {
+  --color-bg: #221812;
+  --color-bg-soft: #2b1f18;
+  --color-surface: #2e2119;
+  --color-surface-alt: #382920;
+  --color-surface-sunk: #1c1410;
+  --color-border: #46342a;
+  --color-border-strong: #5d4638;
+  --color-hairline: #3a2b22;
+
+  --color-primary: #f0665c;
+  --color-primary-hover: #f47d74;
+  --color-primary-active: #d9584f;
+  --color-primary-soft: #45241f;
+  --color-primary-tint: #33201b;
+  --color-primary-ink: #ffd9d4;
+
+  --color-ink: #f6ece0;
+  --color-ink-soft: #e2d3c2;
+
+  --color-gold: #e0b458;
+  --color-gold-strong: #f0c974;
+  --color-gold-soft: #3d3120;
+  --color-beige: #4a3c2a;
+  --color-clay: #d98a72;
+
+  --color-text: #f2e7db;
+  --color-text-muted: #bfae9b;
+  --color-text-faint: #9a8878;
+  --color-text-inverse: #221812;
+
+  --color-success: #6bbf8e;
+  --color-success-soft: #23342a;
+  --color-info: #7fa8cf;
+  --color-info-soft: #22303c;
+  --color-warning: #e0b458;
+  --color-warning-soft: #3a2f1c;
+
+  --shadow-card: 0 1px 1px rgba(0, 0, 0, 0.3),
+    0 8px 20px -12px rgba(0, 0, 0, 0.7);
+  --shadow-raised: 0 2px 4px rgba(0, 0, 0, 0.35),
+    0 18px 40px -16px rgba(0, 0, 0, 0.8);
+  --shadow-nav: 0 -1px 0 var(--color-hairline),
+    0 -14px 32px -20px rgba(0, 0, 0, 0.7);
+  --shadow-primary: 0 10px 24px -10px rgba(240, 102, 92, 0.35);
+
+  /* El grano se nota mas sobre oscuro: se baja la opacidad. */
+  --paper-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.14'/%3E%3C/svg%3E");
+
+  color-scheme: dark;
+}
+
+/*
+ * Preferencia del sistema: solo cuando el tema es "sistema" (clase
+ * .theme-auto). Se importa la misma paleta que .theme-dark.
+ */
+@media (prefers-color-scheme: dark) {
+  .theme-auto {
+    --color-bg: #221812;
+    --color-bg-soft: #2b1f18;
+    --color-surface: #2e2119;
+    --color-surface-alt: #382920;
+    --color-surface-sunk: #1c1410;
+    --color-border: #46342a;
+    --color-border-strong: #5d4638;
+    --color-hairline: #3a2b22;
+
+    --color-primary: #f0665c;
+    --color-primary-hover: #f47d74;
+    --color-primary-active: #d9584f;
+    --color-primary-soft: #45241f;
+    --color-primary-tint: #33201b;
+    --color-primary-ink: #ffd9d4;
+
+    --color-ink: #f6ece0;
+    --color-ink-soft: #e2d3c2;
+
+    --color-gold: #e0b458;
+    --color-gold-strong: #f0c974;
+    --color-gold-soft: #3d3120;
+    --color-beige: #4a3c2a;
+    --color-clay: #d98a72;
+
+    --color-text: #f2e7db;
+    --color-text-muted: #bfae9b;
+    --color-text-faint: #9a8878;
+    --color-text-inverse: #221812;
+
+    --color-success: #6bbf8e;
+    --color-success-soft: #23342a;
+    --color-info: #7fa8cf;
+    --color-info-soft: #22303c;
+    --color-warning: #e0b458;
+    --color-warning-soft: #3a2f1c;
+
+    --shadow-card: 0 1px 1px rgba(0, 0, 0, 0.3),
+      0 8px 20px -12px rgba(0, 0, 0, 0.7);
+    --shadow-raised: 0 2px 4px rgba(0, 0, 0, 0.35),
+      0 18px 40px -16px rgba(0, 0, 0, 0.8);
+    --shadow-nav: 0 -1px 0 var(--color-hairline),
+      0 -14px 32px -20px rgba(0, 0, 0, 0.7);
+    --shadow-primary: 0 10px 24px -10px rgba(240, 102, 92, 0.35);
+
+    --paper-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.14'/%3E%3C/svg%3E");
+
+    color-scheme: dark;
+  }
 }
 
 * {

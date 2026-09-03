@@ -45,6 +45,7 @@ export class SignAvatarScene {
 
   private currentGesture: Gesture | null = null
   private gestureElapsed = 0
+  private gestureSpeed = 1
   private onGestureEnd: (() => void) | null = null
 
   constructor(canvas: HTMLCanvasElement) {
@@ -119,6 +120,14 @@ export class SignAvatarScene {
     this.onGestureEnd = onEnd ?? null
   }
 
+  /**
+   * Velocidad de reproduccion de los gestos (preferencia de accesibilidad).
+   * 1 = normal. No afecta a la animacion de reposo.
+   */
+  setGestureSpeed(speed: number): void {
+    this.gestureSpeed = Number.isFinite(speed) && speed > 0 ? speed : 1
+  }
+
   stopGesture(): void {
     this.currentGesture = null
     this.onGestureEnd = null
@@ -141,7 +150,7 @@ export class SignAvatarScene {
     applyIdle(this.bones, t)
 
     if (this.currentGesture) {
-      this.gestureElapsed += dt * 1000
+      this.gestureElapsed += dt * 1000 * this.gestureSpeed
       const running = applyGesture(
         this.bones,
         this.currentGesture,

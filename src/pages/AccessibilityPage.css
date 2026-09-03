@@ -46,3 +46,31 @@
 .accessibility__save {
   margin-top: var(--space-2);
 }
+
+.accessibility__saved {
+  color: var(--color-success);
+  font-weight: 700;
+}
+
+/* El selector de tema ocupa el ancho: tres opciones iguales. */
+.accessibility__segmented {
+  display: flex;
+  width: 100%;
+}
+
+.accessibility__segmented .segmented__option {
+  flex: 1;
+}
+
+.accessibility__language {
+  width: auto;
+  min-width: 10rem;
+  padding: var(--space-2) var(--space-3);
+  font-size: calc(var(--fs-sm) * var(--text-scale));
+  font-weight: 600;
+}
+
+.accessibility__try {
+  padding: 2px var(--space-3);
+  font-size: calc(var(--fs-xs) * var(--text-scale));
+}
