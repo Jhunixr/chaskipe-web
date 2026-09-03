@@ -1,61 +1,76 @@
 /*
- * Chaski Pe - Sistema visual
- * Mobile first. Identidad peruana sutil, apariencia de startup profesional.
- * Fondo crema, color principal rojo, tarjetas blancas, detalles beige/dorado moderados.
+ * Chaski Pe — Sistema visual
+ * Direccion: editorial calido andino.
+ * Fondo crema con textura sutil de papel · rojo peruano profundo como acento
+ * fuerte · display serif con caracter (Fraunces) + cuerpo grotesque limpio
+ * (Hanken Grotesk) · detalle andino fino · dorado puntual · tarjetas nitidas
+ * con borde definido. Mobile first, identidad peruana sutil, apariencia de
+ * producto real.
  */
 
 :root {
-  /* Paleta base */
-  --color-bg: #fbf5ec;
-  --color-bg-soft: #f6ecdd;
-  --color-surface: #ffffff;
-  --color-surface-alt: #f7efe2;
-  --color-border: #ece0cd;
-  --color-border-strong: #ddcbb0;
+  /* ---- Superficies ---- */
+  --color-bg: #f5ece0;
+  --color-bg-soft: #efe3d2;
+  --color-surface: #fffdf9;
+  --color-surface-alt: #f6ede0;
+  --color-surface-sunk: #efe4d3;
+  --color-border: #e4d4bd;
+  --color-border-strong: #d2bc9c;
+  --color-hairline: #ece0cd;
 
-  /* Rojo (color principal) */
-  --color-primary: #c8221f;
-  --color-primary-hover: #ac1c19;
-  --color-primary-active: #911714;
-  --color-primary-soft: #f9e6e4;
-  --color-primary-tint: #fdf1f0;
+  /* ---- Rojo peruano (acento principal) ---- */
+  --color-primary: #b4231f;
+  --color-primary-hover: #9c1c19;
+  --color-primary-active: #841512;
+  --color-primary-soft: #f6e2df;
+  --color-primary-tint: #fbefed;
+  --color-primary-ink: #6f1512;
 
-  /* Marron del wordmark (para titulos destacados) */
-  --color-ink: #3a2a22;
+  /* ---- Tinta / marron editorial ---- */
+  --color-ink: #33231a;
+  --color-ink-soft: #4a352a;
 
-  /* Detalles */
-  --color-gold: #c8992e;
-  --color-gold-soft: #f7edd7;
-  --color-beige: #e7dcc6;
+  /* ---- Detalles ---- */
+  --color-gold: #b0842b;
+  --color-gold-strong: #8f6a1f;
+  --color-gold-soft: #f4e9cf;
+  --color-beige: #e6d9bf;
+  --color-clay: #c9705a;
 
-  /* Texto */
-  --color-text: #2c2622;
-  --color-text-muted: #726657;
-  --color-text-inverse: #ffffff;
+  /* ---- Texto ---- */
+  --color-text: #2e241d;
+  --color-text-muted: #6c5b4b;
+  --color-text-faint: #8a7864;
+  --color-text-inverse: #fffaf2;
 
-  /* Estados */
-  --color-success: #2e7d51;
-  --color-success-soft: #e4f1ea;
-  --color-info: #345b8c;
-  --color-info-soft: #e6edf5;
-  --color-warning: #b5791b;
-  --color-warning-soft: #f9eed8;
+  /* ---- Estados ---- */
+  --color-success: #2f6b46;
+  --color-success-soft: #e2efe4;
+  --color-info: #2f5578;
+  --color-info-soft: #e3ebf2;
+  --color-warning: #a06a17;
+  --color-warning-soft: #f6ecd6;
 
-  /* Tipografia */
-  --font-sans: 'Nunito', 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue',
-    Arial, sans-serif;
+  /* ---- Tipografia ---- */
+  --font-display: 'Fraunces', 'Iowan Old Style', 'Palatino Linotype', Georgia,
+    serif;
+  --font-sans: 'Hanken Grotesk', 'Segoe UI', system-ui, -apple-system,
+    'Helvetica Neue', Arial, sans-serif;
+
   --fs-xs: 0.75rem;
   --fs-sm: 0.875rem;
   --fs-base: 1rem;
   --fs-lg: 1.125rem;
   --fs-xl: 1.375rem;
   --fs-2xl: 1.75rem;
-  --fs-3xl: 2.125rem;
+  --fs-3xl: 2.25rem;
+  --fs-4xl: 2.85rem;
 
   /* Escala de texto accesible (la ajusta AccessibilityPage) */
   --text-scale: 1;
 
-  /* Espaciado */
+  /* ---- Espaciado ---- */
   --space-1: 0.25rem;
   --space-2: 0.5rem;
   --space-3: 0.75rem;
@@ -65,22 +80,29 @@
   --space-7: 2.5rem;
   --space-8: 3rem;
 
-  /* Formas */
-  --radius-sm: 10px;
-  --radius-md: 16px;
-  --radius-lg: 22px;
-  --radius-xl: 28px;
+  /* ---- Formas ---- */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
+  --radius-xl: 26px;
   --radius-pill: 999px;
 
-  /* Sombras (moderadas) */
-  --shadow-card: 0 1px 2px rgba(58, 42, 34, 0.05), 0 6px 16px rgba(58, 42, 34, 0.06);
-  --shadow-raised: 0 2px 6px rgba(58, 42, 34, 0.08), 0 12px 28px rgba(58, 42, 34, 0.1);
-  --shadow-nav: 0 -1px 0 var(--color-border), 0 -8px 24px rgba(58, 42, 34, 0.05);
+  /* ---- Sombras (calidas, discretas) ---- */
+  --shadow-card: 0 1px 1px rgba(51, 35, 26, 0.04),
+    0 8px 20px -12px rgba(51, 35, 26, 0.16);
+  --shadow-raised: 0 2px 4px rgba(51, 35, 26, 0.06),
+    0 18px 40px -16px rgba(51, 35, 26, 0.24);
+  --shadow-nav: 0 -1px 0 var(--color-hairline),
+    0 -14px 32px -20px rgba(51, 35, 26, 0.22);
+  --shadow-primary: 0 10px 24px -10px rgba(180, 35, 31, 0.45);
 
-  /* Layout */
+  /* ---- Layout ---- */
   --app-max-width: 460px;
-  --bottom-nav-height: 68px;
-  --page-padding: 1.25rem;
+  --bottom-nav-height: 66px;
+  --page-padding: 1.35rem;
+
+  /* ---- Textura de papel (grano sutil sobre el fondo) ---- */
+  --paper-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
 }
 
 * {
@@ -97,11 +119,14 @@ body {
   margin: 0;
   font-family: var(--font-sans);
   font-size: calc(var(--fs-base) * var(--text-scale));
-  line-height: 1.5;
+  line-height: 1.55;
   color: var(--color-text);
   background-color: var(--color-bg);
+  background-image: var(--paper-grain);
+  background-attachment: fixed;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  font-feature-settings: 'ss01', 'cv05';
 }
 
 h1,
@@ -109,22 +134,26 @@ h2,
 h3,
 h4 {
   margin: 0;
-  font-weight: 800;
-  line-height: 1.2;
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.12;
   color: var(--color-ink);
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
+  font-optical-sizing: auto;
 }
 
 h1 {
-  font-size: calc(var(--fs-2xl) * var(--text-scale));
+  font-size: calc(var(--fs-3xl) * var(--text-scale));
+  font-weight: 600;
 }
 
 h2 {
-  font-size: calc(var(--fs-xl) * var(--text-scale));
+  font-size: calc(var(--fs-2xl) * var(--text-scale));
 }
 
 h3 {
-  font-size: calc(var(--fs-lg) * var(--text-scale));
+  font-size: calc(var(--fs-xl) * var(--text-scale));
+  font-weight: 600;
 }
 
 p {
@@ -155,8 +184,13 @@ ol {
   list-style: none;
 }
 
+::selection {
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+}
+
 :focus-visible {
-  outline: 3px solid var(--color-gold);
+  outline: 2.5px solid var(--color-gold);
   outline-offset: 2px;
   border-radius: var(--radius-sm);
 }
@@ -164,4 +198,10 @@ ol {
 img {
   max-width: 100%;
   display: block;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
 }

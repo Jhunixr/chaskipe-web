@@ -3,6 +3,8 @@
   flex-direction: column;
   gap: var(--space-4);
   margin-bottom: var(--space-5);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-hairline);
 }
 
 .flow-header__bar {
@@ -22,6 +24,11 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius-pill);
   color: var(--color-primary);
+  transition: background-color 0.15s ease;
+}
+
+.flow-header__back:hover {
+  background: var(--color-primary-tint);
 }
 
 .flow-header__spacer {

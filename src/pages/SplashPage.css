@@ -1,5 +1,15 @@
 .splash {
-  background: var(--color-surface);
+  background:
+    radial-gradient(
+      120% 60% at 50% 0%,
+      var(--color-primary-tint),
+      transparent 70%
+    ),
+    var(--color-surface);
+}
+
+.splash .fullscreen__center {
+  gap: var(--space-6);
 }
 
 .splash__loader {
@@ -8,11 +18,11 @@
 }
 
 .splash__loader span {
-  width: 10px;
-  height: 10px;
+  width: 7px;
+  height: 7px;
   border-radius: var(--radius-pill);
   background: var(--color-primary);
-  opacity: 0.35;
+  opacity: 0.3;
   animation: splash-pulse 1s ease-in-out infinite;
 }
 
@@ -27,12 +37,12 @@
 @keyframes splash-pulse {
   0%,
   100% {
-    opacity: 0.35;
+    opacity: 0.3;
     transform: translateY(0);
   }
   50% {
     opacity: 1;
-    transform: translateY(-4px);
+    transform: translateY(-5px);
   }
 }
 

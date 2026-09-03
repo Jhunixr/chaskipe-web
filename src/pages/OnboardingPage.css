@@ -1,7 +1,13 @@
 .onboarding {
-  background: var(--color-surface);
+  background:
+    radial-gradient(
+      100% 45% at 50% 100%,
+      var(--color-primary-tint),
+      transparent 60%
+    ),
+    var(--color-surface);
   justify-content: space-between;
-  padding: var(--space-6) var(--page-padding) var(--space-5);
+  padding: var(--space-7) var(--page-padding) var(--space-5);
 }
 
 .onboarding__body {
@@ -14,12 +20,29 @@
 }
 
 .onboarding__title {
-  font-size: calc(var(--fs-3xl) * var(--text-scale));
-  line-height: 1.1;
+  font-size: calc(var(--fs-4xl) * var(--text-scale));
+  line-height: 1.05;
+  max-width: 12ch;
 }
 
 .onboarding__art {
   padding: var(--space-3);
+  position: relative;
+}
+
+.onboarding__art::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 6px;
+  width: 120px;
+  height: 14px;
+  transform: translateX(-50%);
+  background: radial-gradient(
+    50% 100% at 50% 0%,
+    rgba(51, 35, 26, 0.16),
+    transparent
+  );
 }
 
 .onboarding__highlights {
@@ -47,11 +70,17 @@
   gap: 2px;
 }
 
+.onboarding__highlight strong {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
 .onboarding__highlight-icon {
   flex-shrink: 0;
   width: 42px;
   height: 42px;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-md);
   display: inline-flex;
   align-items: center;
   justify-content: center;

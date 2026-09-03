@@ -1,12 +1,12 @@
 .home {
   position: relative;
-  min-height: 78vh;
+  min-height: 80vh;
   padding-bottom: var(--space-8);
+  gap: var(--space-6);
 }
 
 .home > .mountains--bottom {
   z-index: 0;
-  opacity: 0.9;
 }
 
 .home__top {
@@ -23,21 +23,30 @@
 }
 
 .home__avatar {
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
   border-radius: var(--radius-pill);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  flex-shrink: 0;
+}
+
+.home__hello {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
 }
 
 .home__greeting {
-  font-size: calc(var(--fs-lg) * var(--text-scale));
-}
-
-.home__greeting strong {
-  color: var(--color-primary);
+  font-family: var(--font-display);
+  font-size: calc(var(--fs-xl) * var(--text-scale));
+  font-weight: 600;
+  color: var(--color-ink);
+  line-height: 1.1;
 }
 
 .home__bell {
@@ -50,26 +59,38 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
+}
+
+.home__lead {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  align-items: flex-start;
 }
 
 .home__question {
-  margin-top: var(--space-5);
-  font-size: calc(var(--fs-lg) * var(--text-scale));
-  font-weight: 700;
-  color: var(--color-ink);
+  font-size: calc(var(--fs-3xl) * var(--text-scale));
+  line-height: 1.08;
+  max-width: 14ch;
+}
+
+.home__lead .andean-rule::before,
+.home__lead .andean-rule::after {
+  width: 34px;
 }
 
 .home__options {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-  margin-top: var(--space-4);
   position: relative;
   z-index: 1;
 }
 
 .home-option {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto auto 1fr auto;
   align-items: center;
   gap: var(--space-4);
   padding: var(--space-4);
@@ -77,16 +98,29 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-card);
+  transition: transform 0.16s cubic-bezier(0.2, 0.7, 0.2, 1),
+    border-color 0.16s ease, box-shadow 0.16s ease;
 }
 
 .home-option:hover {
-  border-color: var(--color-primary);
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--color-primary) 40%, transparent);
+  box-shadow: var(--shadow-raised);
+}
+
+.home-option__index {
+  font-family: var(--font-display);
+  font-size: calc(var(--fs-sm) * var(--text-scale));
+  font-weight: 500;
+  font-style: italic;
+  color: var(--color-text-faint);
+  align-self: flex-start;
 }
 
 .home-option__icon {
   flex-shrink: 0;
-  width: 46px;
-  height: 46px;
+  width: 44px;
+  height: 44px;
   border-radius: var(--radius-md);
   background: var(--color-primary-soft);
   color: var(--color-primary);
@@ -100,10 +134,11 @@
 }
 
 .home-option--featured .home-option__icon {
-  width: 54px;
-  height: 54px;
+  width: 52px;
+  height: 52px;
   background: var(--color-primary);
   color: var(--color-text-inverse);
+  box-shadow: var(--shadow-primary);
 }
 
 .home-option--featured .home-option__title {
@@ -113,16 +148,47 @@
 .home-option__body {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  flex: 1;
+  gap: 3px;
+  min-width: 0;
 }
 
 .home-option__title {
-  font-weight: 800;
+  font-family: var(--font-display);
+  font-weight: 600;
   color: var(--color-ink);
+  letter-spacing: -0.01em;
 }
 
 .home-option__chevron {
-  color: var(--color-text-muted);
+  color: var(--color-text-faint);
   flex-shrink: 0;
+}
+
+.home__phrases {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius-md);
+  color: var(--color-ink-soft);
+  font-weight: 700;
+  font-size: calc(var(--fs-sm) * var(--text-scale));
+  position: relative;
+  z-index: 1;
+  background: color-mix(in srgb, var(--color-surface) 60%, transparent);
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.home__phrases span {
+  flex: 1;
+}
+
+.home__phrases:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.home__phrases svg:first-child {
+  color: var(--color-primary);
 }

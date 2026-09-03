@@ -8,7 +8,7 @@
 .auth__brand {
   display: flex;
   justify-content: center;
-  padding: var(--space-4) 0 var(--space-2);
+  padding: var(--space-5) 0 var(--space-3);
 }
 
 .auth__form {
@@ -24,13 +24,13 @@
 
 .auth__switch {
   text-align: center;
+  color: var(--color-text-muted);
 }
 
 .auth__demo {
   margin-top: var(--space-2);
 }
 
-/* Cabecera de "Crear cuenta" con titulo de dos tonos */
 .auth__title {
   font-size: calc(var(--fs-3xl) * var(--text-scale));
 }

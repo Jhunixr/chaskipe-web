@@ -54,56 +54,91 @@
 .link {
   color: var(--color-primary);
   font-weight: 700;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--color-primary) 35%, transparent);
+  text-underline-offset: 3px;
+  transition: text-decoration-color 0.15s ease;
 }
 
 .link:hover {
-  text-decoration: underline;
+  text-decoration-color: var(--color-primary);
 }
 
-/* Titulo de dos tonos, como el wordmark (marron + rojo) */
+/*
+ * Titulo editorial de dos tonos (tinta + rojo), en serif.
+ * Uso: <h1 class="wordmark">Comunicate <em>sin barreras</em></h1>
+ */
 .wordmark {
-  font-weight: 800;
+  font-family: var(--font-display);
+  font-weight: 500;
   letter-spacing: -0.02em;
   color: var(--color-ink);
 }
 
 .wordmark em {
-  font-style: normal;
+  font-style: italic;
+  font-weight: 500;
   color: var(--color-primary);
 }
 
-/* Etiqueta de seccion */
+/* Etiqueta de seccion — versalitas con tracking amplio */
 .section-title {
+  font-family: var(--font-sans);
   font-size: calc(var(--fs-xs) * var(--text-scale));
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--color-text-muted);
+  letter-spacing: 0.14em;
+  color: var(--color-text-faint);
 }
 
-/* Cenefa andina: pequena linea decorativa con rombos */
+/*
+ * Cenefa andina: linea fina con rombos escalonados (motivo textil).
+ * Uso decorativo, aria-hidden.
+ */
 .andean-rule {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
   color: var(--color-primary);
+  font-family: var(--font-sans);
+  font-size: calc(var(--fs-xs) * var(--text-scale));
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
 .andean-rule::before,
 .andean-rule::after {
   content: '';
-  height: 2px;
-  width: 28px;
+  height: 1.5px;
+  width: 26px;
   background: currentColor;
-  border-radius: var(--radius-pill);
+  opacity: 0.5;
 }
 
 .andean-rule__diamond {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
   transform: rotate(45deg);
   background: var(--color-gold);
+  box-shadow: 8px 0 0 -1px var(--color-primary), -8px 0 0 -1px var(--color-primary);
+  margin: 0 8px;
+}
+
+/* Banda de cenefa a lo ancho (separador de bloques) */
+.andean-band {
+  height: 10px;
+  width: 100%;
+  background-image: repeating-linear-gradient(
+      45deg,
+      var(--color-gold) 0 2px,
+      transparent 2px 8px
+    ),
+    repeating-linear-gradient(-45deg, var(--color-primary) 0 2px, transparent 2px 8px);
+  background-size: 11px 11px;
+  opacity: 0.55;
+  border-radius: var(--radius-pill);
 }
 
 /* Etiqueta DEMO */
@@ -113,35 +148,50 @@
   gap: var(--space-1);
   padding: 2px var(--space-2);
   font-size: calc(var(--fs-xs) * var(--text-scale));
-  font-weight: 700;
-  letter-spacing: 0.02em;
+  font-weight: 800;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--color-gold);
+  color: var(--color-gold-strong);
   background: var(--color-gold-soft);
-  border: 1px solid var(--color-beige);
+  border: 1px solid color-mix(in srgb, var(--color-gold) 30%, transparent);
   border-radius: var(--radius-pill);
 }
 
-.demo-note {
+/*
+ * Notas al pie. El icono opcional se separa con float para que el texto fluya
+ * a su alrededor: con `display:flex` cada <strong> se convertiria en un item
+ * y el parrafo se partiria en columnas.
+ */
+.demo-note,
+.disclaimer-note {
   font-size: calc(var(--fs-xs) * var(--text-scale));
-  color: var(--color-text-muted);
-  padding: var(--space-3);
-  background: var(--color-gold-soft);
-  border: 1px solid var(--color-beige);
+  line-height: 1.55;
+  padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-sm);
-  display: flex;
-  gap: var(--space-2);
+}
+
+.demo-note > svg,
+.disclaimer-note > svg {
+  float: left;
+  margin: 2px var(--space-2) 0 0;
+}
+
+.demo-note {
+  color: var(--color-text-muted);
+  background: var(--color-gold-soft);
+  border: 1px solid color-mix(in srgb, var(--color-gold) 22%, transparent);
+  border-left: 3px solid var(--color-gold);
+}
+
+.demo-note strong {
+  color: var(--color-ink-soft);
 }
 
 .disclaimer-note {
-  font-size: calc(var(--fs-xs) * var(--text-scale));
   color: var(--color-warning);
-  padding: var(--space-3);
   background: var(--color-warning-soft);
-  border: 1px solid #efd9ab;
-  border-radius: var(--radius-sm);
-  display: flex;
-  gap: var(--space-2);
+  border: 1px solid color-mix(in srgb, var(--color-warning) 22%, transparent);
+  border-left: 3px solid var(--color-warning);
 }
 
 .visually-hidden {
@@ -154,4 +204,46 @@
   clip: rect(0 0 0 0);
   white-space: nowrap;
   border: 0;
+}
+
+/* ---- Entrada escalonada de contenido de pagina ---- */
+@media (prefers-reduced-motion: no-preference) {
+  .page > *,
+  .auth > *,
+  .fullscreen__center > * {
+    animation: rise-in 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
+  }
+  .page > *:nth-child(1),
+  .auth > *:nth-child(1) {
+    animation-delay: 0.02s;
+  }
+  .page > *:nth-child(2),
+  .auth > *:nth-child(2) {
+    animation-delay: 0.07s;
+  }
+  .page > *:nth-child(3),
+  .auth > *:nth-child(3) {
+    animation-delay: 0.12s;
+  }
+  .page > *:nth-child(4),
+  .auth > *:nth-child(4) {
+    animation-delay: 0.17s;
+  }
+  .page > *:nth-child(5) {
+    animation-delay: 0.22s;
+  }
+  .page > *:nth-child(n + 6) {
+    animation-delay: 0.26s;
+  }
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

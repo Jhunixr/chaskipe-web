@@ -2,7 +2,10 @@
   display: flex;
   align-items: center;
   gap: var(--space-2);
+  font-family: var(--font-display);
   font-size: calc(var(--fs-lg) * var(--text-scale));
+  font-weight: 600;
+  letter-spacing: -0.01em;
   color: var(--color-ink);
 }
 
@@ -39,13 +42,14 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-card);
-  font-weight: 700;
+  font-weight: 600;
   color: var(--color-text);
   text-align: left;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
 }
 
 .quick-phrases__row:hover {
-  border-color: var(--color-primary);
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
 }
 
 .quick-phrases__row--active {

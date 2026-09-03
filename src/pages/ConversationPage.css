@@ -11,15 +11,17 @@
   gap: var(--space-2);
   padding: 4px var(--space-3);
   font-size: calc(var(--fs-xs) * var(--text-scale));
-  font-weight: 700;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   color: var(--color-primary);
   background: var(--color-primary-soft);
   border-radius: var(--radius-pill);
 }
 
 .conversation__live-dot {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   border-radius: var(--radius-pill);
   background: var(--color-primary);
   animation: conv-pulse 1.2s ease-in-out infinite;
@@ -28,7 +30,7 @@
 @keyframes conv-pulse {
   0%,
   100% {
-    opacity: 0.4;
+    opacity: 0.35;
   }
   50% {
     opacity: 1;
@@ -45,7 +47,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-  padding: var(--space-4);
+  padding: var(--space-5);
   border-radius: var(--radius-lg);
   border: 1px solid var(--color-border);
   box-shadow: var(--shadow-card);
@@ -58,7 +60,7 @@
 
 .conversation__panel--out {
   background: var(--color-gold-soft);
-  border-color: var(--color-beige);
+  border-color: color-mix(in srgb, var(--color-gold) 25%, transparent);
 }
 
 .conversation__panel-title {
@@ -68,7 +70,7 @@
   font-size: calc(var(--fs-xs) * var(--text-scale));
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.1em;
 }
 
 .conversation__panel--in .conversation__panel-title {
@@ -76,7 +78,7 @@
 }
 
 .conversation__panel--out .conversation__panel-title {
-  color: var(--color-warning);
+  color: var(--color-gold-strong);
 }
 
 .conversation__in-body {
@@ -99,18 +101,19 @@
 }
 
 .conversation__detected {
-  font-size: calc(var(--fs-xl) * var(--text-scale));
-  font-weight: 800;
+  font-family: var(--font-display);
+  font-size: calc(var(--fs-2xl) * var(--text-scale));
+  font-weight: 600;
   color: var(--color-ink);
 }
 
 .conversation__swap {
   align-self: center;
-  width: 40px;
-  height: 40px;
+  width: 38px;
+  height: 38px;
   margin: calc(var(--space-2) * -1) 0;
   border-radius: var(--radius-pill);
-  background: var(--color-primary);
+  background: var(--color-ink);
   color: var(--color-text-inverse);
   display: inline-flex;
   align-items: center;
@@ -122,8 +125,9 @@
 .conversation__reply {
   padding: var(--space-3) var(--space-4);
   font: inherit;
+  font-family: var(--font-display);
   font-size: calc(var(--fs-lg) * var(--text-scale));
-  font-weight: 700;
+  font-weight: 500;
   color: var(--color-ink);
   background: var(--color-surface);
   border: 1.5px solid var(--color-border);
@@ -133,6 +137,7 @@
 .conversation__reply:focus {
   outline: none;
   border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-soft);
 }
 
 .conversation__out-actions {

@@ -13,7 +13,7 @@
 .logo__text {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
+  gap: var(--space-2);
 }
 
 .logo--stack .logo__text {
@@ -21,26 +21,28 @@
 }
 
 .logo__wordmark {
+  font-family: var(--font-display);
   font-size: calc(var(--fs-xl) * var(--text-scale));
-  font-weight: 800;
-  letter-spacing: -0.03em;
+  font-weight: 600;
+  letter-spacing: -0.035em;
   color: var(--color-ink);
   line-height: 1;
 }
 
 .logo__wordmark em {
-  font-style: normal;
+  font-style: italic;
   color: var(--color-primary);
 }
 
 .logo--stack .logo__wordmark {
-  font-size: calc(var(--fs-3xl) * var(--text-scale));
+  font-size: calc(var(--fs-4xl) * var(--text-scale));
 }
 
 .logo__tagline {
+  font-family: var(--font-sans);
   font-size: calc(var(--fs-xs) * var(--text-scale));
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--color-primary);
 }

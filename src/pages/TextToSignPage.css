@@ -2,11 +2,14 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
+  border-left: 3px solid var(--color-gold);
 }
 
 .text-to-sign__incoming-text {
+  font-family: var(--font-display);
   font-size: calc(var(--fs-lg) * var(--text-scale));
-  font-weight: 800;
+  font-weight: 500;
+  font-style: italic;
   color: var(--color-ink);
 }
 
@@ -24,7 +27,7 @@
   flex: 1;
   height: 6px;
   border-radius: var(--radius-pill);
-  background: var(--color-surface-alt);
+  background: var(--color-surface-sunk);
   overflow: hidden;
 }
 

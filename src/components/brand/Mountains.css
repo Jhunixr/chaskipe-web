@@ -10,15 +10,30 @@
   left: 0;
   right: 0;
   bottom: 0;
-  height: 72px;
+  height: 84px;
   z-index: 0;
-  opacity: 0.5;
+  opacity: 0.4;
+  /* Se desvanece hacia los lados y hacia abajo para no leerse como un bloque. */
+  -webkit-mask-image: linear-gradient(
+      90deg,
+      transparent,
+      #000 18%,
+      #000 82%,
+      transparent
+    ),
+    linear-gradient(180deg, #000 45%, transparent);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent),
+    linear-gradient(180deg, #000 45%, transparent);
+  mask-composite: intersect;
 }
 
 .mountains__back {
-  fill: #e79b8f;
+  fill: var(--color-clay);
+  opacity: 0.5;
 }
 
 .mountains__front {
-  fill: #db8375;
+  fill: var(--color-primary);
+  opacity: 0.45;
 }

@@ -1,6 +1,6 @@
 .history__filter {
-  width: 44px;
-  height: 44px;
+  width: 42px;
+  height: 42px;
   border-radius: var(--radius-pill);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
@@ -33,8 +33,8 @@
 }
 
 .history__avatar {
-  width: 44px;
-  height: 44px;
+  width: 42px;
+  height: 42px;
   flex-shrink: 0;
   border-radius: var(--radius-pill);
   background: var(--color-surface-alt);
@@ -54,7 +54,9 @@
 }
 
 .history__text {
-  font-weight: 800;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: calc(var(--fs-lg) * var(--text-scale));
   color: var(--color-ink);
 }
 
@@ -64,7 +66,8 @@
   align-items: center;
   gap: var(--space-1);
   font-size: calc(var(--fs-xs) * var(--text-scale));
-  font-weight: 700;
+  font-weight: 800;
+  letter-spacing: 0.03em;
   padding: 2px var(--space-2);
   border-radius: var(--radius-pill);
 }
@@ -76,7 +79,11 @@
 
 .history__tag--out {
   background: var(--color-gold-soft);
-  color: var(--color-warning);
+  color: var(--color-gold-strong);
+}
+
+.history__meta {
+  font-variant-numeric: tabular-nums;
 }
 
 .history__delete {
