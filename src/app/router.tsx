@@ -22,6 +22,7 @@ import {
   TranslationResultPage,
 } from '@/pages'
 
+import { RequireSession } from './RequireSession'
 import { ROUTES } from './routes'
 
 export const router = createBrowserRouter([
@@ -36,22 +37,27 @@ export const router = createBrowserRouter([
     ],
   },
   {
-    // App: con barra de navegacion inferior
-    element: <AppLayout />,
+    // App: con barra de navegacion inferior. Requiere sesion (cuenta o invitado).
+    element: <RequireSession />,
     children: [
-      { path: ROUTES.home, element: <HomePage /> },
-      { path: ROUTES.cameraPreparation, element: <CameraPreparationPage /> },
-      { path: ROUTES.signToText, element: <SignToTextPage /> },
-      { path: ROUTES.translationResult, element: <TranslationResultPage /> },
-      { path: ROUTES.textToSign, element: <TextToSignPage /> },
-      { path: ROUTES.conversation, element: <ConversationPage /> },
-      { path: ROUTES.quickPhrases, element: <QuickPhrasesPage /> },
-      { path: ROUTES.history, element: <HistoryPage /> },
-      { path: ROUTES.profile, element: <ProfilePage /> },
-      { path: ROUTES.accessibility, element: <AccessibilityPage /> },
-      { path: ROUTES.privacy, element: <PrivacyPage /> },
-      { path: ROUTES.help, element: <HelpPage /> },
-      { path: ROUTES.datasetCollector, element: <DatasetCollectorPage /> },
+      {
+        element: <AppLayout />,
+        children: [
+          { path: ROUTES.home, element: <HomePage /> },
+          { path: ROUTES.cameraPreparation, element: <CameraPreparationPage /> },
+          { path: ROUTES.signToText, element: <SignToTextPage /> },
+          { path: ROUTES.translationResult, element: <TranslationResultPage /> },
+          { path: ROUTES.textToSign, element: <TextToSignPage /> },
+          { path: ROUTES.conversation, element: <ConversationPage /> },
+          { path: ROUTES.quickPhrases, element: <QuickPhrasesPage /> },
+          { path: ROUTES.history, element: <HistoryPage /> },
+          { path: ROUTES.profile, element: <ProfilePage /> },
+          { path: ROUTES.accessibility, element: <AccessibilityPage /> },
+          { path: ROUTES.privacy, element: <PrivacyPage /> },
+          { path: ROUTES.help, element: <HelpPage /> },
+          { path: ROUTES.datasetCollector, element: <DatasetCollectorPage /> },
+        ],
+      },
     ],
   },
   { path: '*', element: <NotFoundPage /> },

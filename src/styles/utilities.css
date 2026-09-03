@@ -194,6 +194,35 @@
   border-left: 3px solid var(--color-warning);
 }
 
+/* Espera mientras se comprueba la sesion guardada */
+.route-loading {
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.route-loading__spinner {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-pill);
+  border: 3px solid var(--color-border-strong);
+  border-top-color: var(--color-primary);
+  animation: route-spin 0.8s linear infinite;
+}
+
+@keyframes route-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .route-loading__spinner {
+    animation-duration: 2.4s;
+  }
+}
+
 .visually-hidden {
   position: absolute;
   width: 1px;

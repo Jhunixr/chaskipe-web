@@ -3,23 +3,31 @@ import { Link, useNavigate } from 'react-router-dom'
 
 import { ROUTES } from '@/app/routes'
 import { Logo } from '@/components/brand'
-import { Button, PasswordInput, TextInput } from '@/components/ui'
+import { Button, Icon, PasswordInput, TextInput } from '@/components/ui'
+import { useAuth } from '@/hooks/useAuth'
 
 import './AuthPage.css'
 import './pages.css'
 
-/**
- * FASE 1: solo interfaz. No hay autenticacion real; cualquier accion lleva a Inicio.
- */
 export function LoginPage() {
   const navigate = useNavigate()
+  const { signIn, continueAsGuest } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const [submitting, setSubmitting] = useState(false)
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
-    navigate(ROUTES.home)
+    setSubmitting(true)
+    setError(null)
+    const message = await signIn(email, password)
+    setSubmitting(false)
+    if (message === null) navigate(ROUTES.home)
+    else setError(message)
   }
+
+  const canSubmit = email.trim() !== '' && password !== '' && !submitting
 
   return (
     <div className="auth">
@@ -42,19 +50,25 @@ export function LoginPage() {
           autoComplete="current-password"
         />
 
-        <Link to={ROUTES.login} className="link auth__forgot">
-          ¿Olvidaste tu contrasena?
-        </Link>
+        {error && (
+          <p className="auth__error" role="alert">
+            <Icon name="shield" size={16} />
+            {error}
+          </p>
+        )}
 
-        <Button type="submit" size="lg" fullWidth>
-          Iniciar sesion
+        <Button type="submit" size="lg" fullWidth disabled={!canSubmit}>
+          {submitting ? 'Entrando...' : 'Iniciar sesion'}
         </Button>
         <Button
           type="button"
           variant="secondary"
           fullWidth
           icon="user"
-          onClick={() => navigate(ROUTES.home)}
+          onClick={() => {
+            continueAsGuest()
+            navigate(ROUTES.home)
+          }}
         >
           Continuar como invitado
         </Button>
@@ -68,7 +82,9 @@ export function LoginPage() {
       </p>
 
       <p className="demo-note auth__demo">
-        Demo: el inicio de sesion todavia no valida credenciales.
+        <Icon name="shield" size={14} />
+        Como invitado puedes usar la app, pero el historial y las preferencias
+        se quedan solo en este navegador.
       </p>
     </div>
   )

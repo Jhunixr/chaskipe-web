@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { ROUTES } from '@/app/routes'
 import { Mascot, Mountains } from '@/components/brand'
 import { Icon, type IconName } from '@/components/ui'
-import { DEMO_USER } from '@/services/mockData'
+import { useAuth } from '@/hooks/useAuth'
 
 import './HomePage.css'
 import './pages.css'
@@ -40,7 +40,11 @@ const OPTIONS: CommOption[] = [
 ]
 
 export function HomePage() {
-  const firstName = DEMO_USER.name.split(' ')[0] ?? DEMO_USER.name
+  // El nombre sale de la sesion, no de una constante: asi Inicio y Perfil
+  // muestran siempre lo mismo.
+  const { user, mode } = useAuth()
+  const isGuest = mode === 'guest' || user === null
+  const firstName = user ? (user.name.split(' ')[0] ?? user.name) : 'Invitado'
 
   return (
     <div className="page home">
@@ -50,7 +54,9 @@ export function HomePage() {
             <Mascot size={40} alt="" />
           </span>
           <span className="home__hello">
-            <span className="section-title">Bienvenido de vuelta</span>
+            <span className="section-title">
+              {isGuest ? 'Estas explorando' : 'Bienvenido de vuelta'}
+            </span>
             <p className="home__greeting">{firstName}</p>
           </span>
         </div>

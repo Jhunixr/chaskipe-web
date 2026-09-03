@@ -46,6 +46,22 @@
   gap: var(--space-3);
 }
 
+.profile__error {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.profile__guest {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.profile__guest-text {
+  color: var(--color-text-muted);
+  line-height: 1.55;
+}
+
 .profile__logout {
   display: flex;
   align-items: center;

@@ -7,6 +7,7 @@ import {
   type ReactNode,
 } from 'react'
 
+import { useAuth } from '@/hooks/useAuth'
 import { getPreferences, updatePreferences } from '@/services/api'
 import {
   coercePreferences,
@@ -74,11 +75,13 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
     }
   }, [prefs])
 
-  // Al montar: traer del backend. Si responde, su valor manda.
-  const hydratedRef = useRef(false)
+  // Traer del backend las preferencias de la cuenta. Si responde, su valor
+  // manda. Se repite al cambiar de usuario para no arrastrar las del anterior;
+  // un invitado no consulta nada (no tiene cuenta).
+  const { user } = useAuth()
+  const userId = user?.id ?? null
   useEffect(() => {
-    if (hydratedRef.current) return
-    hydratedRef.current = true
+    if (userId === null) return
     let cancelled = false
     void getPreferences().then((res) => {
       if (cancelled || res.source !== 'api') return
@@ -88,7 +91,7 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [userId])
 
   const set = useCallback(
     <K extends keyof Preferences>(key: K, value: Preferences[K]) => {
@@ -109,11 +112,17 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
   }, [prefs])
 
   const save = useCallback(async () => {
+    // Un invitado no tiene donde guardar en el servidor: queda en local.
+    if (userId === null) {
+      setSaveState('local')
+      setDirty(false)
+      return
+    }
     setSaveState('saving')
     const res = await updatePreferences(prefsRef.current)
     setSaveState(res.source === 'api' ? 'saved' : 'local')
     setDirty(false)
-  }, [])
+  }, [userId])
 
   const value = useMemo(
     () => ({ prefs, set, save, saveState, dirty }),

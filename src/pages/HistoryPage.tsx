@@ -3,6 +3,7 @@ import { useCallback, useMemo, useState } from 'react'
 import { Mascot } from '@/components/brand'
 import { Icon, PageHeader } from '@/components/ui'
 import { useApiResource } from '@/hooks/useApiResource'
+import { useAuth } from '@/hooks/useAuth'
 import { useBackendHealth } from '@/hooks/useBackendHealth'
 import { deleteHistory, getHistory, persistenceNote } from '@/services/api'
 import { HISTORY_ENTRIES } from '@/services/mockData'
@@ -17,7 +18,9 @@ const DAY_MS = 24 * 60 * 60 * 1000
 
 export function HistoryPage() {
   const [range, setRange] = useState<Range>('semana')
+  const { isAuthenticated } = useAuth()
   const fetcher = useCallback(() => getHistory(), [])
+  // De invitado se muestran los ejemplos: no hay historial en el servidor.
   const { data, source, loading, refetch } = useApiResource(
     fetcher,
     HISTORY_ENTRIES,
@@ -128,7 +131,9 @@ export function HistoryPage() {
 
       <p className="demo-note">
         <Icon name="shield" size={14} />
-        {persistenceNote(source, health.persistence)}
+        {isAuthenticated
+          ? persistenceNote(source, health.persistence)
+          : 'Como invitado se muestran ejemplos: el historial se guarda solo si tienes cuenta.'}
       </p>
     </div>
   )

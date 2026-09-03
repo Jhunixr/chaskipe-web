@@ -34,3 +34,32 @@
 .auth__title {
   font-size: calc(var(--fs-3xl) * var(--text-scale));
 }
+
+.auth__error {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  font-size: calc(var(--fs-sm) * var(--text-scale));
+  line-height: 1.5;
+  font-weight: 600;
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+  border: 1px solid color-mix(in srgb, var(--color-primary) 30%, transparent);
+  border-radius: var(--radius-sm);
+}
+
+.auth__error svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.auth__hint {
+  color: var(--color-text-faint);
+  line-height: 1.5;
+  margin-top: calc(var(--space-2) * -1);
+}
+
+.auth__hint--warn {
+  color: var(--color-warning);
+}

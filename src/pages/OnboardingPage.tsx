@@ -1,8 +1,9 @@
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import { ROUTES } from '@/app/routes'
 import { Mascot, Mountains } from '@/components/brand'
 import { Button, Icon } from '@/components/ui'
+import { useAuth } from '@/hooks/useAuth'
 
 import './OnboardingPage.css'
 import './pages.css'
@@ -24,6 +25,7 @@ const HIGHLIGHTS = [
 
 export function OnboardingPage() {
   const navigate = useNavigate()
+  const { continueAsGuest } = useAuth()
 
   return (
     <div className="fullscreen onboarding">
@@ -61,9 +63,18 @@ export function OnboardingPage() {
         >
           Comenzar
         </Button>
-        <Link to={ROUTES.home} className="link onboarding__skip">
+        <button
+          type="button"
+          className="link onboarding__skip"
+          onClick={() => {
+            // "Omitir" es entrar como invitado: hay que declararlo, no solo
+            // navegar, o la app quedaria sin sesion.
+            continueAsGuest()
+            navigate(ROUTES.home)
+          }}
+        >
           Omitir
-        </Link>
+        </button>
       </div>
 
       <Mountains />

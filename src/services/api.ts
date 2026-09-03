@@ -14,6 +14,7 @@ import {
   HISTORY_ENTRIES,
   QUICK_PHRASE_GROUPS,
 } from '@/services/mockData'
+import type { AuthError, AuthUser } from '@/types/auth'
 import {
   coercePreferences,
   DEFAULT_PREFERENCES,
@@ -42,10 +43,40 @@ export interface Result<T> {
   source: Source
 }
 
-async function request<T>(
-  path: string,
-  init?: RequestInit,
-): Promise<T> {
+/** Error de la API con el codigo HTTP, para distinguir 401 de 409 o de red. */
+export class ApiError extends Error {
+  readonly status: number
+  readonly detail: string | undefined
+
+  constructor(status: number, detail?: string) {
+    super(detail ?? `HTTP ${status}`)
+    this.name = 'ApiError'
+    this.status = status
+    this.detail = detail
+  }
+}
+
+/**
+ * Token de acceso en memoria. `AuthProvider` lo fija al iniciar sesion y lo
+ * limpia al cerrarla; tambien lo restaura desde localStorage al arrancar.
+ *
+ * Vive aqui (y no en el contexto) para que `request` pueda usarlo sin que
+ * cada llamada tenga que pasarlo.
+ */
+let accessToken: string | null = null
+
+export function setAccessToken(token: string | null): void {
+  accessToken = token
+}
+
+/** Se invoca cuando el backend responde 401: la sesion ya no vale. */
+let onUnauthorized: (() => void) | null = null
+
+export function setUnauthorizedHandler(handler: (() => void) | null): void {
+  onUnauthorized = handler
+}
+
+async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const controller = new AbortController()
   const timer = window.setTimeout(() => controller.abort(), TIMEOUT_MS)
   try {
@@ -54,17 +85,106 @@ async function request<T>(
       signal: controller.signal,
       headers: {
         'Content-Type': 'application/json',
+        ...(accessToken !== null
+          ? { Authorization: `Bearer ${accessToken}` }
+          : {}),
         ...(init?.headers ?? {}),
       },
     })
     if (!res.ok) {
-      throw new Error(`${path} -> ${res.status}`)
+      // Token caducado o revocado: avisar para cerrar la sesion.
+      if (res.status === 401) onUnauthorized?.()
+      let detail: string | undefined
+      try {
+        const body = (await res.json()) as { detail?: unknown }
+        if (typeof body.detail === 'string') detail = body.detail
+      } catch {
+        // respuesta sin cuerpo JSON
+      }
+      throw new ApiError(res.status, detail)
     }
     if (res.status === 204) return undefined as T
     return (await res.json()) as T
   } finally {
     window.clearTimeout(timer)
   }
+}
+
+// ---- Autenticacion ----
+
+interface ApiAuthResponse {
+  access_token: string
+  token_type: string
+  user: AuthUser
+}
+
+export interface AuthResult {
+  token: string
+  user: AuthUser
+}
+
+/**
+ * Traduce el error a un mensaje para la persona usuaria. Se distingue el fallo
+ * de red del rechazo del servidor: no es lo mismo "no hay backend" que
+ * "contrasena incorrecta".
+ */
+function authErrorMessage(error: unknown, fallback: string): AuthError {
+  if (error instanceof ApiError) {
+    return { message: error.detail ?? fallback, status: error.status }
+  }
+  return {
+    message:
+      'No se pudo conectar con el servidor. Revisa que este encendido e intentalo de nuevo.',
+  }
+}
+
+export async function register(data: {
+  name: string
+  email: string
+  password: string
+}): Promise<AuthResult | AuthError> {
+  try {
+    const res = await request<ApiAuthResponse>('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+    return { token: res.access_token, user: res.user }
+  } catch (error) {
+    return authErrorMessage(error, 'No se pudo crear la cuenta.')
+  }
+}
+
+export async function login(data: {
+  email: string
+  password: string
+}): Promise<AuthResult | AuthError> {
+  try {
+    const res = await request<ApiAuthResponse>('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+    return { token: res.access_token, user: res.user }
+  } catch (error) {
+    return authErrorMessage(error, 'No se pudo iniciar sesion.')
+  }
+}
+
+/** Comprueba que el token guardado sigue valido. `null` si no lo esta. */
+export async function fetchMe(): Promise<AuthUser | null> {
+  try {
+    return await request<AuthUser>('/auth/me')
+  } catch {
+    return null
+  }
+}
+
+export function isAuthError(value: unknown): value is AuthError {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'message' in value &&
+    !('token' in value)
+  )
 }
 
 // ---- Perfil ----
@@ -83,18 +203,27 @@ export async function getProfile(): Promise<Result<UserProfile>> {
   }
 }
 
+export type UpdateProfileResult =
+  | { ok: true; data: UserProfile; source: Source }
+  | { ok: false; error: string }
+
 export async function updateProfile(
   profile: UserProfile,
-): Promise<Result<UserProfile>> {
+): Promise<UpdateProfileResult> {
   try {
     const p = await request<ApiProfile>('/profile', {
       method: 'PUT',
       body: JSON.stringify(profile),
     })
-    return { data: { name: p.name, email: p.email }, source: 'api' }
-  } catch {
-    // sin backend no se persiste; devolvemos lo que se intento guardar
-    return { data: profile, source: 'mock' }
+    return { ok: true, data: { name: p.name, email: p.email }, source: 'api' }
+  } catch (error) {
+    // Un 409 (correo de otra cuenta) es un rechazo real que hay que mostrar,
+    // no un "sin conexion".
+    if (error instanceof ApiError) {
+      return { ok: false, error: error.detail ?? 'No se pudo guardar el perfil.' }
+    }
+    // Sin backend: no se persistio, pero no es culpa de lo que escribio.
+    return { ok: true, data: profile, source: 'mock' }
   }
 }
 

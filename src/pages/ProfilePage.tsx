@@ -12,9 +12,10 @@ import {
   TextInput,
 } from '@/components/ui'
 import { useApiResource } from '@/hooks/useApiResource'
+import { useAuth } from '@/hooks/useAuth'
 import { useBackendHealth } from '@/hooks/useBackendHealth'
 import { getProfile, persistenceNote, updateProfile } from '@/services/api'
-import { DEMO_USER } from '@/services/mockData'
+import type { UserProfile } from '@/types'
 
 import './ProfilePage.css'
 import './pages.css'
@@ -31,10 +32,20 @@ const LINKS: ProfileLink[] = [
   { label: 'Ayuda y tutorial', to: ROUTES.help, icon: 'help' },
 ]
 
+/** Perfil vacio para el modo invitado: no hay cuenta que mostrar. */
+const GUEST_PROFILE: UserProfile = { name: 'Invitado', email: '' }
+
 export function ProfilePage() {
   const navigate = useNavigate()
+  const { user, isAuthenticated, signOut, updateUser } = useAuth()
+
   const fetcher = useCallback(() => getProfile(), [])
-  const { data: profile, source, refetch } = useApiResource(fetcher, DEMO_USER)
+  // De invitado no se consulta el perfil del servidor: no hay cuenta.
+  const initial: UserProfile = user
+    ? { name: user.name, email: user.email }
+    : GUEST_PROFILE
+  const { data: fetched, source, refetch } = useApiResource(fetcher, initial)
+  const profile = isAuthenticated ? fetched : GUEST_PROFILE
   const health = useBackendHealth()
 
   const [editing, setEditing] = useState(false)
@@ -42,20 +53,33 @@ export function ProfilePage() {
   const [email, setEmail] = useState('')
   const [saving, setSaving] = useState(false)
   const [savedNote, setSavedNote] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
   const startEditing = () => {
     setName(profile.name)
     setEmail(profile.email)
     setSavedNote(null)
+    setError(null)
     setEditing(true)
   }
 
   const handleSave = async () => {
     setSaving(true)
+    setError(null)
     const res = await updateProfile({ name: name.trim(), email: email.trim() })
     setSaving(false)
+
+    if (!res.ok) {
+      // Rechazo real del servidor (p. ej. correo de otra cuenta): se queda
+      // en edicion para poder corregirlo.
+      setError(res.error)
+      return
+    }
+
     setEditing(false)
     if (res.source === 'api') {
+      // Reflejar el cambio en la sesion para que Inicio lo muestre al momento.
+      updateUser({ name: res.data.name, email: res.data.email })
       setSavedNote(
         health.persistence === 'postgresql'
           ? 'Perfil guardado en el servidor (PostgreSQL).'
@@ -74,62 +98,89 @@ export function ProfilePage() {
       <div className="profile__identity">
         <span className="profile__avatar" aria-hidden="true">
           <Mascot size={88} alt="" />
-          <span className="profile__status" />
+          {isAuthenticated && <span className="profile__status" />}
         </span>
         {!editing && (
           <>
             <p className="profile__name">{profile.name}</p>
-            <p className="text-muted text-sm">{profile.email}</p>
+            {isAuthenticated ? (
+              <p className="text-muted text-sm">{profile.email}</p>
+            ) : (
+              <p className="text-muted text-sm">Sin cuenta</p>
+            )}
           </>
         )}
       </div>
 
-      {editing ? (
-        <Card className="stack-sm">
-          <TextInput
-            value={name}
-            onChange={setName}
-            icon="user"
-            label="Nombre"
-            autoComplete="name"
-          />
-          <TextInput
-            value={email}
-            onChange={setEmail}
-            type="email"
-            icon="mail"
-            label="Correo"
-            autoComplete="email"
-          />
-          <div className="profile__edit-actions">
+      {isAuthenticated ? (
+        editing ? (
+          <Card className="stack-sm">
+            <TextInput
+              value={name}
+              onChange={setName}
+              icon="user"
+              label="Nombre"
+              autoComplete="name"
+            />
+            <TextInput
+              value={email}
+              onChange={setEmail}
+              type="email"
+              icon="mail"
+              label="Correo"
+              autoComplete="email"
+            />
+            {error && <p className="profile__error text-sm">{error}</p>}
+            <div className="profile__edit-actions">
+              <Button
+                icon="check"
+                onClick={handleSave}
+                disabled={saving || name.trim() === '' || email.trim() === ''}
+              >
+                {saving ? 'Guardando...' : 'Guardar'}
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  setEditing(false)
+                  setError(null)
+                }}
+              >
+                Cancelar
+              </Button>
+            </div>
+          </Card>
+        ) : (
+          <Button variant="secondary" fullWidth icon="edit" onClick={startEditing}>
+            Editar perfil
+          </Button>
+        )
+      ) : (
+        <Card className="profile__guest">
+          <p className="profile__guest-text text-sm">
+            Estas usando Chaski Pe sin cuenta. Crea una para guardar tu
+            historial y tus preferencias, y recuperarlos en otro dispositivo.
+          </p>
+          <div className="stack-sm">
             <Button
-              icon="check"
-              onClick={handleSave}
-              disabled={saving || name.trim() === '' || email.trim() === ''}
+              fullWidth
+              icon="user"
+              onClick={() => navigate(ROUTES.register)}
             >
-              Guardar
+              Crear cuenta
             </Button>
             <Button
-              variant="ghost"
-              onClick={() => {
-                setEditing(false)
-                setName(profile.name)
-                setEmail(profile.email)
-              }}
+              variant="secondary"
+              fullWidth
+              onClick={() => navigate(ROUTES.login)}
             >
-              Cancelar
+              Iniciar sesion
             </Button>
           </div>
         </Card>
-      ) : (
-        <Button variant="secondary" fullWidth icon="edit" onClick={startEditing}>
-          Editar perfil
-        </Button>
       )}
 
-      {savedNote && (
-        <p className="text-xs text-muted text-center">{savedNote}</p>
-      )}
+      {savedNote && <p className="text-xs text-muted text-center">{savedNote}</p>}
 
       <Card className="card--flat">
         <nav className="list-links" aria-label="Opciones de perfil">
@@ -148,18 +199,25 @@ export function ProfilePage() {
         </nav>
       </Card>
 
-      <button
-        type="button"
-        className="profile__logout"
-        onClick={() => navigate(ROUTES.login)}
-      >
-        <Icon name="logout" size={20} />
-        Cerrar sesion
-      </button>
+      {isAuthenticated && (
+        <button
+          type="button"
+          className="profile__logout"
+          onClick={() => {
+            signOut()
+            navigate(ROUTES.login)
+          }}
+        >
+          <Icon name="logout" size={20} />
+          Cerrar sesion
+        </button>
+      )}
 
       <p className="demo-note">
         <Icon name="shield" size={14} />
-        {persistenceNote(source, health.persistence)}
+        {isAuthenticated
+          ? persistenceNote(source, health.persistence)
+          : 'Como invitado, nada se guarda en el servidor: el historial y las preferencias viven solo en este navegador.'}
       </p>
     </div>
   )

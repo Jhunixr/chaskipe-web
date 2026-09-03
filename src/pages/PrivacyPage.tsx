@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react'
 
 import { Card, Icon, type IconName, PageHeader } from '@/components/ui'
 import { useApiResource } from '@/hooks/useApiResource'
+import { useAuth } from '@/hooks/useAuth'
 import { useBackendHealth } from '@/hooks/useBackendHealth'
 import { getHistory } from '@/services/api'
 import { HISTORY_ENTRIES } from '@/services/mockData'
@@ -62,12 +63,14 @@ const SECTIONS: Section[] = [
 
 export function PrivacyPage() {
   const [open, setOpen] = useState<number | null>(0)
+  const { isAuthenticated } = useAuth()
   const health = useBackendHealth()
   const fetcher = useCallback(() => getHistory(), [])
   const { data: history } = useApiResource(fetcher, HISTORY_ENTRIES)
 
-  const storageLabel =
-    health.persistence === 'postgresql'
+  const storageLabel = !isAuthenticated
+    ? 'Solo en este navegador (sin cuenta)'
+    : health.persistence === 'postgresql'
       ? 'Base de datos del servidor (PostgreSQL)'
       : health.online
         ? 'Memoria del servidor (se borra al reiniciarlo)'
@@ -126,7 +129,7 @@ export function PrivacyPage() {
           </div>
           <div className="privacy__fact">
             <span className="text-sm text-muted">Traducciones guardadas</span>
-            <strong>{history.length}</strong>
+            <strong>{isAuthenticated ? history.length : 0}</strong>
           </div>
           <div className="privacy__fact">
             <span className="text-sm text-muted">Videos guardados</span>
