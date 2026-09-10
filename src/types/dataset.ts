@@ -32,9 +32,43 @@ export interface VocabItem {
  * confundir cualquier movimiento con una sena.
  */
 export const SIGN_VOCAB: readonly VocabItem[] = [
+  // --- Palabras y frases ---
   { label: 'HOLA', word: 'Hola', dynamic: true },
   { label: 'GRACIAS', word: 'Gracias', dynamic: true },
+  { label: 'ADIOS', word: 'Adios', dynamic: true },
+  { label: 'HOLA_COMO_ESTAS', word: 'Hola, como estas', dynamic: true },
+  { label: 'CUIDATE', word: 'Cuidate', dynamic: true },
   { label: 'REPOSO', word: 'Reposo (sin sena)', dynamic: false },
+
+  // --- Abecedario dactilologico ---
+  // La mayoria son poses fijas; J, Z y ENYE llevan movimiento.
+  { label: 'A', word: 'A', dynamic: false },
+  { label: 'B', word: 'B', dynamic: false },
+  { label: 'C', word: 'C', dynamic: false },
+  { label: 'D', word: 'D', dynamic: false },
+  { label: 'E', word: 'E', dynamic: false },
+  { label: 'F', word: 'F', dynamic: false },
+  { label: 'G', word: 'G', dynamic: false },
+  { label: 'H', word: 'H', dynamic: false },
+  { label: 'I', word: 'I', dynamic: false },
+  { label: 'J', word: 'J', dynamic: true },
+  { label: 'K', word: 'K', dynamic: false },
+  { label: 'L', word: 'L', dynamic: false },
+  { label: 'M', word: 'M', dynamic: false },
+  { label: 'N', word: 'N', dynamic: false },
+  { label: 'ENYE', word: 'N (enye)', dynamic: true },
+  { label: 'O', word: 'O', dynamic: false },
+  { label: 'P', word: 'P', dynamic: false },
+  { label: 'Q', word: 'Q', dynamic: false },
+  { label: 'R', word: 'R', dynamic: false },
+  { label: 'S', word: 'S', dynamic: false },
+  { label: 'T', word: 'T', dynamic: false },
+  { label: 'U', word: 'U', dynamic: false },
+  { label: 'V', word: 'V', dynamic: false },
+  { label: 'W', word: 'W', dynamic: false },
+  { label: 'X', word: 'X', dynamic: false },
+  { label: 'Y', word: 'Y', dynamic: false },
+  { label: 'Z', word: 'Z', dynamic: true },
 ]
 
 /** Vocabulario activo de la herramienta de captura. */
