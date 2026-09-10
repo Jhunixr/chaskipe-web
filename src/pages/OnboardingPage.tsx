@@ -11,15 +11,15 @@ import './pages.css'
 const HIGHLIGHTS = [
   {
     icon: 'hands' as const,
-    title: 'Senas a texto y voz',
-    description: 'Convierte tus senas en texto y voz al instante.',
+    title: 'Señas a texto y voz',
+    description: 'Convierte tus señas en texto y voz al instante.',
     tone: 'primary' as const,
   },
   {
     icon: 'user' as const,
-    title: 'Texto a senas con avatar',
-    description: 'Convierte cualquier mensaje en senas con un avatar.',
-    tone: 'success' as const,
+    title: 'Texto a señas con avatar',
+    description: 'Convierte cualquier mensaje en señas con un avatar.',
+    tone: 'primary' as const,
   },
 ]
 
@@ -31,7 +31,7 @@ export function OnboardingPage() {
     <div className="fullscreen onboarding">
       <div className="onboarding__body">
         <h1 className="onboarding__title wordmark">
-          Comunicate <em>sin barreras</em>
+          Comunícate <em>sin barreras</em>
         </h1>
 
         <div className="onboarding__art">

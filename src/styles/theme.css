@@ -10,42 +10,42 @@
 
 :root {
   /* ---- Superficies ---- */
-  --color-bg: #f5ece0;
-  --color-bg-soft: #efe3d2;
-  --color-surface: #fffdf9;
-  --color-surface-alt: #f6ede0;
-  --color-surface-sunk: #efe4d3;
-  --color-border: #e4d4bd;
-  --color-border-strong: #d2bc9c;
-  --color-hairline: #ece0cd;
+  --color-bg: #FBF9F6;
+  --color-bg-soft: #FFF4E4;
+  --color-surface: #FFFFFF;
+  --color-surface-alt: #FFF4E4;
+  --color-surface-sunk: #FFF4E4;
+  --color-border: #E7DDD5;
+  --color-border-strong: #DFA69D;
+  --color-hairline: #E7DDD5;
 
   /* ---- Rojo peruano (acento principal) ---- */
-  --color-primary: #b4231f;
-  --color-primary-hover: #9c1c19;
-  --color-primary-active: #841512;
-  --color-primary-soft: #f6e2df;
-  --color-primary-tint: #fbefed;
-  --color-primary-ink: #6f1512;
+  --color-primary: #CA2422;
+  --color-primary-hover: #A81717;
+  --color-primary-active: #601E12;
+  --color-primary-soft: #DFA69D;
+  --color-primary-tint: #FFF4E4;
+  --color-primary-ink: #601E12;
 
   /* ---- Tinta / marron editorial ---- */
-  --color-ink: #33231a;
-  --color-ink-soft: #4a352a;
+  --color-ink: #160B07;
+  --color-ink-soft: #601E12;
 
   /* ---- Detalles ---- */
-  --color-gold: #b0842b;
-  --color-gold-strong: #8f6a1f;
-  --color-gold-soft: #f4e9cf;
+  --color-gold: #CD8850;
+  --color-gold-strong: #CD8850;
+  --color-gold-soft: #FFF4E4;
   --color-beige: #e6d9bf;
   --color-clay: #c9705a;
 
   /* ---- Texto ---- */
-  --color-text: #2e241d;
-  --color-text-muted: #6c5b4b;
-  --color-text-faint: #8a7864;
-  --color-text-inverse: #fffaf2;
+  --color-text: #160B07;
+  --color-text-muted: #716864;
+  --color-text-faint: #716864;
+  --color-text-inverse: #FFFFFF;
 
   /* ---- Estados ---- */
-  --color-success: #2f6b46;
+  --color-success: #2E9D58;
   --color-success-soft: #e2efe4;
   --color-info: #2f5578;
   --color-info-soft: #e3ebf2;

@@ -5,7 +5,7 @@ import './Logo.css'
 interface LogoProps {
   /** 'row' = mascota + wordmark en linea; 'stack' = apilado y centrado. */
   layout?: 'row' | 'stack'
-  /** Muestra el lema "Comunicacion sin barreras". */
+  /** Muestra el lema "Comunicación sin barreras". */
   tagline?: boolean
   mascotSize?: number
 }
@@ -25,7 +25,7 @@ export function Logo({ layout = 'row', tagline = false, mascotSize = 40 }: LogoP
         {tagline && (
           <span className="logo__tagline andean-rule">
             <span className="andean-rule__diamond" aria-hidden="true" />
-            Comunicacion sin barreras
+            Comunicación sin barreras
             <span className="andean-rule__diamond" aria-hidden="true" />
           </span>
         )}
