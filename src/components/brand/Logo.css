@@ -23,14 +23,14 @@
 .logo__wordmark {
   font-family: var(--font-display);
   font-size: calc(var(--fs-xl) * var(--text-scale));
-  font-weight: 600;
+  font-weight: 900;
   letter-spacing: -0.035em;
   color: var(--color-ink);
   line-height: 1;
 }
 
 .logo__wordmark em {
-  font-style: italic;
+  font-style: normal;
   color: var(--color-primary);
 }
 
@@ -41,7 +41,7 @@
 .logo__tagline {
   font-family: var(--font-sans);
   font-size: calc(var(--fs-xs) * var(--text-scale));
-  font-weight: 700;
+  font-weight: 900;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--color-primary);

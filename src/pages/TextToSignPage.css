@@ -1,45 +1,123 @@
+.text-to-sign {
+  gap: var(--space-4);
+}
+
+/* Lo que se dijo: globo verde azulado (voz de la persona oyente). */
+.text-to-sign__said {
+  align-self: flex-end;
+  max-width: 88%;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border-radius: 24px 24px 6px 24px;
+  background: var(--color-teal);
+  color: #fff;
+  font-size: calc(var(--fs-xl) * var(--text-scale));
+  font-weight: 900;
+  line-height: 1.2;
+  box-shadow: 0 5px 0 var(--color-teal-edge);
+}
+
+.text-to-sign__said svg {
+  flex-shrink: 0;
+}
+
 .text-to-sign__incoming {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
-  border-left: 3px solid var(--color-gold);
+  gap: var(--space-1);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  box-shadow: 0 4px 0 var(--color-border);
+  font-size: calc(var(--fs-xl) * var(--text-scale));
+  font-weight: 900;
 }
 
-.text-to-sign__incoming-text {
-  font-family: var(--font-display);
-  font-size: calc(var(--fs-lg) * var(--text-scale));
-  font-weight: 500;
-  font-style: italic;
-  color: var(--color-ink);
-}
-
-.text-to-sign__label {
-  color: var(--color-primary);
-}
-
-.text-to-sign__playback {
+.text-to-sign__controls {
   display: flex;
   align-items: center;
   gap: var(--space-3);
 }
 
-.text-to-sign__track {
+.text-to-sign__grow {
   flex: 1;
-  height: 6px;
-  border-radius: var(--radius-pill);
-  background: var(--color-surface-sunk);
-  overflow: hidden;
 }
 
-.text-to-sign__track-fill {
-  display: block;
-  width: 50%;
-  height: 100%;
+.text-to-sign__round {
+  flex-shrink: 0;
+  width: 62px;
+  height: 62px;
+  border: none;
+  border-radius: var(--radius-lg);
   background: var(--color-primary);
+  color: #fff;
+  box-shadow: 0 5px 0 var(--color-primary-edge);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
 }
 
-.text-to-sign__controls {
+.text-to-sign__round--teal {
+  background: var(--color-teal);
+  box-shadow: 0 5px 0 var(--color-teal-edge);
+}
+
+.text-to-sign__round:active:not(:disabled) {
+  transform: translateY(4px);
+  box-shadow: none;
+}
+
+.text-to-sign__round:disabled {
+  opacity: 0.45;
+}
+
+/* Boton grande de dictado. */
+.text-to-sign__mic {
   display: flex;
-  gap: var(--space-2);
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  background: var(--color-surface);
+  box-shadow: 0 5px 0 var(--color-border);
+  color: var(--color-text);
+  font-size: calc(var(--fs-lg) * var(--text-scale));
+  font-weight: 900;
+}
+
+.text-to-sign__mic-icon {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: var(--color-teal);
+  color: #fff;
+  box-shadow: 0 6px 0 var(--color-teal-edge);
+  display: inline-flex;
+  align-items: center;
   justify-content: center;
+}
+
+.text-to-sign__mic--live .text-to-sign__mic-icon {
+  background: var(--color-gold);
+  color: #2b1611;
+  box-shadow: 0 6px 0 #c98400;
+  animation: mic-pulse 1.1s ease-in-out infinite;
+}
+
+@keyframes mic-pulse {
+  50% {
+    transform: scale(1.06);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .text-to-sign__mic--live .text-to-sign__mic-icon {
+    animation: none;
+  }
 }

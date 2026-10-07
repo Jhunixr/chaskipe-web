@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 import { ROUTES } from '@/app/routes'
 
@@ -13,126 +13,164 @@ import type { QuickPhraseCategory } from '@/types'
 import './QuickPhrasesPage.css'
 import './pages.css'
 
-const CATEGORY_ICON: Record<QuickPhraseCategory, IconName> = {
-  saludos: 'chat',
-  respuestas: 'check',
-  necesidades: 'hands',
-  salud: 'shield',
-  transporte: 'swap',
-  compras: 'phrases',
-  emergencias: 'bell',
+type Tone = 'red' | 'teal' | 'gold'
+
+const CATEGORY_STYLE: Record<QuickPhraseCategory, { icon: IconName; tone: Tone }> = {
+  saludos: { icon: 'smile', tone: 'gold' },
+  respuestas: { icon: 'check', tone: 'teal' },
+  necesidades: { icon: 'hands', tone: 'red' },
+  salud: { icon: 'pulse', tone: 'red' },
+  transporte: { icon: 'bus', tone: 'teal' },
+  compras: { icon: 'bag', tone: 'gold' },
+  emergencias: { icon: 'siren', tone: 'red' },
 }
 
-/** Categorias de frases cortas: se muestran como chips en vez de lista. */
-const CHIP_CATEGORIES: QuickPhraseCategory[] = ['saludos', 'respuestas']
+/** Estilo de un tema; uno desconocido (p. ej. nuevo en el servidor) usa el neutro. */
+function styleOf(category: string): { icon: IconName; tone: Tone } {
+  return CATEGORY_STYLE[category as QuickPhraseCategory] ?? { icon: 'phrases', tone: 'gold' }
+}
 
+/** La frase mas usada: siempre arriba, en grande. */
+const SOS_TEXT = 'Soy una persona sorda. Por favor, escríbeme.'
+
+/**
+ * Frases rapidas: se tocan una vez y el celular las dice en voz alta. La
+ * elegida se puede mostrar en señas con Chaski.
+ */
 export function QuickPhrasesPage() {
   const navigate = useNavigate()
+  const location = useLocation()
   const { speak, supported } = useSpeech()
   const [query, setQuery] = useState('')
+  const [category, setCategory] = useState<QuickPhraseCategory | 'todas'>(
+    () => (location.state as { category?: QuickPhraseCategory } | null)?.category ?? 'todas',
+  )
   const [selected, setSelected] = useState<string | null>(null)
 
   const fetcher = useCallback(() => getPhraseGroups(), [])
   const { data: allGroups } = useApiResource(fetcher, QUICK_PHRASE_GROUPS)
 
-  const selectedText = useMemo(
-    () =>
-      allGroups.flatMap((g) => g.phrases).find((p) => p.id === selected)?.text ?? null,
-    [allGroups, selected],
-  )
-
-  const groups = useMemo(() => {
+  const phrases = useMemo(() => {
     const term = query.trim().toLowerCase()
-    if (!term) return allGroups
     return allGroups
-      .map((group) => ({
-        ...group,
-        phrases: group.phrases.filter((phrase) =>
-          phrase.text.toLowerCase().includes(term),
-        ),
-      }))
-      .filter((group) => group.phrases.length > 0)
-  }, [query, allGroups])
+      .filter((g) => category === 'todas' || g.category === category)
+      .flatMap((g) => g.phrases.map((p) => ({ ...p, category: g.category })))
+      .filter((p) => !term || p.text.toLowerCase().includes(term))
+  }, [query, category, allGroups])
+
+  const selectedText =
+    selected === 'sos' ? SOS_TEXT : (phrases.find((p) => p.id === selected)?.text ?? null)
+
+  const say = (id: string, text: string) => {
+    setSelected(id)
+    speak(text)
+  }
 
   return (
-    <div className="page quick-phrases">
-      <PageHeader title="Frases rapidas" showBack={false} />
+    <div className={`page quick-phrases${selectedText ? ' quick-phrases--selected' : ''}`}>
+      <PageHeader title="Frases" showBack={false} />
 
       <div className="input-group">
-        <Icon name="search" size={20} className="input-group__icon" />
+        <Icon name="search" size={22} className="input-group__icon" />
         <input
           className="input-group__field"
-          type="text"
-          placeholder="Buscar frases..."
+          type="search"
+          placeholder="Buscar una frase"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           aria-label="Buscar frases"
         />
       </div>
 
-      <p className="demo-note">
-        Las senas LSP asociadas a estas frases aun no estan validadas con
-        personas usuarias ni interpretes (contenido demostrativo).
-      </p>
+      <div className="chip-row" role="tablist" aria-label="Temas">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={category === 'todas'}
+          className={`chip${category === 'todas' ? ' chip--active' : ''}`}
+          onClick={() => setCategory('todas')}
+        >
+          Todas
+        </button>
+        {allGroups.map((group) => {
+          const style = styleOf(group.category)
+          const active = category === group.category
+          return (
+            <button
+              key={group.category}
+              type="button"
+              role="tab"
+              aria-selected={active}
+              className={`chip${active ? ' chip--active' : ''}`}
+              onClick={() => setCategory(group.category)}
+            >
+              <span className={`quick-phrases__chip-icon quick-phrases__chip-icon--${style.tone}`}>
+                <Icon name={style.icon} size={18} />
+              </span>
+              {group.label}
+            </button>
+          )
+        })}
+      </div>
 
-      {groups.map((group) => (
-        <section key={group.category} className="page__section">
-          <h2 className="quick-phrases__category">
-            <Icon name={CATEGORY_ICON[group.category]} size={18} />
-            {group.label}
-          </h2>
-          {CHIP_CATEGORIES.includes(group.category) ? (
-            <div className="quick-phrases__chips">
-              {group.phrases.map((phrase) => (
+      {!query && (
+        <button
+          type="button"
+          className={`quick-phrases__sos${selected === 'sos' ? ' quick-phrases__sos--on' : ''}`}
+          onClick={() => say('sos', SOS_TEXT)}
+          disabled={!supported}
+        >
+          <span className="quick-phrases__sos-icon">
+            <Icon name="volume" size={26} />
+          </span>
+          {SOS_TEXT}
+        </button>
+      )}
+
+      {phrases.length === 0 ? (
+        <p className="text-muted text-center">No hay frases con “{query}”.</p>
+      ) : (
+        <ul className="quick-phrases__grid">
+          {phrases.map((phrase) => {
+            const style = styleOf(phrase.category)
+            return (
+              <li key={phrase.id}>
                 <button
-                  key={phrase.id}
                   type="button"
-                  className={`chip${selected === phrase.id ? ' chip--active' : ''}`}
-                  onClick={() => {
-                    setSelected(phrase.id)
-                    speak(phrase.text)
-                  }}
+                  className={`tile quick-phrases__tile${
+                    selected === phrase.id ? ' quick-phrases__tile--on' : ''
+                  }`}
+                  onClick={() => say(phrase.id, phrase.text)}
                   disabled={!supported}
                 >
-                  {phrase.text}
-                  <Icon name="chevron" size={14} />
+                  <span className={`icon-badge icon-badge--${style.tone} quick-phrases__tile-icon`}>
+                    <Icon name={style.icon} size={22} />
+                  </span>
+                  <span className="quick-phrases__tile-text">{phrase.text}</span>
                 </button>
-              ))}
-            </div>
-          ) : (
-            <ul className="quick-phrases__list">
-              {group.phrases.map((phrase) => (
-                <li key={phrase.id}>
-                  <button
-                    type="button"
-                    className={`quick-phrases__row${
-                      selected === phrase.id ? ' quick-phrases__row--active' : ''
-                    }`}
-                    onClick={() => {
-                      setSelected(phrase.id)
-                      speak(phrase.text)
-                    }}
-                    disabled={!supported}
-                  >
-                    <span>{phrase.text}</span>
-                    <Icon name="chevron" size={18} className="text-muted" />
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
-      ))}
+              </li>
+            )
+          })}
+        </ul>
+      )}
 
-      <Button
-        size="lg"
-        fullWidth
-        icon="hands"
-        disabled={!selectedText}
-        onClick={() => navigate(ROUTES.textToSign, { state: { text: selectedText } })}
-      >
-        Mostrar en senas
-      </Button>
+      <p className="demo-note">
+        Toca una frase y el celular la dice en voz alta. Las señas de estas
+        frases aún no están validadas con personas usuarias ni intérpretes.
+      </p>
+
+      {selectedText && (
+        <div className="quick-phrases__bar">
+          <Button
+            size="lg"
+            fullWidth
+            icon="hands"
+            onClick={() => navigate(ROUTES.textToSign, { state: { text: selectedText } })}
+          >
+            Mostrar en señas
+          </Button>
+        </div>
+      )}
     </div>
   )
 }

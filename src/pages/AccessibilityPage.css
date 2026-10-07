@@ -10,7 +10,7 @@
   border: 1.5px solid var(--color-border-strong);
   background: var(--color-surface);
   font-family: var(--font-display);
-  font-weight: 600;
+  font-weight: 900;
   color: var(--color-ink);
   transition: border-color 0.15s ease, color 0.15s ease;
 }

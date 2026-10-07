@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 
 import { ROUTES } from '@/app/routes'
 import { CameraView, HandOverlay } from '@/components/camera'
@@ -9,6 +9,7 @@ import { useHandLandmarker } from '@/hooks/useHandLandmarker'
 import { useSignRecognition, type RecognitionOutput } from '@/hooks/useSignRecognition'
 import { addHistory } from '@/services/api'
 import { handOffSpelled } from '@/services/conversation'
+import { markLearned } from '@/services/learning'
 import {
   phraseForLabel,
   saveRecognition,
@@ -40,18 +41,33 @@ import './pages.css'
 export function SignToTextPage() {
   const navigate = useNavigate()
   const location = useLocation()
-  // Se llego desde Conversacion: "Usar texto" devuelve la palabra alli.
-  const fromConversation =
-    (location.state as { from?: string } | null)?.from === 'conversation'
+  const state = location.state as { from?: string; practice?: string } | null
+  // Se llego desde Conversacion o Cara a cara: "Enviar" devuelve la palabra alli.
+  const returnTo =
+    state?.from === 'conversation'
+      ? ROUTES.conversation
+      : state?.from === 'face-to-face'
+        ? ROUTES.faceToFace
+        : null
+  const fromConversation = returnTo !== null
+  // Practica de Aprende LSP: la letra que hay que hacer.
+  const practice = state?.practice ?? null
+  const [practiceDone, setPracticeDone] = useState(false)
   const camera = useCamera('user')
   const [mode, setMode] = useState<ModelKind>('letters')
   const [spelled, setSpelled] = useState('')
 
   const handleConfirm = useCallback(
     (out: RecognitionOutput) => {
-      if (mode === 'letters') setSpelled((text) => text + phraseForLabel(out.label))
+      if (mode !== 'letters') return
+      const letter = phraseForLabel(out.label)
+      setSpelled((text) => text + letter)
+      if (practice && letter === practice) {
+        markLearned(practice)
+        setPracticeDone(true)
+      }
     },
-    [mode],
+    [mode, practice],
   )
   const recog = useSignRecognition({ mode, onConfirm: handleConfirm })
   const letters = mode === 'letters'
@@ -99,11 +115,11 @@ export function SignToTextPage() {
   const confirmed = recog.confirmed
   const candidate = recog.candidate
 
-  const showResult = (payload: RecognitionResult) => {
+  const showResult = (payload: RecognitionResult, autoSpeak = false) => {
     saveRecognition(payload)
     // Guardar en el historial (si el backend no responde, se ignora).
     void addHistory({ direction: 'sign-to-text', text: payload.text, isDemo: true })
-    navigate(ROUTES.translationResult, { state: payload })
+    navigate(ROUTES.translationResult, { state: { ...payload, autoSpeak } })
   }
 
   const goToResult = () => {
@@ -120,9 +136,9 @@ export function SignToTextPage() {
   const submitSpelled = () => {
     const text = spelled.trim()
     if (!text) return
-    if (fromConversation) {
+    if (returnTo) {
       handOffSpelled(text)
-      navigate(ROUTES.conversation)
+      navigate(returnTo)
       return
     }
     showResult({
@@ -131,7 +147,7 @@ export function SignToTextPage() {
       confidence: confirmed?.confidence ?? 1,
       isSynthetic: false,
       at: Date.now(),
-    })
+    }, true)
   }
 
   const changeMode = (next: ModelKind) => {
@@ -158,7 +174,34 @@ export function SignToTextPage() {
 
   return (
     <div className="page sign-to-text">
-      <PageHeader title="Senas a texto" />
+      <PageHeader title="Señas a texto" />
+
+      {practice && (
+        <section
+          className={`sign-to-text__practice${practiceDone ? ' sign-to-text__practice--done' : ''}`}
+          aria-live="polite"
+        >
+          <span className="sign-to-text__practice-letter">{practice}</span>
+          <span className="sign-to-text__practice-text">
+            {practiceDone ? (
+              <>
+                <strong>¡Bien hecho!</strong>
+                <span>Ya sabes hacer la {practice}.</span>
+              </>
+            ) : (
+              <>
+                <strong>Haz la letra {practice}</strong>
+                <span>Mantén la mano quieta frente a la cámara.</span>
+              </>
+            )}
+          </span>
+          {practiceDone && (
+            <Link to={ROUTES.learn} className="sign-to-text__practice-back">
+              Seguir
+            </Link>
+          )}
+        </section>
+      )}
 
       <div className="segmented sign-to-text__modes" role="tablist" aria-label="Que reconocer">
         <button
@@ -168,7 +211,7 @@ export function SignToTextPage() {
           className={`segmented__option${letters ? ' segmented__option--active' : ''}`}
           onClick={() => changeMode('letters')}
         >
-          Abecedario
+          Letras
         </button>
         <button
           type="button"
@@ -177,7 +220,7 @@ export function SignToTextPage() {
           className={`segmented__option${!letters ? ' segmented__option--active' : ''}`}
           onClick={() => changeMode('sign')}
         >
-          Senas
+          Señas
         </button>
       </div>
 
@@ -220,7 +263,7 @@ export function SignToTextPage() {
 
       {letters ? (
         <section className="sign-to-text__panel">
-          <span className="section-title">Palabra deletreada</span>
+          <span className="section-title">Estás diciendo</span>
           <p className="sign-to-text__text sign-to-text__spelled" aria-live="polite">
             {spelled}
             {recog.phase === 'candidate' && candidate && (
@@ -269,7 +312,7 @@ export function SignToTextPage() {
             </Button>
             <Button
               variant="secondary"
-              icon="back"
+              icon="backspace"
               onClick={() => setSpelled((t) => t.slice(0, -1))}
               disabled={!spelled}
             >
@@ -352,8 +395,14 @@ export function SignToTextPage() {
 
       {letters ? (
         <div className="stack-sm">
-          <Button size="lg" fullWidth icon="check" onClick={submitSpelled} disabled={!spelled.trim()}>
-            {fromConversation ? 'Enviar a la conversacion' : 'Usar texto'}
+          <Button
+            size="lg"
+            fullWidth
+            icon={fromConversation ? 'send' : 'volume'}
+            onClick={submitSpelled}
+            disabled={!spelled.trim()}
+          >
+            {fromConversation ? 'Enviar a la conversación' : 'Decir en voz alta'}
           </Button>
           {recog.phase === 'paused' ? (
             <Button variant="ghost" fullWidth icon="camera" onClick={recog.resume}>

@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { ROUTES } from '@/app/routes'
-import { Mascot } from '@/components/brand'
+import { ChaskiFigure, Hills } from '@/components/brand'
 import {
   Button,
   Card,
@@ -14,8 +14,10 @@ import {
 import { useApiResource } from '@/hooks/useApiResource'
 import { useAuth } from '@/hooks/useAuth'
 import { useBackendHealth } from '@/hooks/useBackendHealth'
+import { usePreferences } from '@/hooks/usePreferences'
 import { getProfile, persistenceNote, updateProfile } from '@/services/api'
 import type { UserProfile } from '@/types'
+import type { Speed, TextSize } from '@/types/preferences'
 
 import './ProfilePage.css'
 import './pages.css'
@@ -27,9 +29,22 @@ interface ProfileLink {
 }
 
 const LINKS: ProfileLink[] = [
-  { label: 'Preferencias', to: ROUTES.accessibility, icon: 'settings' },
+  { label: 'Historial', to: ROUTES.history, icon: 'clock' },
+  { label: 'Más preferencias', to: ROUTES.accessibility, icon: 'settings' },
   { label: 'Privacidad y datos', to: ROUTES.privacy, icon: 'shield' },
   { label: 'Ayuda y tutorial', to: ROUTES.help, icon: 'help' },
+]
+
+const SIZES: { value: TextSize; label: string; px: number }[] = [
+  { value: 'normal', label: 'Normal', px: 15 },
+  { value: 'grande', label: 'Grande', px: 19 },
+  { value: 'muy-grande', label: 'Muy grande', px: 23 },
+]
+
+const SPEEDS: { value: Speed; label: string }[] = [
+  { value: 'lenta', label: 'Lenta' },
+  { value: 'normal', label: 'Normal' },
+  { value: 'rapida', label: 'Rápida' },
 ]
 
 /** Perfil vacio para el modo invitado: no hay cuenta que mostrar. */
@@ -47,6 +62,7 @@ export function ProfilePage() {
   const { data: fetched, source, refetch } = useApiResource(fetcher, initial)
   const profile = isAuthenticated ? fetched : GUEST_PROFILE
   const health = useBackendHealth()
+  const { prefs, set } = usePreferences()
 
   const [editing, setEditing] = useState(false)
   const [name, setName] = useState('')
@@ -93,24 +109,34 @@ export function ProfilePage() {
 
   return (
     <div className="page profile">
-      <PageHeader title="Mi perfil" showBack={false} />
+      <PageHeader title="Perfil" showBack={false} />
 
-      <div className="profile__identity">
-        <span className="profile__avatar" aria-hidden="true">
-          <Mascot size={88} alt="" />
-          {isAuthenticated && <span className="profile__status" />}
+      <section className="profile__hero" aria-label="Tu perfil">
+        <Hills sun />
+        <ChaskiFigure width={116} className="profile__chaski" />
+        <span className="profile__hero-text">
+          <span className="profile__name">Hola, {profile.name.split(' ')[0]}</span>
+          <span className="profile__sub">
+            {isAuthenticated ? profile.email : 'Crea tu cuenta para guardar tu historial'}
+          </span>
         </span>
-        {!editing && (
-          <>
-            <p className="profile__name">{profile.name}</p>
-            {isAuthenticated ? (
-              <p className="text-muted text-sm">{profile.email}</p>
-            ) : (
-              <p className="text-muted text-sm">Sin cuenta</p>
-            )}
-          </>
+        {isAuthenticated ? (
+          !editing && (
+            <button type="button" className="profile__hero-btn" onClick={startEditing}>
+              <Icon name="edit" size={18} />
+              Editar perfil
+            </button>
+          )
+        ) : (
+          <button
+            type="button"
+            className="profile__hero-btn"
+            onClick={() => navigate(ROUTES.register)}
+          >
+            Crear cuenta
+          </button>
         )}
-      </div>
+      </section>
 
       {isAuthenticated ? (
         editing ? (
@@ -150,37 +176,70 @@ export function ProfilePage() {
               </Button>
             </div>
           </Card>
-        ) : (
-          <Button variant="secondary" fullWidth icon="edit" onClick={startEditing}>
-            Editar perfil
-          </Button>
-        )
+        ) : null
       ) : (
-        <Card className="profile__guest">
-          <p className="profile__guest-text text-sm">
-            Estas usando Chaski Pe sin cuenta. Crea una para guardar tu
-            historial y tus preferencias, y recuperarlos en otro dispositivo.
-          </p>
-          <div className="stack-sm">
-            <Button
-              fullWidth
-              icon="user"
-              onClick={() => navigate(ROUTES.register)}
-            >
-              Crear cuenta
-            </Button>
-            <Button
-              variant="secondary"
-              fullWidth
-              onClick={() => navigate(ROUTES.login)}
-            >
-              Iniciar sesion
-            </Button>
-          </div>
-        </Card>
+        <button type="button" className="link profile__login" onClick={() => navigate(ROUTES.login)}>
+          Ya tengo cuenta · Iniciar sesión
+        </button>
       )}
 
       {savedNote && <p className="text-xs text-muted text-center">{savedNote}</p>}
+
+      <h2 className="profile__group">Ver y leer</h2>
+      <Card className="profile__settings">
+        <div className="profile__setting">
+          <span className="icon-badge icon-badge--gold profile__setting-icon" aria-hidden="true">
+            Aa
+          </span>
+          <span className="profile__setting-label">Letra</span>
+          <div className="segmented" role="radiogroup" aria-label="Tamaño de letra">
+            {SIZES.map((size) => (
+              <button
+                key={size.value}
+                type="button"
+                role="radio"
+                aria-checked={prefs.textSize === size.value}
+                aria-label={size.label}
+                className={`segmented__option profile__size${
+                  prefs.textSize === size.value ? ' segmented__option--active' : ''
+                }`}
+                style={{ fontSize: size.px }}
+                onClick={() => set('textSize', size.value)}
+              >
+                A
+              </button>
+            ))}
+          </div>
+        </div>
+      </Card>
+
+      <h2 className="profile__group">Voz y señas</h2>
+      <Card className="profile__settings">
+        <div className="profile__setting profile__setting--stack">
+          <span className="profile__setting-head">
+            <span className="icon-badge icon-badge--teal profile__setting-icon" aria-hidden="true">
+              <Icon name="clock" size={22} />
+            </span>
+            <span className="profile__setting-label">Velocidad de Chaski</span>
+          </span>
+          <div className="segmented profile__speeds" role="radiogroup" aria-label="Velocidad de Chaski">
+            {SPEEDS.map((speed) => (
+              <button
+                key={speed.value}
+                type="button"
+                role="radio"
+                aria-checked={prefs.avatarSpeed === speed.value}
+                className={`segmented__option${
+                  prefs.avatarSpeed === speed.value ? ' segmented__option--active' : ''
+                }`}
+                onClick={() => set('avatarSpeed', speed.value)}
+              >
+                {speed.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </Card>
 
       <Card className="card--flat">
         <nav className="list-links" aria-label="Opciones de perfil">

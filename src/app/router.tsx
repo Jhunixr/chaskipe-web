@@ -6,9 +6,11 @@ import {
   CameraPreparationPage,
   ConversationPage,
   DatasetCollectorPage,
+  FaceToFacePage,
   HelpPage,
   HistoryPage,
   HomePage,
+  LearnPage,
   LoginPage,
   NotFoundPage,
   OnboardingPage,
@@ -41,6 +43,11 @@ export const router = createBrowserRouter([
     element: <RequireSession />,
     children: [
       {
+        // Pantalla completa: el telefono queda en la mesa entre dos personas.
+        element: <AppLayout hideNav />,
+        children: [{ path: ROUTES.faceToFace, element: <FaceToFacePage /> }],
+      },
+      {
         element: <AppLayout />,
         children: [
           { path: ROUTES.home, element: <HomePage /> },
@@ -50,6 +57,7 @@ export const router = createBrowserRouter([
           { path: ROUTES.textToSign, element: <TextToSignPage /> },
           { path: ROUTES.conversation, element: <ConversationPage /> },
           { path: ROUTES.quickPhrases, element: <QuickPhrasesPage /> },
+          { path: ROUTES.learn, element: <LearnPage /> },
           { path: ROUTES.history, element: <HistoryPage /> },
           { path: ROUTES.profile, element: <ProfilePage /> },
           { path: ROUTES.accessibility, element: <AccessibilityPage /> },

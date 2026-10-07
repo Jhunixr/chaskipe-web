@@ -1,21 +1,25 @@
+.sign-to-text {
+  gap: var(--space-4);
+}
+
 .sign-to-text__panel {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-  padding: var(--space-5);
+  padding: var(--space-4) var(--space-5) var(--space-5);
   background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-card);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 5px 0 var(--color-border);
 }
 
 .sign-to-text__text {
-  font-family: var(--font-display);
-  font-size: calc(var(--fs-2xl) * var(--text-scale));
-  font-weight: 600;
-  letter-spacing: -0.015em;
+  font-size: calc(2.6rem * var(--text-scale));
+  font-weight: 900;
+  letter-spacing: 0.03em;
+  line-height: 1.05;
   color: var(--color-ink);
-  min-height: 2.6rem;
+  min-height: 2.8rem;
 }
 
 /*
@@ -23,9 +27,9 @@
  * de texto y no compite con el resultado real.
  */
 .sign-to-text__text .text-muted {
-  font-family: var(--font-sans);
-  font-size: calc(var(--fs-base) * var(--text-scale));
-  font-weight: 500;
+  font-size: calc(var(--fs-lg) * var(--text-scale));
+  font-weight: 700;
+  letter-spacing: 0;
 }
 
 .sign-to-text__confidence {
@@ -34,11 +38,10 @@
 
 .sign-to-text__candidate {
   color: var(--color-primary);
-  font-style: italic;
 }
 
 .sign-to-text__hold {
-  height: 8px;
+  height: 12px;
   border-radius: var(--radius-pill);
   background: var(--color-surface-sunk);
   overflow: hidden;
@@ -47,7 +50,7 @@
 .sign-to-text__hold span {
   display: block;
   height: 100%;
-  background: linear-gradient(90deg, var(--color-gold), var(--color-primary));
+  background: var(--color-primary);
   border-radius: var(--radius-pill);
   transition: width 0.15s linear;
 }
@@ -113,4 +116,70 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);
+}
+
+.sign-to-text__spell-actions .btn {
+  flex: 1;
+}
+
+/* Practica de Aprende LSP */
+.sign-to-text__practice {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-lg);
+  background: var(--color-gold-soft);
+  border: 2px solid var(--color-gold-edge);
+  box-shadow: 0 4px 0 var(--color-gold-edge);
+}
+
+.sign-to-text__practice--done {
+  background: var(--color-success-soft);
+  border-color: var(--color-success-edge);
+  box-shadow: 0 4px 0 var(--color-success-edge);
+}
+
+.sign-to-text__practice-letter {
+  flex-shrink: 0;
+  width: 58px;
+  height: 62px;
+  border-radius: var(--radius-md);
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 2.2rem;
+  font-weight: 900;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sign-to-text__practice--done .sign-to-text__practice-letter {
+  background: var(--color-success);
+}
+
+.sign-to-text__practice-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+
+.sign-to-text__practice-text strong {
+  font-size: calc(var(--fs-lg) * var(--text-scale));
+  font-weight: 900;
+}
+
+.sign-to-text__practice-text span {
+  font-size: calc(var(--fs-sm) * var(--text-scale));
+  color: var(--color-text-muted);
+}
+
+.sign-to-text__practice-back {
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-success);
+  color: #fff;
+  font-weight: 900;
+  box-shadow: 0 4px 0 var(--color-success-ink);
 }

@@ -1,0 +1,7 @@
+.chaski-figure {
+  display: block;
+  max-width: none;
+  height: auto;
+  user-select: none;
+  pointer-events: none;
+}

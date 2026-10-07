@@ -37,6 +37,20 @@ export type IconName =
   | 'mail'
   | 'lock'
   | 'text-size'
+  | 'grid'
+  | 'cap'
+  | 'siren'
+  | 'heart'
+  | 'pulse'
+  | 'bag'
+  | 'bus'
+  | 'smile'
+  | 'flame'
+  | 'users'
+  | 'close'
+  | 'backspace'
+  | 'vibrate'
+  | 'sparkle'
 
 const PATHS: Record<IconName, string> = {
   home: 'M3 10.5 12 3l9 7.5M5 9.5V21h14V9.5',
@@ -74,6 +88,20 @@ const PATHS: Record<IconName, string> = {
   mail: 'M3 6h18v12H3V6Zm0 1 9 6 9-6',
   lock: 'M6 11V8a6 6 0 0 1 12 0v3M5 11h14v10H5V11Z',
   'text-size': 'M4 7V5h11v2M9.5 5v14M7 19h5M15 12v-1h6v1M18 11v8M16.5 19h3',
+  grid: 'M4 3h5a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Zm11 0h5a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Zm0 11h5a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1v-5a1 1 0 0 1 1-1ZM4 14h5a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-5a1 1 0 0 1 1-1Z',
+  cap: 'M22 10 12 5 2 10l10 5 10-5ZM6 12v5c3 2 9 2 12 0v-5M22 10v6',
+  siren: 'M7 18v-6a5 5 0 0 1 10 0v6M5 21h14v-3H5v3Zm7-9v6M2 12h1M21 12h1M4.9 4.9l.7.7M19.1 4.9l-.7.7M12 2v1',
+  heart: 'M19 14c1.5-1.5 3-3.2 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.8 0-3 .5-4.5 2-1.5-1.5-2.7-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4 3 5.5l7 7Z',
+  pulse: 'M19 14c1.5-1.5 3-3.2 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.8 0-3 .5-4.5 2-1.5-1.5-2.7-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4 3 5.5l7 7ZM3.2 12h6.3l.5-1 2 4.5 2-7 1.5 3.5h5.3',
+  bag: 'M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4ZM3 6h18M16 10a4 4 0 0 1-8 0',
+  bus: 'M8 6v6M15 6v6M2 12h19.6M18 18h3s.5-1.7.8-2.8c.1-.4.2-.8.2-1.2s-.1-.8-.2-1.2l-1.4-5C20.1 6.8 19.1 6 18 6H4a2 2 0 0 0-2 2v10h3M9 18h5M7 16a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm9 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z',
+  smile: 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20ZM8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01',
+  flame: 'M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.4-.5-2-1-3-1.1-2.1-.2-4.1 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.2.4-2.3 1-3a2.5 2.5 0 0 0 2.5 2.5Z',
+  users: 'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm13 10v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8',
+  close: 'M18 6 6 18M6 6l12 12',
+  backspace: 'M10 5a2 2 0 0 0-1.3.5l-6.4 5.8a1 1 0 0 0 0 1.4l6.4 5.8A2 2 0 0 0 10 19h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2ZM12 9l6 6M18 9l-6 6',
+  vibrate: 'M2 8l2 2-2 2 2 2-2 2M22 8l-2 2 2 2-2 2 2 2M9 5h6a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Z',
+  sparkle: 'M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2 2M16 16l2 2M6 18l2-2M16 8l2-2',
 }
 
 /** Icono de linea. Decorativo salvo que el contenedor le de un aria-label. */
@@ -86,7 +114,7 @@ export function Icon({ name, size = 22, className }: IconProps) {
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="1.9"
+      strokeWidth="2.3"
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"

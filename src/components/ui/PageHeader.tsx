@@ -17,7 +17,7 @@ export function PageHeader({ title, showBack = true, action }: PageHeaderProps) 
   const navigate = useNavigate()
 
   return (
-    <header className="page-header">
+    <header className={`page-header${showBack ? '' : ' page-header--root'}`}>
       <div className="page-header__slot">
         {showBack && (
           <button

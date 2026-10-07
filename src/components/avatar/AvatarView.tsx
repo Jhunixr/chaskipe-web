@@ -1,5 +1,6 @@
 import { lazy, Suspense, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react'
 
+import { Hills } from '@/components/brand'
 import { Icon } from '@/components/ui'
 import { usePreferences } from '@/hooks/usePreferences'
 
@@ -26,6 +27,8 @@ interface AvatarViewProps {
   caption?: string | undefined
   /** true para empezar en cuanto el avatar este cargado. */
   playing?: boolean
+  /** Sin la nota aclaratoria (pantallas con poco espacio, p. ej. Cara a cara). */
+  compact?: boolean
 }
 
 /**
@@ -42,12 +45,19 @@ interface AvatarViewProps {
  *
  * El componente Three.js se carga de forma diferida (React.lazy).
  */
-export function AvatarView({ ref, spell, caption, playing = false }: AvatarViewProps) {
+export function AvatarView({
+  ref,
+  spell,
+  caption,
+  playing = false,
+  compact = false,
+}: AvatarViewProps) {
   const inner = useRef<Avatar3DHandle | null>(null)
   const [mode, setMode] = useState<'idle' | 'demo' | 'spelling'>('idle')
   const [tokens, setTokens] = useState<SpellToken[]>([])
   const [current, setCurrent] = useState(-1)
-  const autoPlayedRef = useRef(false)
+  // Ultimo texto reproducido solo: si `spell` cambia, se vuelve a reproducir.
+  const autoPlayedRef = useRef<string | null>(null)
   const { prefs } = usePreferences()
 
   const start = useCallback(() => {
@@ -85,18 +95,20 @@ export function AvatarView({ ref, spell, caption, playing = false }: AvatarViewP
     [start],
   )
 
-  // Empieza una vez cuando `playing` pasa a true (el modelo 3D puede tardar
-  // en cargar; reintenta hasta que la ref exista).
+  // Empieza cuando `playing` pasa a true y otra vez cada vez que cambia el
+  // texto (el modelo 3D puede tardar en cargar; reintenta hasta que la ref
+  // exista).
   useEffect(() => {
-    if (!playing || autoPlayedRef.current) return
+    const key = spell?.trim() ?? ''
+    if (!playing || autoPlayedRef.current === key) return
     const id = window.setInterval(() => {
       if (start()) {
-        autoPlayedRef.current = true
+        autoPlayedRef.current = key
         window.clearInterval(id)
       }
     }, 120)
     return () => window.clearInterval(id)
-  }, [playing, start])
+  }, [playing, spell, start])
 
   const spelling = tokens.length > 0 && (mode === 'spelling' || prefs.subtitles)
   const missing = [
@@ -108,8 +120,9 @@ export function AvatarView({ ref, spell, caption, playing = false }: AvatarViewP
     !spelling && caption !== undefined && caption !== '' && (prefs.subtitles || mode !== 'idle')
 
   return (
-    <div className="avatar-view">
+    <div className={`avatar-view${compact ? ' avatar-view--compact' : ''}`}>
       <div className="avatar-view__stage">
+        <Hills sun />
         {mode === 'spelling' && (
           <span className="avatar-view__tag avatar-view__tag--lsp">
             <Icon name="hands" size={14} />
@@ -170,6 +183,7 @@ export function AvatarView({ ref, spell, caption, playing = false }: AvatarViewP
         {showCaption && <p className="avatar-view__caption">{caption}</p>}
       </div>
 
+      {!compact && (
       <p className="demo-note avatar-view__note">
         <Icon name="shield" size={14} />
         {spell
@@ -180,6 +194,7 @@ export function AvatarView({ ref, spell, caption, playing = false }: AvatarViewP
             } Las senas de palabras completas aun no estan disponibles.`
           : 'El avatar aun no representa senas reales. El movimiento es un marcador de posicion; las animaciones de LSP deben validarse con personas usuarias o interpretes.'}
       </p>
+      )}
     </div>
   )
 }

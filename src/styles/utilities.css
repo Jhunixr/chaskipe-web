@@ -70,14 +70,13 @@
  */
 .wordmark {
   font-family: var(--font-display);
-  font-weight: 500;
-  letter-spacing: -0.02em;
+  font-weight: 900;
+  letter-spacing: -0.03em;
   color: var(--color-ink);
 }
 
 .wordmark em {
-  font-style: italic;
-  font-weight: 500;
+  font-style: normal;
   color: var(--color-primary);
 }
 
@@ -85,10 +84,10 @@
 .section-title {
   font-family: var(--font-sans);
   font-size: calc(var(--fs-xs) * var(--text-scale));
-  font-weight: 800;
+  font-weight: 900;
   text-transform: uppercase;
-  letter-spacing: 0.14em;
-  color: var(--color-text-faint);
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
 }
 
 /*
@@ -165,9 +164,10 @@
 .demo-note,
 .disclaimer-note {
   font-size: calc(var(--fs-xs) * var(--text-scale));
-  line-height: 1.55;
+  line-height: 1.5;
+  font-weight: 700;
   padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
 }
 
 .demo-note > svg,
@@ -179,8 +179,7 @@
 .demo-note {
   color: var(--color-text-muted);
   background: var(--color-gold-soft);
-  border: 1px solid color-mix(in srgb, var(--color-gold) 22%, transparent);
-  border-left: 3px solid var(--color-gold);
+  border: 2px solid var(--color-gold-edge);
 }
 
 .demo-note strong {
@@ -190,8 +189,7 @@
 .disclaimer-note {
   color: var(--color-warning);
   background: var(--color-warning-soft);
-  border: 1px solid color-mix(in srgb, var(--color-warning) 22%, transparent);
-  border-left: 3px solid var(--color-warning);
+  border: 2px solid var(--color-gold-edge);
 }
 
 /* Espera mientras se comprueba la sesion guardada */

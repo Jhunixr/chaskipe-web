@@ -20,7 +20,6 @@ import { LETTER_POSES, textToSpelling, type SignClip, type SpellToken, type Vec3
 import { buildAvatar, type AvatarBones } from './rig'
 import { lerpPose, SpellingArm } from './spellingHand'
 
-const BG = 0xfbf5ec
 
 /** Tiempos del deletreo (s), a velocidad normal. */
 const SPELL_TRANSITION = 0.24
@@ -117,7 +116,9 @@ export class SignAvatarScene {
     this.renderer.shadowMap.enabled = false
 
     this.scene = new THREE.Scene()
-    this.scene.background = new THREE.Color(BG)
+    // Fondo transparente: el escenario (rojo con montañas) lo pinta el CSS.
+    this.scene.background = null
+    this.renderer.setClearColor(0x000000, 0)
 
     this.camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100)
     this.camera.position.set(0, 0.9, 4.9)

@@ -5,63 +5,79 @@
   bottom: 0;
   z-index: 30;
   display: flex;
-  justify-content: space-around;
-  align-items: stretch;
+  align-items: flex-start;
   width: 100%;
   max-width: var(--app-max-width);
   height: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom));
-  padding-bottom: env(safe-area-inset-bottom);
-  background: color-mix(in srgb, var(--color-surface) 92%, transparent);
-  backdrop-filter: blur(12px) saturate(1.4);
-  -webkit-backdrop-filter: blur(12px) saturate(1.4);
+  padding: 8px 6px env(safe-area-inset-bottom);
+  background: var(--color-surface);
+  border-top: 2px solid var(--color-border);
+  border-radius: 26px 26px 0 0;
   box-shadow: var(--shadow-nav);
-  border-top: 1px solid var(--color-hairline);
 }
 
 .bottom-nav__item {
   flex: 1;
-  position: relative;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   gap: 3px;
   font-size: calc(var(--fs-xs) * var(--text-scale));
-  font-weight: 700;
-  letter-spacing: 0.01em;
+  font-weight: 800;
   color: var(--color-text-faint);
   transition: color 0.16s ease;
 }
 
-.bottom-nav__item svg {
-  transition: transform 0.2s cubic-bezier(0.2, 0.7, 0.2, 1);
+.bottom-nav__icon {
+  width: 58px;
+  height: 36px;
+  border-radius: var(--radius-pill);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.16s ease;
 }
 
 .bottom-nav__item--active {
   color: var(--color-primary);
+  font-weight: 900;
 }
 
-.bottom-nav__item--active svg {
-  transform: translateY(-1px) scale(1.06);
-}
-
-/* Marca activa: rombo andino sobre el icono */
-.bottom-nav__item--active::before {
-  content: '';
-  position: absolute;
-  top: 8px;
-  width: 5px;
-  height: 5px;
-  transform: rotate(45deg);
-  background: var(--color-gold);
+.bottom-nav__item--active .bottom-nav__icon {
+  background: var(--color-primary-soft);
 }
 
 .bottom-nav__label {
-  line-height: 1;
+  line-height: 1.1;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .bottom-nav__item svg {
-    transition: none;
-  }
+/* Boton central de señas: circulo rojo elevado con relieve. */
+.bottom-nav__item--fab {
+  margin-top: -36px;
+  gap: 9px;
+  color: var(--color-primary);
+  font-weight: 900;
+}
+
+.bottom-nav__fab {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 0 5px var(--color-surface), 0 5px 0 5px var(--color-primary-edge);
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+
+.bottom-nav__item--fab:active .bottom-nav__fab {
+  transform: translateY(4px);
+  box-shadow: 0 0 0 5px var(--color-surface), 0 1px 0 5px var(--color-primary-edge);
+}
+
+.bottom-nav__item--fab.bottom-nav__item--active .bottom-nav__fab {
+  background: var(--color-primary-active);
 }

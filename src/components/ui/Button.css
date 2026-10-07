@@ -1,30 +1,38 @@
+/*
+ * Botones con relieve: el borde inferior grueso (box-shadow solido) hace que
+ * se vean "tocables"; al pulsar bajan y el relieve desaparece.
+ */
 .btn {
+  --btn-edge: transparent;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  border: 1.5px solid transparent;
-  border-radius: var(--radius-pill);
+  border: 2px solid transparent;
+  border-radius: var(--radius-md);
   font-family: var(--font-sans);
-  font-weight: 700;
+  font-weight: 900;
   letter-spacing: -0.005em;
+  box-shadow: 0 5px 0 var(--btn-edge);
   transition: background-color 0.16s ease, border-color 0.16s ease,
-    color 0.16s ease, transform 0.06s ease, box-shadow 0.16s ease;
+    color 0.16s ease, transform 0.08s ease, box-shadow 0.08s ease;
 }
 
-.btn:active {
-  transform: translateY(1px) scale(0.995);
+.btn:active:not(:disabled) {
+  transform: translateY(4px);
+  box-shadow: 0 1px 0 var(--btn-edge);
 }
 
 .btn--md {
   padding: var(--space-3) var(--space-5);
-  min-height: 46px;
+  min-height: 52px;
   font-size: calc(var(--fs-base) * var(--text-scale));
 }
 
 .btn--lg {
   padding: var(--space-4) var(--space-6);
-  min-height: 54px;
+  min-height: 62px;
+  border-radius: var(--radius-lg);
   font-size: calc(var(--fs-lg) * var(--text-scale));
 }
 
@@ -33,51 +41,54 @@
 }
 
 .btn--primary {
+  --btn-edge: var(--color-primary-edge);
   background: var(--color-primary);
   color: var(--color-text-inverse);
-  box-shadow: var(--shadow-primary);
 }
 
 .btn--primary:hover {
   background: var(--color-primary-hover);
-  box-shadow: 0 12px 28px -8px rgba(180, 35, 31, 0.5);
+}
+
+.btn--teal {
+  --btn-edge: var(--color-teal-edge);
+  background: var(--color-teal);
+  color: var(--color-text-inverse);
 }
 
 .btn--secondary {
+  --btn-edge: var(--color-border);
   background: var(--color-surface);
-  color: var(--color-primary);
-  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
-  box-shadow: var(--shadow-card);
+  color: var(--color-ink);
+  border-color: var(--color-border);
 }
 
 .btn--secondary:hover {
-  background: var(--color-primary-tint);
-  border-color: var(--color-primary);
+  background: var(--color-surface-alt);
 }
 
 .btn--dark {
+  --btn-edge: #000;
   background: var(--color-ink);
-  color: var(--color-text-inverse);
-  box-shadow: 0 10px 24px -12px rgba(51, 35, 26, 0.6);
-}
-
-.btn--dark:hover {
-  background: #241810;
+  color: var(--color-bg);
 }
 
 .btn--ghost {
   background: transparent;
   color: var(--color-ink-soft);
-  border-color: var(--color-border-strong);
+  box-shadow: none;
 }
 
 .btn--ghost:hover {
-  background: var(--color-surface-alt);
-  border-color: var(--color-ink-soft);
+  background: var(--color-surface-sunk);
+}
+
+.btn--ghost:active:not(:disabled) {
+  transform: translateY(1px);
+  box-shadow: none;
 }
 
 .btn:disabled {
-  opacity: 0.42;
+  opacity: 0.45;
   cursor: not-allowed;
-  box-shadow: none;
 }

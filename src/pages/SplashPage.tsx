@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { ROUTES } from '@/app/routes'
-import { Logo, Mountains } from '@/components/brand'
+import { ChaskiBubble } from '@/components/brand'
 import { useAuth } from '@/hooks/useAuth'
 
 import './SplashPage.css'
@@ -28,14 +28,16 @@ export function SplashPage() {
   return (
     <div className="fullscreen splash">
       <div className="fullscreen__center">
-        <Logo layout="stack" tagline mascotSize={132} />
+        <ChaskiBubble size={210} />
+        <p className="splash__wordmark">
+          chaski<span>pe</span>
+        </p>
         <div className="splash__loader" aria-label="Cargando" role="status">
           <span />
           <span />
           <span />
         </div>
       </div>
-      <Mountains />
     </div>
   )
 }

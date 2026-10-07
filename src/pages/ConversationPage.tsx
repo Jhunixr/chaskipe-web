@@ -91,7 +91,7 @@ export function ConversationPage() {
   return (
     <div className="page conversation">
       <header className="conversation__header">
-        <h1>Conversacion</h1>
+        <h1>Conversación</h1>
         <button
           type="button"
           className="chip"

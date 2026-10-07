@@ -1,3 +1,6 @@
+export { ChaskiBubble } from './ChaskiBubble'
+export { ChaskiFigure } from './ChaskiFigure'
+export { Hills } from './Hills'
 export { Logo } from './Logo'
 export { Mascot } from './Mascot'
 export { Mountains } from './Mountains'

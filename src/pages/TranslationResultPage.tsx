@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 
 import { ROUTES } from '@/app/routes'
@@ -28,6 +28,14 @@ export function TranslationResultPage() {
 
   const fromState = location.state as RecognitionResult | null
   const result = fromState ?? loadRecognition()
+  // "Decir en voz alta" (deletreo): se lee apenas se abre el resultado.
+  const autoSpeak = (location.state as { autoSpeak?: boolean } | null)?.autoSpeak === true
+  const spokenRef = useRef(false)
+  useEffect(() => {
+    if (!autoSpeak || !result || spokenRef.current) return
+    spokenRef.current = true
+    speak(result.text)
+  }, [autoSpeak, result, speak])
 
   if (!result) {
     return (

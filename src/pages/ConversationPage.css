@@ -51,8 +51,8 @@
   max-width: 88%;
   padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-lg);
-  border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-card);
+  border: 2px solid var(--color-border);
+  box-shadow: 0 4px 0 var(--color-border);
 }
 
 .conversation__bubble--sorda {
@@ -64,9 +64,16 @@
 
 .conversation__bubble--oyente {
   align-self: flex-end;
-  background: var(--color-gold-soft);
-  border-color: color-mix(in srgb, var(--color-gold) 25%, transparent);
+  background: var(--color-teal);
+  border-color: var(--color-teal);
+  box-shadow: 0 5px 0 var(--color-teal-edge);
   border-bottom-right-radius: var(--radius-sm);
+}
+
+.conversation__bubble--oyente .conversation__bubble-text,
+.conversation__bubble--oyente .conversation__bubble-who,
+.conversation__bubble--oyente .conversation__bubble-actions button {
+  color: #fff;
 }
 
 .conversation__bubble-who {
@@ -81,7 +88,7 @@
 .conversation__bubble-text {
   font-family: var(--font-display);
   font-size: calc(var(--fs-lg) * var(--text-scale));
-  font-weight: 600;
+  font-weight: 900;
   color: var(--color-ink);
   word-break: break-word;
 }
@@ -122,8 +129,8 @@
   gap: var(--space-2);
   padding: var(--space-3);
   border-radius: var(--radius-lg);
-  border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-card);
+  border: 2px solid var(--color-border);
+  box-shadow: 0 5px 0 var(--color-border);
 }
 
 .conversation__composer--sorda {
@@ -132,8 +139,8 @@
 }
 
 .conversation__composer--oyente {
-  background: var(--color-gold-soft);
-  border-color: color-mix(in srgb, var(--color-gold) 25%, transparent);
+  background: var(--color-teal-soft);
+  border-color: var(--color-teal-soft);
 }
 
 .conversation__who {

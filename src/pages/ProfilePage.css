@@ -32,15 +32,6 @@
   border: 3px solid var(--color-surface);
 }
 
-.profile__name {
-  font-family: var(--font-display);
-  font-size: calc(var(--fs-2xl) * var(--text-scale));
-  font-weight: 600;
-  letter-spacing: -0.015em;
-  color: var(--color-ink);
-  margin-top: var(--space-2);
-}
-
 .profile__edit-actions {
   display: flex;
   gap: var(--space-3);
@@ -80,4 +71,138 @@
 .profile__logout:hover {
   background: var(--color-primary-soft);
   border-color: var(--color-primary);
+}
+
+/* Tarjeta roja de perfil con Chaski, sol y montañas. */
+.profile__hero {
+  position: relative;
+  min-height: 168px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  border-radius: var(--radius-xl);
+  background: #D62027;
+  color: #fff;
+  overflow: hidden;
+  box-shadow: 0 6px 0 #A3141A;
+}
+
+.profile__hero .hills svg {
+  height: 36%;
+}
+
+.profile__hero .hills__back {
+  fill: #E8434A;
+}
+
+.profile__hero .hills__front {
+  fill: #B8161D;
+}
+
+.profile__hero .hills__sun {
+  right: -6%;
+  top: -14%;
+  width: 44%;
+  background: #FFB627;
+}
+
+.profile__chaski {
+  position: absolute;
+  right: 6px;
+  bottom: 0;
+}
+
+.profile__hero-text {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  max-width: 62%;
+}
+
+.profile__name {
+  font-size: calc(var(--fs-2xl) * var(--text-scale));
+  font-weight: 900;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+.profile__sub {
+  font-weight: 700;
+  opacity: 0.94;
+  overflow-wrap: anywhere;
+}
+
+.profile__hero-btn {
+  position: relative;
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 46px;
+  padding: 0 var(--space-4);
+  border: none;
+  border-radius: var(--radius-md);
+  background: #fff;
+  color: #D62027;
+  font-weight: 900;
+  box-shadow: 0 4px 0 #8E0F14;
+}
+
+.profile__login {
+  align-self: center;
+  background: none;
+  border: none;
+  padding: var(--space-2);
+  text-decoration: none;
+}
+
+.profile__group {
+  margin: var(--space-1) 0 calc(var(--space-2) * -1);
+  padding: 0 var(--space-1);
+  font-size: calc(var(--fs-sm) * var(--text-scale));
+  color: var(--color-text-muted);
+}
+
+.profile__settings {
+  padding: var(--space-3) var(--space-4);
+}
+
+.profile__setting {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.profile__setting--stack {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.profile__setting-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.profile__setting-icon {
+  width: 42px;
+  height: 42px;
+  font-weight: 900;
+}
+
+.profile__setting-label {
+  flex: 1;
+  font-size: calc(var(--fs-lg) * var(--text-scale));
+  font-weight: 800;
+}
+
+.profile__size {
+  width: 46px;
+  padding: 0;
+}
+
+.profile__speeds .segmented__option {
+  flex: 1;
 }

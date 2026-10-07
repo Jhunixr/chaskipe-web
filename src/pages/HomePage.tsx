@@ -1,110 +1,108 @@
 import { Link } from 'react-router-dom'
 
 import { ROUTES } from '@/app/routes'
-import { Mascot, Mountains } from '@/components/brand'
-import { Icon, type IconName } from '@/components/ui'
+import { ChaskiFigure, Hills } from '@/components/brand'
+import { Icon } from '@/components/ui'
 import { useAuth } from '@/hooks/useAuth'
+import { useSpeech } from '@/hooks/useSpeech'
+import { letterOfTheDay } from '@/services/learning'
 
 import './HomePage.css'
 import './pages.css'
 
-interface CommOption {
-  to: string
-  title: string
-  description: string
-  icon: IconName
-  featured?: boolean
-}
-
-const OPTIONS: CommOption[] = [
-  {
-    to: ROUTES.cameraPreparation,
-    title: 'Senas a texto',
-    description: 'Interpreta Lengua de Senas Peruana con la camara.',
-    icon: 'hands',
-    featured: true,
-  },
-  {
-    to: ROUTES.textToSign,
-    title: 'Texto a senas',
-    description: 'Responde con el avatar y con voz.',
-    icon: 'keyboard',
-    featured: true,
-  },
-  {
-    to: ROUTES.conversation,
-    title: 'Conversacion',
-    description: 'Ida y vuelta en la misma pantalla.',
-    icon: 'chat',
-  },
-]
+/** Frases que la persona sorda suele necesitar al momento: se leen en voz alta. */
+const QUICK = ['Hola', 'Gracias', 'No entiendo', 'Más despacio, por favor']
 
 export function HomePage() {
   // El nombre sale de la sesion, no de una constante: asi Inicio y Perfil
   // muestran siempre lo mismo.
-  const { user, mode } = useAuth()
-  const isGuest = mode === 'guest' || user === null
-  const firstName = user ? (user.name.split(' ')[0] ?? user.name) : 'Invitado'
+  const { user } = useAuth()
+  const firstName = user ? (user.name.split(' ')[0] ?? user.name) : null
+  const { speak, supported } = useSpeech()
+  const letter = letterOfTheDay()
 
   return (
     <div className="page home">
       <header className="home__top">
-        <div className="home__user">
-          <span className="home__avatar" aria-hidden="true">
-            <Mascot size={40} alt="" />
-          </span>
-          <span className="home__hello">
-            <span className="section-title">
-              {isGuest ? 'Estas explorando' : 'Bienvenido de vuelta'}
-            </span>
-            <p className="home__greeting">{firstName}</p>
-          </span>
-        </div>
-        <button type="button" className="home__bell" aria-label="Notificaciones">
-          <Icon name="bell" size={20} />
-        </button>
+        <p className="home__wordmark wordmark">
+          chaski<em>pe</em>
+        </p>
+        <Link
+          to={ROUTES.quickPhrases}
+          state={{ category: 'emergencias' }}
+          className="home__sos"
+          aria-label="Emergencia: frases para pedir ayuda"
+        >
+          <Icon name="siren" size={20} />
+          SOS
+        </Link>
       </header>
 
-      <div className="home__lead">
-        <h1 className="home__question wordmark">
-          ¿Como deseas <em>comunicarte</em> hoy?
-        </h1>
-        <span className="andean-rule" aria-hidden="true">
-          <span className="andean-rule__diamond" />
+      <section className="home__greeting" aria-label="Saludo">
+        <ChaskiFigure width={104} className="home__chaski" />
+        <p className="home__bubble">
+          {firstName ? `¡Hola, ${firstName}!` : '¡Hola!'} ¿Cómo quieres conversar hoy?
+        </p>
+      </section>
+
+      <Link to={ROUTES.faceToFace} className="home__hero">
+        <Hills />
+        <span className="home__phone" aria-hidden="true">
+          <span className="home__phone-top">Aa</span>
+          <span className="home__phone-bottom">
+            <Icon name="hands" size={26} />
+          </span>
         </span>
-      </div>
-
-      <div className="home__options">
-        {OPTIONS.map((option, index) => (
-          <Link
-            key={option.to}
-            to={option.to}
-            className={`home-option${option.featured ? ' home-option--featured' : ''}`}
-          >
-            <span className="home-option__index" aria-hidden="true">
-              {String(index + 1).padStart(2, '0')}
-            </span>
-            <span className="home-option__icon" aria-hidden="true">
-              <Icon name={option.icon} size={option.featured ? 24 : 20} />
-            </span>
-            <span className="home-option__body">
-              <span className="home-option__title">{option.title}</span>
-              <span className="home-option__description text-sm text-muted">
-                {option.description}
-              </span>
-            </span>
-            <Icon name="chevron" size={20} className="home-option__chevron" />
-          </Link>
-        ))}
-      </div>
-
-      <Link to={ROUTES.quickPhrases} className="home__phrases">
-        <Icon name="chat" size={18} />
-        <span>Frases rapidas para empezar</span>
-        <Icon name="chevron" size={18} />
+        <span className="home__pill">
+          <Icon name="users" size={16} />
+          Para dos personas
+        </span>
+        <span className="home__hero-text">
+          <span className="home__hero-title">Cara a cara</span>
+          <span className="home__hero-sub">Pon el celular en la mesa, entre los dos</span>
+        </span>
       </Link>
 
-      <Mountains />
+      <div className="home__tiles">
+        <Link to={ROUTES.cameraPreparation} className="tile home__tile">
+          <span className="icon-badge icon-badge--red">
+            <Icon name="camera" size={26} />
+          </span>
+          <span className="home__tile-title">Hago señas</span>
+        </Link>
+        <Link to={ROUTES.textToSign} className="tile home__tile">
+          <span className="icon-badge icon-badge--teal">
+            <Icon name="mic" size={26} />
+          </span>
+          <span className="home__tile-title">Hablo o escribo</span>
+        </Link>
+      </div>
+
+      <Link to={ROUTES.learn} className="home__learn">
+        <span className="home__learn-letter" aria-hidden="true">
+          {letter}
+        </span>
+        <span className="home__learn-text">
+          <strong>Letra del día: {letter}</strong>
+          <span>Aprende a deletrear en LSP</span>
+        </span>
+        <Icon name="chevron" size={24} />
+      </Link>
+
+      <div className="chip-row" aria-label="Frases rápidas">
+        {QUICK.map((text) => (
+          <button
+            key={text}
+            type="button"
+            className="chip"
+            onClick={() => speak(text)}
+            disabled={!supported}
+          >
+            <Icon name="volume" size={18} />
+            {text}
+          </button>
+        ))}
+      </div>
     </div>
   )
 }

@@ -1,15 +1,25 @@
 .splash {
-  background:
-    radial-gradient(
-      120% 60% at 50% 0%,
-      var(--color-primary-tint),
-      transparent 70%
-    ),
-    var(--color-surface);
+  margin: calc(-1 * (env(safe-area-inset-top) + var(--space-5))) calc(-1 * var(--page-padding))
+    calc(-1 * (env(safe-area-inset-bottom) + var(--space-6)));
+  min-height: 100dvh;
+  background: #D62027;
+  color: #fff;
 }
 
 .splash .fullscreen__center {
-  gap: var(--space-6);
+  gap: var(--space-5);
+}
+
+.splash__wordmark {
+  margin-top: var(--space-4);
+  font-size: 2.6rem;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.splash__wordmark span {
+  color: #FFD166;
 }
 
 .splash__loader {
@@ -21,7 +31,7 @@
   width: 7px;
   height: 7px;
   border-radius: var(--radius-pill);
-  background: var(--color-primary);
+  background: #fff;
   opacity: 0.3;
   animation: splash-pulse 1s ease-in-out infinite;
 }

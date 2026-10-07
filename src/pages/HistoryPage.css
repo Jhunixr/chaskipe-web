@@ -55,7 +55,7 @@
 
 .history__text {
   font-family: var(--font-display);
-  font-weight: 600;
+  font-weight: 900;
   font-size: calc(var(--fs-lg) * var(--text-scale));
   color: var(--color-ink);
 }

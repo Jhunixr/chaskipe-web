@@ -4,7 +4,7 @@ import { Icon, type IconName } from './Icon'
 
 import './Button.css'
 
-type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'dark'
+type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'dark' | 'teal'
 type ButtonSize = 'md' | 'lg'
 
 interface ButtonProps
@@ -39,7 +39,7 @@ export function Button({
 
   return (
     <button type={type} className={classes} {...rest}>
-      {icon && <Icon name={icon} size={size === 'lg' ? 20 : 18} />}
+      {icon && <Icon name={icon} size={size === 'lg' ? 24 : 20} />}
       {children}
     </button>
   )

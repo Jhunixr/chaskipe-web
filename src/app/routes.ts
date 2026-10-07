@@ -14,6 +14,8 @@ export const ROUTES = {
   translationResult: '/senas-a-texto/resultado',
   textToSign: '/texto-a-senas',
   conversation: '/conversacion',
+  faceToFace: '/cara-a-cara',
+  learn: '/aprende',
   quickPhrases: '/frases',
   history: '/historial',
   profile: '/perfil',

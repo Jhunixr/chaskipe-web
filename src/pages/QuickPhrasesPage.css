@@ -1,62 +1,116 @@
-.quick-phrases__category {
+.quick-phrases {
+  gap: var(--space-4);
+}
+
+/* Deja sitio a la barra "Mostrar en señas". */
+.quick-phrases--selected {
+  padding-bottom: 84px;
+}
+
+.quick-phrases__chip-icon {
+  display: inline-flex;
+}
+
+.quick-phrases__chip-icon--red {
+  color: var(--color-primary);
+}
+
+.quick-phrases__chip-icon--teal {
+  color: var(--color-teal);
+}
+
+.quick-phrases__chip-icon--gold {
+  color: var(--color-gold-strong);
+}
+
+.chip--active .quick-phrases__chip-icon {
+  color: inherit;
+}
+
+/* "Soy sordo/a": la frase mas importante, en rojo y arriba. */
+.quick-phrases__sos {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
-  font-family: var(--font-display);
-  font-size: calc(var(--fs-lg) * var(--text-scale));
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  color: var(--color-ink);
+  gap: var(--space-3);
+  min-height: 84px;
+  padding: var(--space-3) var(--space-4);
+  border: none;
+  border-radius: var(--radius-lg);
+  background: var(--color-primary);
+  color: #fff;
+  box-shadow: 0 6px 0 var(--color-primary-edge);
+  font-size: calc(var(--fs-xl) * var(--text-scale));
+  font-weight: 900;
+  line-height: 1.2;
+  text-align: left;
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
 }
 
-.quick-phrases__category svg {
-  color: var(--color-primary);
+.quick-phrases__sos:active {
+  transform: translateY(5px);
+  box-shadow: none;
 }
 
-.quick-phrases__chips {
+.quick-phrases__sos--on {
+  outline: 4px solid #ffd166;
+  outline-offset: 2px;
+}
+
+.quick-phrases__sos-icon {
+  flex-shrink: 0;
+  width: 50px;
+  height: 50px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.quick-phrases__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+
+.quick-phrases__grid li {
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
 }
 
-.chip--active {
-  border-color: var(--color-primary);
-  background: var(--color-primary-soft);
-  color: var(--color-primary);
-}
-
-.quick-phrases__list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.quick-phrases__row {
+.quick-phrases__tile {
   width: 100%;
-  display: flex;
-  align-items: center;
+  min-height: 112px;
+  flex-direction: column;
   justify-content: space-between;
   gap: var(--space-3);
-  padding: var(--space-4);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-card);
-  font-weight: 600;
-  color: var(--color-text);
-  text-align: left;
-  transition: border-color 0.15s ease, background-color 0.15s ease;
+  padding: var(--space-3) var(--space-4) var(--space-4);
 }
 
-.quick-phrases__row:hover {
-  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
+.quick-phrases__tile-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 14px;
 }
 
-.quick-phrases__row--active {
+.quick-phrases__tile-text {
+  font-size: calc(var(--fs-lg) * var(--text-scale));
+  font-weight: 900;
+  line-height: 1.15;
+}
+
+.quick-phrases__tile--on {
   border-color: var(--color-primary);
-  background: var(--color-primary-tint);
+  box-shadow: 0 5px 0 var(--color-primary);
 }
 
-.quick-phrases__row:disabled {
-  opacity: 0.6;
+.quick-phrases__bar {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + var(--space-5));
+  z-index: 20;
+  width: min(100%, var(--app-max-width));
+  padding: 0 var(--page-padding);
+  /* No hereda la animacion de entrada de .page > * (pisaria el translateX). */
+  animation: none !important;
 }

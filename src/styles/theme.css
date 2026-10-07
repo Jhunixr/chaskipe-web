@@ -1,71 +1,80 @@
 /*
- * Chaski Pe — Sistema visual
- * Direccion: editorial calido andino.
- * Fondo crema con textura sutil de papel · rojo peruano profundo como acento
- * fuerte · display serif con caracter (Fraunces) + cuerpo grotesque limpio
- * (Hanken Grotesk) · detalle andino fino · dorado puntual · tarjetas nitidas
- * con borde definido. Mobile first, identidad peruana sutil, apariencia de
- * producto real.
+ * Chaski Pe — Sistema visual «Chaski cercano»
+ * Nace del logo: burbuja de dialogo, montañas rojas, sol dorado y letra
+ * redonda (Nunito). Botones con relieve (borde inferior grueso) para que se
+ * note de un vistazo que se pueden tocar. Colores con significado: rojo =
+ * señas / persona sorda, verde azulado = voz / persona oyente, dorado =
+ * aprender. Mobile first.
  */
 
 :root {
   /* ---- Superficies ---- */
-  --color-bg: #FBF9F6;
-  --color-bg-soft: #FFF4E4;
+  --color-bg: #FFF7EE;
+  --color-bg-soft: #FFF1E3;
   --color-surface: #FFFFFF;
-  --color-surface-alt: #FFF4E4;
-  --color-surface-sunk: #FFF4E4;
-  --color-border: #E7DDD5;
-  --color-border-strong: #DFA69D;
-  --color-hairline: #E7DDD5;
+  --color-surface-alt: #FFF7EE;
+  --color-surface-sunk: #FBEFE3;
+  --color-border: #F1E3D6;
+  --color-border-strong: #E6D2C2;
+  --color-hairline: #F4E8DD;
 
-  /* ---- Rojo peruano (acento principal) ---- */
-  --color-primary: #CA2422;
-  --color-primary-hover: #A81717;
-  --color-primary-active: #601E12;
-  --color-primary-soft: #DFA69D;
-  --color-primary-tint: #FFF4E4;
-  --color-primary-ink: #601E12;
+  /* ---- Rojo Chaski (señas, acción principal) ---- */
+  --color-primary: #D62027;
+  --color-primary-hover: #C21A21;
+  --color-primary-active: #A3141A;
+  --color-primary-edge: #A3141A;
+  --color-primary-soft: #FFE4E1;
+  --color-primary-tint: #FFF1EF;
+  --color-primary-ink: #8E0F14;
 
-  /* ---- Tinta / marron editorial ---- */
-  --color-ink: #160B07;
-  --color-ink-soft: #601E12;
+  /* ---- Verde azulado (voz, persona oyente) ---- */
+  --color-teal: #0C7C74;
+  --color-teal-edge: #08564F;
+  --color-teal-soft: #DDF4F1;
 
-  /* ---- Detalles ---- */
-  --color-gold: #CD8850;
-  --color-gold-strong: #CD8850;
-  --color-gold-soft: #FFF4E4;
-  --color-beige: #e6d9bf;
-  --color-clay: #c9705a;
+  /* ---- Tinta marron del logo ---- */
+  --color-ink: #2B1611;
+  --color-ink-soft: #5A3B31;
+
+  /* ---- Dorado (aprender, detalles) ---- */
+  --color-gold: #FFB627;
+  --color-gold-strong: #8A5A00;
+  --color-gold-soft: #FFF1CF;
+  --color-gold-edge: #FFE1A0;
+  --color-beige: #F3E3CF;
+  --color-clay: #E8434A;
+  --color-mountain: #E8434A;
+  --color-mountain-deep: #B8161D;
 
   /* ---- Texto ---- */
-  --color-text: #160B07;
-  --color-text-muted: #716864;
-  --color-text-faint: #716864;
+  --color-text: #2B1611;
+  --color-text-muted: #6E5A52;
+  --color-text-faint: #8A7A72;
   --color-text-inverse: #FFFFFF;
 
   /* ---- Estados ---- */
-  --color-success: #2E9D58;
-  --color-success-soft: #e2efe4;
-  --color-info: #2f5578;
-  --color-info-soft: #e3ebf2;
-  --color-warning: #a06a17;
-  --color-warning-soft: #f6ecd6;
+  --color-success: #2FA84F;
+  --color-success-ink: #1F7A37;
+  --color-success-soft: #E3F6E8;
+  --color-success-edge: #BDE8C9;
+  --color-info: #0C7C74;
+  --color-info-soft: #DDF4F1;
+  --color-warning: #8A5A00;
+  --color-warning-soft: #FFF1CF;
 
   /* ---- Tipografia ---- */
-  --font-display: 'Fraunces', 'Iowan Old Style', 'Palatino Linotype', Georgia,
-    serif;
-  --font-sans: 'Hanken Grotesk', 'Segoe UI', system-ui, -apple-system,
+  --font-display: 'Nunito', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-sans: 'Nunito', 'Segoe UI', system-ui, -apple-system,
     'Helvetica Neue', Arial, sans-serif;
 
-  --fs-xs: 0.75rem;
-  --fs-sm: 0.875rem;
-  --fs-base: 1rem;
-  --fs-lg: 1.125rem;
+  --fs-xs: 0.8125rem;
+  --fs-sm: 0.9375rem;
+  --fs-base: 1.0625rem;
+  --fs-lg: 1.1875rem;
   --fs-xl: 1.375rem;
   --fs-2xl: 1.75rem;
-  --fs-3xl: 2.25rem;
-  --fs-4xl: 2.85rem;
+  --fs-3xl: 2rem;
+  --fs-4xl: 2.75rem;
 
   /* Escala de texto accesible (la ajusta AccessibilityPage) */
   --text-scale: 1;
@@ -81,146 +90,146 @@
   --space-8: 3rem;
 
   /* ---- Formas ---- */
-  --radius-sm: 8px;
-  --radius-md: 14px;
-  --radius-lg: 18px;
-  --radius-xl: 26px;
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
+  --radius-xl: 28px;
   --radius-pill: 999px;
 
-  /* ---- Sombras (calidas, discretas) ---- */
-  --shadow-card: 0 1px 1px rgba(51, 35, 26, 0.04),
-    0 8px 20px -12px rgba(51, 35, 26, 0.16);
-  --shadow-raised: 0 2px 4px rgba(51, 35, 26, 0.06),
-    0 18px 40px -16px rgba(51, 35, 26, 0.24);
-  --shadow-nav: 0 -1px 0 var(--color-hairline),
-    0 -14px 32px -20px rgba(51, 35, 26, 0.22);
-  --shadow-primary: 0 10px 24px -10px rgba(180, 35, 31, 0.45);
+  /* ---- Relieve: borde inferior solido en vez de sombra difusa ---- */
+  --shadow-card: 0 4px 0 var(--color-border);
+  --shadow-raised: 0 18px 40px -16px rgba(43, 22, 17, 0.28);
+  --shadow-nav: 0 -10px 30px -18px rgba(43, 22, 17, 0.25);
+  --shadow-primary: 0 5px 0 var(--color-primary-edge);
 
   /* ---- Layout ---- */
   --app-max-width: 460px;
-  --bottom-nav-height: 66px;
-  --page-padding: 1.35rem;
+  --bottom-nav-height: 78px;
+  --page-padding: 1.125rem;
 
-  /* ---- Textura de papel (grano sutil sobre el fondo) ---- */
-  --paper-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
+  /* Sin textura: fondo crema limpio. */
+  --paper-grain: none;
 
   color-scheme: light;
 }
 
 /*
  * ---- Modo oscuro ----
- * Misma direccion editorial, no un gris generico: la tinta marron pasa a ser
- * el fondo y el crema pasa a ser el texto. El rojo se aclara para mantener
- * contraste AA sobre superficies oscuras (el #b4231f del modo claro no lo
- * alcanza), y el dorado gana luminosidad.
+ * La tinta marron del logo pasa a ser el fondo y el crema el texto. El rojo y
+ * el verde azulado se aclaran para mantener contraste AA.
  *
- * `.theme-dark` lo pone el hook useTheme en <html>. Se define una sola vez y
- * se reutiliza para la preferencia del sistema mas abajo.
+ * `.theme-dark` lo pone el hook useTheme en <html>; `.theme-auto` sigue la
+ * preferencia del sistema.
  */
 .theme-dark {
-  --color-bg: #221812;
-  --color-bg-soft: #2b1f18;
-  --color-surface: #2e2119;
-  --color-surface-alt: #382920;
-  --color-surface-sunk: #1c1410;
-  --color-border: #46342a;
-  --color-border-strong: #5d4638;
-  --color-hairline: #3a2b22;
+  --color-bg: #1E1310;
+  --color-bg-soft: #26180F;
+  --color-surface: #2C1D18;
+  --color-surface-alt: #34231D;
+  --color-surface-sunk: #1A100D;
+  --color-border: #45302A;
+  --color-border-strong: #5A4037;
+  --color-hairline: #3A2822;
 
-  --color-primary: #f0665c;
-  --color-primary-hover: #f47d74;
-  --color-primary-active: #d9584f;
-  --color-primary-soft: #45241f;
-  --color-primary-tint: #33201b;
-  --color-primary-ink: #ffd9d4;
+  --color-primary: #F0555B;
+  --color-primary-hover: #F36A70;
+  --color-primary-active: #C8343B;
+  --color-primary-edge: #8E1B20;
+  --color-primary-soft: #4A2124;
+  --color-primary-tint: #36201E;
+  --color-primary-ink: #FFD9D4;
 
-  --color-ink: #f6ece0;
-  --color-ink-soft: #e2d3c2;
+  --color-teal: #2BB3A8;
+  --color-teal-edge: #136C65;
+  --color-teal-soft: #173A37;
 
-  --color-gold: #e0b458;
-  --color-gold-strong: #f0c974;
-  --color-gold-soft: #3d3120;
-  --color-beige: #4a3c2a;
-  --color-clay: #d98a72;
+  --color-ink: #FBEFE6;
+  --color-ink-soft: #E6D3C6;
 
-  --color-text: #f2e7db;
-  --color-text-muted: #bfae9b;
-  --color-text-faint: #9a8878;
-  --color-text-inverse: #221812;
+  --color-gold: #FFC24D;
+  --color-gold-strong: #FFD27A;
+  --color-gold-soft: #3D2F18;
+  --color-gold-edge: #5A4520;
+  --color-beige: #4A3828;
+  --color-clay: #E8434A;
+  --color-mountain: #A82A2F;
+  --color-mountain-deep: #7A1519;
 
-  --color-success: #6bbf8e;
-  --color-success-soft: #23342a;
-  --color-info: #7fa8cf;
-  --color-info-soft: #22303c;
-  --color-warning: #e0b458;
-  --color-warning-soft: #3a2f1c;
+  --color-text: #F6EAE0;
+  --color-text-muted: #C9B6A9;
+  --color-text-faint: #A8958A;
+  --color-text-inverse: #FFFFFF;
 
-  --shadow-card: 0 1px 1px rgba(0, 0, 0, 0.3),
-    0 8px 20px -12px rgba(0, 0, 0, 0.7);
-  --shadow-raised: 0 2px 4px rgba(0, 0, 0, 0.35),
-    0 18px 40px -16px rgba(0, 0, 0, 0.8);
-  --shadow-nav: 0 -1px 0 var(--color-hairline),
-    0 -14px 32px -20px rgba(0, 0, 0, 0.7);
-  --shadow-primary: 0 10px 24px -10px rgba(240, 102, 92, 0.35);
+  --color-success: #4CC56E;
+  --color-success-ink: #8BE0A3;
+  --color-success-soft: #1D3424;
+  --color-success-edge: #2C5537;
+  --color-info: #2BB3A8;
+  --color-info-soft: #173A37;
+  --color-warning: #FFD27A;
+  --color-warning-soft: #3D2F18;
 
-  /* El grano se nota mas sobre oscuro: se baja la opacidad. */
-  --paper-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.14'/%3E%3C/svg%3E");
+  --shadow-card: 0 4px 0 var(--color-border);
+  --shadow-raised: 0 18px 40px -16px rgba(0, 0, 0, 0.8);
+  --shadow-nav: 0 -14px 32px -20px rgba(0, 0, 0, 0.7);
+  --shadow-primary: 0 5px 0 var(--color-primary-edge);
 
   color-scheme: dark;
 }
 
-/*
- * Preferencia del sistema: solo cuando el tema es "sistema" (clase
- * .theme-auto). Se importa la misma paleta que .theme-dark.
- */
 @media (prefers-color-scheme: dark) {
   .theme-auto {
-    --color-bg: #221812;
-    --color-bg-soft: #2b1f18;
-    --color-surface: #2e2119;
-    --color-surface-alt: #382920;
-    --color-surface-sunk: #1c1410;
-    --color-border: #46342a;
-    --color-border-strong: #5d4638;
-    --color-hairline: #3a2b22;
+    --color-bg: #1E1310;
+    --color-bg-soft: #26180F;
+    --color-surface: #2C1D18;
+    --color-surface-alt: #34231D;
+    --color-surface-sunk: #1A100D;
+    --color-border: #45302A;
+    --color-border-strong: #5A4037;
+    --color-hairline: #3A2822;
 
-    --color-primary: #f0665c;
-    --color-primary-hover: #f47d74;
-    --color-primary-active: #d9584f;
-    --color-primary-soft: #45241f;
-    --color-primary-tint: #33201b;
-    --color-primary-ink: #ffd9d4;
+    --color-primary: #F0555B;
+    --color-primary-hover: #F36A70;
+    --color-primary-active: #C8343B;
+    --color-primary-edge: #8E1B20;
+    --color-primary-soft: #4A2124;
+    --color-primary-tint: #36201E;
+    --color-primary-ink: #FFD9D4;
 
-    --color-ink: #f6ece0;
-    --color-ink-soft: #e2d3c2;
+    --color-teal: #2BB3A8;
+    --color-teal-edge: #136C65;
+    --color-teal-soft: #173A37;
 
-    --color-gold: #e0b458;
-    --color-gold-strong: #f0c974;
-    --color-gold-soft: #3d3120;
-    --color-beige: #4a3c2a;
-    --color-clay: #d98a72;
+    --color-ink: #FBEFE6;
+    --color-ink-soft: #E6D3C6;
 
-    --color-text: #f2e7db;
-    --color-text-muted: #bfae9b;
-    --color-text-faint: #9a8878;
-    --color-text-inverse: #221812;
+    --color-gold: #FFC24D;
+    --color-gold-strong: #FFD27A;
+    --color-gold-soft: #3D2F18;
+    --color-gold-edge: #5A4520;
+    --color-beige: #4A3828;
+    --color-clay: #E8434A;
+    --color-mountain: #A82A2F;
+    --color-mountain-deep: #7A1519;
 
-    --color-success: #6bbf8e;
-    --color-success-soft: #23342a;
-    --color-info: #7fa8cf;
-    --color-info-soft: #22303c;
-    --color-warning: #e0b458;
-    --color-warning-soft: #3a2f1c;
+    --color-text: #F6EAE0;
+    --color-text-muted: #C9B6A9;
+    --color-text-faint: #A8958A;
+    --color-text-inverse: #FFFFFF;
 
-    --shadow-card: 0 1px 1px rgba(0, 0, 0, 0.3),
-      0 8px 20px -12px rgba(0, 0, 0, 0.7);
-    --shadow-raised: 0 2px 4px rgba(0, 0, 0, 0.35),
-      0 18px 40px -16px rgba(0, 0, 0, 0.8);
-    --shadow-nav: 0 -1px 0 var(--color-hairline),
-      0 -14px 32px -20px rgba(0, 0, 0, 0.7);
-    --shadow-primary: 0 10px 24px -10px rgba(240, 102, 92, 0.35);
+    --color-success: #4CC56E;
+    --color-success-ink: #8BE0A3;
+    --color-success-soft: #1D3424;
+    --color-success-edge: #2C5537;
+    --color-info: #2BB3A8;
+    --color-info-soft: #173A37;
+    --color-warning: #FFD27A;
+    --color-warning-soft: #3D2F18;
 
-    --paper-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.14'/%3E%3C/svg%3E");
+    --shadow-card: 0 4px 0 var(--color-border);
+    --shadow-raised: 0 18px 40px -16px rgba(0, 0, 0, 0.8);
+    --shadow-nav: 0 -14px 32px -20px rgba(0, 0, 0, 0.7);
+    --shadow-primary: 0 5px 0 var(--color-primary-edge);
 
     color-scheme: dark;
   }
@@ -240,14 +249,14 @@ body {
   margin: 0;
   font-family: var(--font-sans);
   font-size: calc(var(--fs-base) * var(--text-scale));
-  line-height: 1.55;
+  font-weight: 600;
+  line-height: 1.5;
   color: var(--color-text);
   background-color: var(--color-bg);
   background-image: var(--paper-grain);
   background-attachment: fixed;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  font-feature-settings: 'ss01', 'cv05';
 }
 
 h1,
@@ -256,16 +265,14 @@ h3,
 h4 {
   margin: 0;
   font-family: var(--font-display);
-  font-weight: 600;
+  font-weight: 900;
   line-height: 1.12;
   color: var(--color-ink);
-  letter-spacing: -0.015em;
-  font-optical-sizing: auto;
+  letter-spacing: -0.02em;
 }
 
 h1 {
   font-size: calc(var(--fs-3xl) * var(--text-scale));
-  font-weight: 600;
 }
 
 h2 {
@@ -274,7 +281,6 @@ h2 {
 
 h3 {
   font-size: calc(var(--fs-xl) * var(--text-scale));
-  font-weight: 600;
 }
 
 p {
@@ -311,7 +317,7 @@ ol {
 }
 
 :focus-visible {
-  outline: 2.5px solid var(--color-gold);
+  outline: 3px solid var(--color-teal);
   outline-offset: 2px;
   border-radius: var(--radius-sm);
 }
