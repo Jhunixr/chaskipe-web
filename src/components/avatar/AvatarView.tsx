@@ -1,9 +1,10 @@
-import { lazy, Suspense, useEffect, useImperativeHandle, useRef, useState } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react'
 
 import { Icon } from '@/components/ui'
 import { usePreferences } from '@/hooks/usePreferences'
 
 import type { Avatar3DHandle } from './Avatar3D'
+import type { SpellToken } from './fingerspelling'
 
 import './AvatarView.css'
 
@@ -12,75 +13,110 @@ const Avatar3D = lazy(() =>
 )
 
 export interface AvatarViewHandle {
-  /** Reproduce el gesto DEMO (marcador, no es una sena real). */
+  /** Deletrea `spell` (o, sin texto, reproduce el gesto DEMO). */
   play: () => void
   stop: () => void
 }
 
 interface AvatarViewProps {
   ref?: React.Ref<AvatarViewHandle>
-  /** Texto que el avatar "representaria" (se muestra como subtitulo). */
+  /** Texto que el avatar deletrea con el alfabeto manual de la LSP. */
+  spell?: string | undefined
+  /** Texto de subtitulo cuando no se deletrea. */
   caption?: string | undefined
-  /** true mientras reproduce un gesto. */
+  /** true para empezar en cuanto el avatar este cargado. */
   playing?: boolean
 }
 
 /**
- * Avatar 3D de Chaski Pe (FASE 9).
+ * Avatar 3D de Chaski Pe.
  *
- * Escena Three.js con un avatar geometrico en reposo (respira, parpadea) que
- * puede reproducir un **gesto DEMO**. Ese gesto NO representa ninguna sena de
- * Lengua de Senas Peruana: es un marcador de posicion. Las animaciones de
- * senas validadas con personas usuarias de LSP o interpretes son la FASE 10.
+ * Con `spell`, el avatar **deletrea en LSP**: su mano derecha forma cada letra
+ * del abecedario manual con la pose real de una foto del dataset publico
+ * (ver `fingerspelling.ts`). J, N con tilde y Z llevan movimiento y aun no
+ * tienen datos: se muestran escritas.
+ *
+ * Sin `spell` reproduce el gesto DEMO (marcador de posicion, no es una sena).
+ * Las senas de palabras completas necesitan animaciones validadas con personas
+ * usuarias de LSP o interpretes.
  *
  * El componente Three.js se carga de forma diferida (React.lazy).
  */
-export function AvatarView({ ref, caption, playing = false }: AvatarViewProps) {
+export function AvatarView({ ref, spell, caption, playing = false }: AvatarViewProps) {
   const inner = useRef<Avatar3DHandle | null>(null)
-  const [gestureActive, setGestureActive] = useState(false)
+  const [mode, setMode] = useState<'idle' | 'demo' | 'spelling'>('idle')
+  const [tokens, setTokens] = useState<SpellToken[]>([])
+  const [current, setCurrent] = useState(-1)
   const autoPlayedRef = useRef(false)
   const { prefs } = usePreferences()
+
+  const start = useCallback(() => {
+    const avatar = inner.current
+    if (!avatar) return false
+    const text = spell?.trim()
+    if (text) {
+      setMode('spelling')
+      setCurrent(-1)
+      const seq = avatar.spell(text, {
+        onToken: (index) => setCurrent(index),
+        onEnd: () => {
+          setMode('idle')
+          setCurrent(-1)
+        },
+      })
+      setTokens(seq)
+    } else {
+      setMode('demo')
+      avatar.playDemoGesture()
+    }
+    return true
+  }, [spell])
 
   useImperativeHandle(
     ref,
     () => ({
-      play: () => {
-        setGestureActive(true)
-        inner.current?.playDemoGesture()
-      },
+      play: () => void start(),
       stop: () => {
-        setGestureActive(false)
+        setMode('idle')
+        setCurrent(-1)
         inner.current?.stop()
       },
     }),
-    [],
+    [start],
   )
 
-  // Dispara el gesto una vez cuando `playing` pasa a true (el modelo 3D
-  // puede tardar en cargar; reintenta hasta que la ref exista).
+  // Empieza una vez cuando `playing` pasa a true (el modelo 3D puede tardar
+  // en cargar; reintenta hasta que la ref exista).
   useEffect(() => {
     if (!playing || autoPlayedRef.current) return
     const id = window.setInterval(() => {
-      if (inner.current) {
+      if (start()) {
         autoPlayedRef.current = true
-        setGestureActive(true)
-        inner.current.playDemoGesture()
         window.clearInterval(id)
       }
     }, 120)
     return () => window.clearInterval(id)
-  }, [playing])
+  }, [playing, start])
 
-  const showDemo = gestureActive || playing
-  // "Subtitulos siempre visibles": con la preferencia activa el texto se queda
-  // fijo; sin ella, solo acompana al gesto mientras se reproduce.
+  const spelling = tokens.length > 0 && (mode === 'spelling' || prefs.subtitles)
+  const missing = [
+    ...new Set(
+      tokens.filter((t) => t.kind === 'letter' && !t.pose).map((t) => t.char),
+    ),
+  ]
   const showCaption =
-    caption !== undefined && caption !== '' && (prefs.subtitles || showDemo)
+    !spelling && caption !== undefined && caption !== '' && (prefs.subtitles || mode !== 'idle')
 
   return (
     <div className="avatar-view">
       <div className="avatar-view__stage">
-        {showDemo && (
+        {mode === 'spelling' && (
+          <span className="avatar-view__tag avatar-view__tag--lsp">
+            <Icon name="hands" size={14} />
+            Deletreo LSP
+          </span>
+        )}
+        {mode === 'demo' && (
           <span className="avatar-view__tag">
             <Icon name="hands" size={14} />
             Gesto DEMO · no validado
@@ -95,20 +131,43 @@ export function AvatarView({ ref, caption, playing = false }: AvatarViewProps) {
             </div>
           }
         >
-          <Avatar3D
-            ref={inner}
-            onGestureEnd={() => setGestureActive(false)}
-          />
+          <Avatar3D ref={inner} onGestureEnd={() => setMode('idle')} />
         </Suspense>
 
+        {spelling && (
+          <p className="avatar-view__caption avatar-view__spelling" aria-label={spell}>
+            {tokens.map((t, i) =>
+              t.kind === 'space' ? (
+                <span key={i} className="avatar-view__space" aria-hidden="true" />
+              ) : (
+                <span
+                  key={i}
+                  aria-hidden="true"
+                  className={[
+                    'avatar-view__letter',
+                    i === current ? 'avatar-view__letter--active' : '',
+                    i < current ? 'avatar-view__letter--done' : '',
+                    t.pose ? '' : 'avatar-view__letter--nopose',
+                  ].join(' ')}
+                >
+                  {t.char}
+                </span>
+              ),
+            )}
+          </p>
+        )}
         {showCaption && <p className="avatar-view__caption">{caption}</p>}
       </div>
 
       <p className="demo-note avatar-view__note">
         <Icon name="shield" size={14} />
-        El avatar aun no representa senas reales. El movimiento es un marcador de
-        posicion; las animaciones de LSP deben validarse con personas usuarias o
-        interpretes.
+        {spell
+          ? `El avatar deletrea con el abecedario manual de la LSP (formas de mano de un dataset publico, aun sin validar con personas usuarias).${
+              missing.length > 0
+                ? ` ${missing.join(', ')} ${missing.length === 1 ? 'lleva' : 'llevan'} movimiento o no tiene${missing.length === 1 ? '' : 'n'} forma todavia: se muestra${missing.length === 1 ? '' : 'n'} escrita${missing.length === 1 ? '' : 's'}.`
+                : ''
+            } Las senas de palabras completas aun no estan disponibles.`
+          : 'El avatar aun no representa senas reales. El movimiento es un marcador de posicion; las animaciones de LSP deben validarse con personas usuarias o interpretes.'}
       </p>
     </div>
   )

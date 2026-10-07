@@ -97,3 +97,51 @@
     animation-duration: 2s;
   }
 }
+
+.avatar-view__tag--lsp {
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+}
+
+/* Deletreo: cada letra; la actual, grande y en rojo. */
+.avatar-view__spelling {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: baseline;
+  gap: 2px;
+  letter-spacing: 0.04em;
+}
+
+.avatar-view__letter {
+  display: inline-block;
+  min-width: 0.7em;
+  color: var(--color-text-muted);
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.avatar-view__letter--done {
+  color: var(--color-ink);
+}
+
+.avatar-view__letter--active {
+  color: var(--color-primary);
+  transform: scale(1.45);
+  font-weight: 800;
+}
+
+/* Letras sin forma de mano (J, N con tilde, Z, numeros): se muestran escritas. */
+.avatar-view__letter--nopose {
+  text-decoration: underline dotted;
+}
+
+.avatar-view__space {
+  display: inline-block;
+  width: 0.6em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .avatar-view__letter {
+    transition: none;
+  }
+}

@@ -50,7 +50,7 @@ export function TextToSignPage() {
 
         <p className="text-to-sign__label section-title">Respuesta en senas</p>
 
-        <AvatarView ref={avatarRef} caption={text.trim() || undefined} playing />
+        <AvatarView ref={avatarRef} spell={text.trim() || undefined} playing />
 
         <div className="text-to-sign__controls">
           <button

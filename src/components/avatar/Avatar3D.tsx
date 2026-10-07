@@ -4,11 +4,14 @@ import { usePreferences } from '@/hooks/usePreferences'
 import { AVATAR_RATE } from '@/types/preferences'
 
 import { DEMO_GESTURE } from './animation'
-import { SignAvatarScene } from './scene'
+import type { SpellToken } from './fingerspelling'
+import { SignAvatarScene, type SpellCallbacks } from './scene'
 
 export interface Avatar3DHandle {
   /** Reproduce el gesto DEMO (marcador de posicion, no es una sena). */
   playDemoGesture: () => void
+  /** Deletrea el texto con el alfabeto manual de la LSP. */
+  spell: (text: string, callbacks?: SpellCallbacks) => SpellToken[]
   stop: () => void
 }
 
@@ -61,8 +64,10 @@ export function Avatar3D({ ref, onGestureEnd }: Avatar3DProps) {
       playDemoGesture: () => {
         sceneRef.current?.playGesture(DEMO_GESTURE, onGestureEnd)
       },
+      spell: (text, callbacks) => sceneRef.current?.spell(text, callbacks) ?? [],
       stop: () => {
         sceneRef.current?.stopGesture()
+        sceneRef.current?.stopSpelling()
       },
     }),
     [onGestureEnd],
