@@ -1,6 +1,9 @@
 import { useCallback, useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
-import { Button, Icon, PageHeader } from '@/components/ui'
+import { ROUTES } from '@/app/routes'
+
+import { Button, Icon, PageHeader, type IconName } from '@/components/ui'
 import { useApiResource } from '@/hooks/useApiResource'
 import { useSpeech } from '@/hooks/useSpeech'
 import { getPhraseGroups } from '@/services/api'
@@ -10,19 +13,33 @@ import type { QuickPhraseCategory } from '@/types'
 import './QuickPhrasesPage.css'
 import './pages.css'
 
-const CATEGORY_ICON: Record<QuickPhraseCategory, 'chat' | 'hands' | 'bell'> = {
+const CATEGORY_ICON: Record<QuickPhraseCategory, IconName> = {
   saludos: 'chat',
+  respuestas: 'check',
   necesidades: 'hands',
+  salud: 'shield',
+  transporte: 'swap',
+  compras: 'phrases',
   emergencias: 'bell',
 }
 
+/** Categorias de frases cortas: se muestran como chips en vez de lista. */
+const CHIP_CATEGORIES: QuickPhraseCategory[] = ['saludos', 'respuestas']
+
 export function QuickPhrasesPage() {
+  const navigate = useNavigate()
   const { speak, supported } = useSpeech()
   const [query, setQuery] = useState('')
   const [selected, setSelected] = useState<string | null>(null)
 
   const fetcher = useCallback(() => getPhraseGroups(), [])
   const { data: allGroups } = useApiResource(fetcher, QUICK_PHRASE_GROUPS)
+
+  const selectedText = useMemo(
+    () =>
+      allGroups.flatMap((g) => g.phrases).find((p) => p.id === selected)?.text ?? null,
+    [allGroups, selected],
+  )
 
   const groups = useMemo(() => {
     const term = query.trim().toLowerCase()
@@ -64,7 +81,7 @@ export function QuickPhrasesPage() {
             <Icon name={CATEGORY_ICON[group.category]} size={18} />
             {group.label}
           </h2>
-          {group.category === 'saludos' ? (
+          {CHIP_CATEGORIES.includes(group.category) ? (
             <div className="quick-phrases__chips">
               {group.phrases.map((phrase) => (
                 <button
@@ -107,7 +124,13 @@ export function QuickPhrasesPage() {
         </section>
       ))}
 
-      <Button size="lg" fullWidth icon="hands" disabled={!selected}>
+      <Button
+        size="lg"
+        fullWidth
+        icon="hands"
+        disabled={!selectedText}
+        onClick={() => navigate(ROUTES.textToSign, { state: { text: selectedText } })}
+      >
         Mostrar en senas
       </Button>
     </div>

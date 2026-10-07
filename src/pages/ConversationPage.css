@@ -5,156 +5,159 @@
   gap: var(--space-3);
 }
 
-.conversation__live {
-  display: inline-flex;
-  align-items: center;
+/* Situaciones: fila desplazable de chips. */
+.conversation__situations {
+  display: flex;
   gap: var(--space-2);
-  padding: 4px var(--space-3);
-  font-size: calc(var(--fs-xs) * var(--text-scale));
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--color-primary);
-  background: var(--color-primary-soft);
-  border-radius: var(--radius-pill);
+  overflow-x: auto;
+  padding-bottom: var(--space-1);
+  scrollbar-width: none;
 }
 
-.conversation__live-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: var(--radius-pill);
-  background: var(--color-primary);
-  animation: conv-pulse 1.2s ease-in-out infinite;
+.conversation__situations::-webkit-scrollbar {
+  display: none;
 }
 
-@keyframes conv-pulse {
-  0%,
-  100% {
-    opacity: 0.35;
-  }
-  50% {
-    opacity: 1;
-  }
+.conversation__situations .chip {
+  flex-shrink: 0;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .conversation__live-dot {
-    animation: none;
-  }
-}
-
-.conversation__panel {
+/* ---- Hilo de mensajes ---- */
+.conversation__thread {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: var(--space-3);
+  min-height: 180px;
+}
+
+.conversation__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
   padding: var(--space-5);
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: calc(var(--fs-sm) * var(--text-scale));
+  background: var(--color-surface);
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius-lg);
+}
+
+.conversation__bubble {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  max-width: 88%;
+  padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-lg);
   border: 1px solid var(--color-border);
   box-shadow: var(--shadow-card);
 }
 
-.conversation__panel--in {
+.conversation__bubble--sorda {
+  align-self: flex-start;
+  background: var(--color-primary-tint);
+  border-color: var(--color-primary-soft);
+  border-bottom-left-radius: var(--radius-sm);
+}
+
+.conversation__bubble--oyente {
+  align-self: flex-end;
+  background: var(--color-gold-soft);
+  border-color: color-mix(in srgb, var(--color-gold) 25%, transparent);
+  border-bottom-right-radius: var(--radius-sm);
+}
+
+.conversation__bubble-who {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: calc(var(--fs-xs) * var(--text-scale));
+  font-weight: 800;
+  color: var(--color-text-muted);
+}
+
+.conversation__bubble-text {
+  font-family: var(--font-display);
+  font-size: calc(var(--fs-lg) * var(--text-scale));
+  font-weight: 600;
+  color: var(--color-ink);
+  word-break: break-word;
+}
+
+/* Lo que dice la persona oyente se lee en grande: es lo que lee la persona sorda. */
+.conversation__bubble--oyente .conversation__bubble-text {
+  font-size: calc(var(--fs-2xl) * var(--text-scale));
+  line-height: 1.2;
+}
+
+.conversation__bubble-actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 2px 0;
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: calc(var(--fs-xs) * var(--text-scale));
+  font-weight: 700;
+  color: var(--color-primary);
+  cursor: pointer;
+}
+
+.conversation__bubble-actions button:disabled {
+  color: var(--color-text-faint);
+  cursor: default;
+}
+
+/* ---- Redactor ---- */
+.conversation__composer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-card);
+}
+
+.conversation__composer--sorda {
   background: var(--color-primary-tint);
   border-color: var(--color-primary-soft);
 }
 
-.conversation__panel--out {
+.conversation__composer--oyente {
   background: var(--color-gold-soft);
   border-color: color-mix(in srgb, var(--color-gold) 25%, transparent);
 }
 
-.conversation__panel-title {
-  display: inline-flex;
-  align-items: center;
+.conversation__who {
+  align-self: stretch;
+  display: flex;
+}
+
+.conversation__who .segmented__option {
+  flex: 1;
+}
+
+.conversation__suggestions {
+  display: flex;
+  flex-wrap: wrap;
   gap: var(--space-2);
-  font-size: calc(var(--fs-xs) * var(--text-scale));
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
 }
 
-.conversation__panel--in .conversation__panel-title {
-  color: var(--color-primary);
-}
-
-.conversation__panel--out .conversation__panel-title {
-  color: var(--color-gold-strong);
-}
-
-.conversation__in-body {
+.conversation__mic {
   display: flex;
-  align-items: center;
-  gap: var(--space-3);
+  flex-direction: column;
+  gap: var(--space-2);
 }
 
-.conversation__avatar {
-  width: 52px;
-  height: 52px;
-  border-radius: var(--radius-pill);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  flex-shrink: 0;
+.conversation__draft {
+  min-height: 72px;
 }
 
-.conversation__detected {
-  font-family: var(--font-display);
-  font-size: calc(var(--fs-2xl) * var(--text-scale));
-  font-weight: 600;
-  color: var(--color-ink);
-}
-
-.conversation__swap {
-  align-self: center;
-  width: 38px;
-  height: 38px;
-  margin: calc(var(--space-2) * -1) 0;
-  border-radius: var(--radius-pill);
-  background: var(--color-ink);
-  color: var(--color-text-inverse);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1;
-  box-shadow: var(--shadow-card);
-}
-
-.conversation__reply {
-  padding: var(--space-3) var(--space-4);
-  font: inherit;
-  font-family: var(--font-display);
-  font-size: calc(var(--fs-lg) * var(--text-scale));
-  font-weight: 500;
-  color: var(--color-ink);
-  background: var(--color-surface);
-  border: 1.5px solid var(--color-border);
-  border-radius: var(--radius-md);
-}
-
-.conversation__reply:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px var(--color-primary-soft);
-}
-
-.conversation__out-actions {
+.conversation__send-row {
   display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  margin-top: var(--space-1);
-}
-
-.conversation__icon-btn {
-  width: 48px;
-  height: 48px;
-  border-radius: var(--radius-pill);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border-strong);
-  color: var(--color-text);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  gap: var(--space-2);
 }

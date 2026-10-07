@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 import { ROUTES } from '@/app/routes'
 import { CameraView, HandOverlay } from '@/components/camera'
@@ -8,6 +8,7 @@ import { useCamera } from '@/hooks/useCamera'
 import { useHandLandmarker } from '@/hooks/useHandLandmarker'
 import { useSignRecognition, type RecognitionOutput } from '@/hooks/useSignRecognition'
 import { addHistory } from '@/services/api'
+import { handOffSpelled } from '@/services/conversation'
 import {
   phraseForLabel,
   saveRecognition,
@@ -38,6 +39,10 @@ import './pages.css'
  */
 export function SignToTextPage() {
   const navigate = useNavigate()
+  const location = useLocation()
+  // Se llego desde Conversacion: "Usar texto" devuelve la palabra alli.
+  const fromConversation =
+    (location.state as { from?: string } | null)?.from === 'conversation'
   const camera = useCamera('user')
   const [mode, setMode] = useState<ModelKind>('letters')
   const [spelled, setSpelled] = useState('')
@@ -115,6 +120,11 @@ export function SignToTextPage() {
   const submitSpelled = () => {
     const text = spelled.trim()
     if (!text) return
+    if (fromConversation) {
+      handOffSpelled(text)
+      navigate(ROUTES.conversation)
+      return
+    }
     showResult({
       label: 'DELETREO',
       text,
@@ -343,7 +353,7 @@ export function SignToTextPage() {
       {letters ? (
         <div className="stack-sm">
           <Button size="lg" fullWidth icon="check" onClick={submitSpelled} disabled={!spelled.trim()}>
-            Usar texto
+            {fromConversation ? 'Enviar a la conversacion' : 'Usar texto'}
           </Button>
           {recog.phase === 'paused' ? (
             <Button variant="ghost" fullWidth icon="camera" onClick={recog.resume}>

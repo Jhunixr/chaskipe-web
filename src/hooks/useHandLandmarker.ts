@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { startTransition, useCallback, useEffect, useRef, useState } from 'react'
 
 import { closeHandLandmarker, getHandLandmarker } from '@/services/handLandmarker'
 import type { HandFrame, Landmark } from '@/types/handLandmarks'
@@ -112,7 +112,11 @@ export function useHandLandmarker(
               worldHands: (result.worldLandmarks ?? EMPTY) as Landmark[][],
               timestamp: now,
             }
-            setFrame(next)
+            // Como transicion: el dibujo de los puntos puede esperar. Si fuera
+            // urgente, al llegar ~30 veces por segundo interrumpiria siempre la
+            // navegacion de React Router (que tambien es una transicion) y no
+            // se podria salir de la pantalla mientras la camara esta activa.
+            startTransition(() => setFrame(next))
             onFrameRef.current?.(next)
           } catch {
             // Un frame fallido no detiene el bucle.

@@ -9,7 +9,6 @@
  * `http://localhost:8000`.
  */
 import {
-  CONVERSATION_MESSAGES,
   DEMO_USER,
   HISTORY_ENTRIES,
   QUICK_PHRASE_GROUPS,
@@ -441,12 +440,6 @@ export async function getPhraseGroups(): Promise<Result<QuickPhraseGroup[]>> {
   } catch {
     return { data: QUICK_PHRASE_GROUPS, source: 'mock' }
   }
-}
-
-// ---- Conversacion (solo mock por ahora; no hay endpoint en FASE 7) ----
-
-export function getConversationMessages() {
-  return CONVERSATION_MESSAGES
 }
 
 // ---- Salud del backend ----

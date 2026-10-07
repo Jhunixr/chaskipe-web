@@ -16,6 +16,18 @@ export function formatDateTime(isoDate: string): string {
   return DATE_FORMATTER.format(parsed)
 }
 
+const TIME_FORMATTER = new Intl.DateTimeFormat('es-PE', {
+  hour: '2-digit',
+  minute: '2-digit',
+})
+
+/** Solo la hora (para los mensajes de una conversacion). */
+export function formatTime(isoDate: string): string {
+  const parsed = new Date(isoDate)
+  if (Number.isNaN(parsed.getTime())) return ''
+  return TIME_FORMATTER.format(parsed)
+}
+
 const DIRECTION_LABEL: Record<TranslationDirection, string> = {
   'sign-to-text': 'Senas a texto',
   'text-to-sign': 'Texto a senas',

@@ -23,7 +23,14 @@ export interface QuickPhrase {
   isDemo: boolean
 }
 
-export type QuickPhraseCategory = 'saludos' | 'necesidades' | 'emergencias'
+export type QuickPhraseCategory =
+  | 'saludos'
+  | 'respuestas'
+  | 'necesidades'
+  | 'salud'
+  | 'transporte'
+  | 'compras'
+  | 'emergencias'
 
 export interface QuickPhraseGroup {
   category: QuickPhraseCategory
@@ -37,14 +44,6 @@ export interface HistoryEntry {
   /** Texto reconocido (sign-to-text) o texto de entrada (text-to-sign). */
   text: string
   /** Fecha ISO 8601. */
-  createdAt: string
-  isDemo: boolean
-}
-
-export interface ConversationMessage {
-  id: string
-  direction: TranslationDirection
-  text: string
   createdAt: string
   isDemo: boolean
 }
