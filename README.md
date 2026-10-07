@@ -174,13 +174,13 @@ Configuracion **estricta** (`strict: true` + `noUncheckedIndexedAccess`,
 
 ## Despliegue en Dokploy (VPS)
 
-El frontend se sirve con nginx desde un contenedor (`Dockerfile` de esta
-carpeta). La app llama a la API en `/backend` (mismo dominio) y nginx la
+El frontend se sirve con nginx desde un contenedor (`Dockerfile` en la raiz
+del repo). La app llama a la API en `/backend` (mismo dominio) y nginx la
 reenvia al backend: sin CORS ni contenido mixto.
 
 1. Dokploy → proyecto **CHASKI_PE** → **Create Service → Application**.
-2. **Provider**: GitHub, repo `chaskipe`, la rama a presentar, **Build Type**
-   *Dockerfile*, **Build Path** `/frontend`.
+2. **Provider**: GitHub, repo `chaskipe-web`, rama `main`, **Build Type**
+   *Dockerfile*, **Build Path** `/`.
 3. **Environment**:
    ```env
    BACKEND_URL=http://<App Name interno del backend>:8000

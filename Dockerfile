@@ -1,5 +1,5 @@
 # Frontend de Chaski Pe (React + Vite) servido con nginx.
-# Pensado para Dokploy: Build Type Dockerfile, Build Path /frontend.
+# Pensado para Dokploy: Build Type Dockerfile, Build Path /.
 #
 # La app llama a la API en /backend (mismo dominio) y nginx la reenvia a
 # BACKEND_URL. Asi no hay CORS ni contenido mixto, y la direccion del backend
