@@ -1,0 +1,104 @@
+.history__filter {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.history__toolbar {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.history__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.history__item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+}
+
+.history__avatar {
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.history__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.history__text {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: calc(var(--fs-lg) * var(--text-scale));
+  color: var(--color-ink);
+}
+
+.history__tag {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: calc(var(--fs-xs) * var(--text-scale));
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-pill);
+}
+
+.history__tag--in {
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+.history__tag--out {
+  background: var(--color-gold-soft);
+  color: var(--color-gold-strong);
+}
+
+.history__meta {
+  font-variant-numeric: tabular-nums;
+}
+
+.history__delete {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  border: none;
+  color: var(--color-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.history__delete:hover {
+  background: var(--color-primary-soft);
+}

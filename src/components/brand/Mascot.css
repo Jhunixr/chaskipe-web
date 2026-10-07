@@ -1,0 +1,34 @@
+.mascot {
+  flex-shrink: 0;
+}
+
+.mascot--image {
+  object-fit: contain;
+}
+
+.mascot__bubble {
+  fill: none;
+  stroke: var(--color-primary);
+  stroke-width: 6;
+  stroke-linejoin: round;
+}
+
+.mascot__head {
+  fill: var(--color-surface-alt);
+  stroke: var(--color-ink);
+  stroke-width: 2;
+}
+
+.mascot__hat {
+  fill: var(--color-primary);
+}
+
+.mascot__pom {
+  fill: var(--color-primary);
+}
+
+.mascot__hand {
+  fill: var(--color-surface-alt);
+  stroke: var(--color-ink);
+  stroke-width: 2;
+}

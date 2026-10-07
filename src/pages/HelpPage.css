@@ -1,0 +1,80 @@
+.help__art {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  min-height: 156px;
+  padding-top: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(
+    180deg,
+    var(--color-primary-tint),
+    var(--color-surface-alt)
+  );
+  border: 1px solid var(--color-primary-soft);
+  overflow: hidden;
+}
+
+.help__art > .mascot {
+  position: relative;
+  z-index: 1;
+  margin-bottom: var(--space-3);
+}
+
+/* Dentro de la tarjeta el motivo llena el ancho: sin desvanecido lateral. */
+.help__art > .mountains--bottom {
+  -webkit-mask-image: none;
+  mask-image: none;
+  opacity: 0.5;
+}
+
+.help__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.help__topic {
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+}
+
+.help__topic-head {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: none;
+  border: none;
+  text-align: left;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: calc(var(--fs-base) * var(--text-scale));
+  color: var(--color-ink);
+}
+
+.help__topic-icon {
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.help__topic-title {
+  flex: 1;
+}
+
+.help__topic-chevron {
+  color: var(--color-text-faint);
+  transition: transform 0.18s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.help__topic-chevron--open {
+  transform: rotate(90deg);
+  color: var(--color-primary);
+}
+
+.help__topic-body {
+  padding: 0 var(--space-4) var(--space-4);
+  line-height: 1.6;
+}

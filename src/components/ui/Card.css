@@ -1,0 +1,35 @@
+.card {
+  position: relative;
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-card);
+}
+
+.card--flat {
+  box-shadow: none;
+}
+
+.card--tint {
+  background: var(--color-primary-tint);
+  border-color: var(--color-primary-soft);
+  box-shadow: 0 4px 0 var(--color-primary-soft);
+}
+
+/* Filo dorado superior — sello editorial opcional */
+.card--sealed::before {
+  content: '';
+  position: absolute;
+  left: var(--space-5);
+  right: var(--space-5);
+  top: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--color-gold) 20%,
+    var(--color-gold) 80%,
+    transparent
+  );
+}

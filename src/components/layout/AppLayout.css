@@ -1,0 +1,32 @@
+.app-shell {
+  min-height: 100%;
+  max-width: var(--app-max-width);
+  margin: 0 auto;
+  background: var(--color-bg);
+  background-image: var(--paper-grain);
+  position: relative;
+  /* clip (no hidden): hidden convierte el contenedor en zona de scroll y
+     anula position: sticky en las paginas (p. ej. el cuadro del chat). */
+  overflow-x: clip;
+}
+
+.app-shell__content {
+  padding: var(--space-5) var(--page-padding);
+  padding-top: calc(env(safe-area-inset-top) + var(--space-5));
+  padding-bottom: calc(
+    var(--bottom-nav-height) + env(safe-area-inset-bottom) + var(--space-7)
+  );
+}
+
+.app-shell--no-nav .app-shell__content {
+  padding-bottom: calc(env(safe-area-inset-bottom) + var(--space-6));
+}
+
+@media (min-width: 481px) {
+  .app-shell {
+    min-height: 100vh;
+    border-left: 1px solid var(--color-border);
+    border-right: 1px solid var(--color-border);
+    box-shadow: 0 0 80px -20px rgba(51, 35, 26, 0.18);
+  }
+}

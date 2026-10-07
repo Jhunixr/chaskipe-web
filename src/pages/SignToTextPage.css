@@ -1,0 +1,185 @@
+.sign-to-text {
+  gap: var(--space-4);
+}
+
+.sign-to-text__panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5) var(--space-5);
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 5px 0 var(--color-border);
+}
+
+.sign-to-text__text {
+  font-size: calc(2.6rem * var(--text-scale));
+  font-weight: 900;
+  letter-spacing: 0.03em;
+  line-height: 1.05;
+  color: var(--color-ink);
+  min-height: 2.8rem;
+}
+
+/*
+ * Estado vacio / de espera: no es una sena reconocida, asi que baja al cuerpo
+ * de texto y no compite con el resultado real.
+ */
+.sign-to-text__text .text-muted {
+  font-size: calc(var(--fs-lg) * var(--text-scale));
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.sign-to-text__confidence {
+  margin-top: calc(var(--space-1) * -1);
+}
+
+.sign-to-text__candidate {
+  color: var(--color-primary);
+}
+
+.sign-to-text__hold {
+  height: 12px;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-sunk);
+  overflow: hidden;
+}
+
+.sign-to-text__hold span {
+  display: block;
+  height: 100%;
+  background: var(--color-primary);
+  border-radius: var(--radius-pill);
+  transition: width 0.15s linear;
+}
+
+.sign-to-text code {
+  font-family: var(--font-sans);
+  font-size: 0.85em;
+  font-weight: 700;
+  background: var(--color-surface-sunk);
+  padding: 1px 5px;
+  border-radius: 5px;
+}
+
+.sign-to-text__audio {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.sign-to-text__play {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-pill);
+  border: none;
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sign-to-text__play:disabled {
+  opacity: 0.5;
+}
+
+.sign-to-text__track {
+  flex: 1;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-sunk);
+  overflow: hidden;
+}
+
+.sign-to-text__track-fill {
+  display: block;
+  width: 38%;
+  height: 100%;
+  background: var(--color-primary);
+  border-radius: var(--radius-pill);
+}
+
+.sign-to-text__modes {
+  align-self: center;
+}
+
+.sign-to-text__spelled {
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+.sign-to-text__spell-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.sign-to-text__spell-actions .btn {
+  flex: 1;
+}
+
+/* Practica de Aprende LSP */
+.sign-to-text__practice {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-lg);
+  background: var(--color-gold-soft);
+  border: 2px solid var(--color-gold-edge);
+  box-shadow: 0 4px 0 var(--color-gold-edge);
+}
+
+.sign-to-text__practice--done {
+  background: var(--color-success-soft);
+  border-color: var(--color-success-edge);
+  box-shadow: 0 4px 0 var(--color-success-edge);
+}
+
+.sign-to-text__practice-letter {
+  flex-shrink: 0;
+  width: 58px;
+  height: 62px;
+  border-radius: var(--radius-md);
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 2.2rem;
+  font-weight: 900;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sign-to-text__practice--done .sign-to-text__practice-letter {
+  background: var(--color-success);
+}
+
+.sign-to-text__practice-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+
+.sign-to-text__practice-text strong {
+  font-size: calc(var(--fs-lg) * var(--text-scale));
+  font-weight: 900;
+}
+
+.sign-to-text__practice-text span {
+  font-size: calc(var(--fs-sm) * var(--text-scale));
+  color: var(--color-text-muted);
+}
+
+.sign-to-text__practice-back {
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-success);
+  color: #fff;
+  font-weight: 900;
+  box-shadow: 0 4px 0 var(--color-success-ink);
+}

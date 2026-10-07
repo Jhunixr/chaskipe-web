@@ -1,0 +1,217 @@
+.home {
+  gap: var(--space-4);
+}
+
+.home__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.home__wordmark {
+  font-size: calc(1.75rem * var(--text-scale));
+  line-height: 1;
+}
+
+.home__sos {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 46px;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  box-shadow: 0 4px 0 var(--color-border);
+  color: var(--color-primary);
+  font-weight: 900;
+}
+
+/* Chaski saluda con un globo de dialogo. */
+.home__greeting {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-2);
+  min-height: 128px;
+  margin-top: calc(var(--space-2) * -1);
+}
+
+.home__chaski {
+  flex-shrink: 0;
+  margin-left: -6px;
+  margin-bottom: -2px;
+}
+
+.home__bubble {
+  align-self: center;
+  flex: 1;
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: 22px 22px 22px 6px;
+  box-shadow: 0 4px 0 var(--color-border);
+  font-size: calc(var(--fs-lg) * var(--text-scale));
+  font-weight: 900;
+  line-height: 1.25;
+}
+
+/* Tarjeta principal: Cara a cara. */
+.home__hero {
+  position: relative;
+  min-height: 188px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: var(--space-5);
+  border-radius: var(--radius-xl);
+  background: var(--color-primary);
+  color: #fff;
+  overflow: hidden;
+  box-shadow: 0 6px 0 var(--color-primary-edge);
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+
+.home__hero:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 var(--color-primary-edge);
+}
+
+.home__hero .hills svg {
+  height: 34%;
+}
+
+.home__phone {
+  position: absolute;
+  right: 24px;
+  top: 20px;
+  width: 84px;
+  height: 136px;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.25);
+  transform: rotate(8deg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.home__phone-top,
+.home__phone-bottom {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.home__phone-top {
+  background: var(--color-teal);
+  font-size: 1.4rem;
+  font-weight: 900;
+  transform: rotate(180deg);
+}
+
+.home__phone-bottom {
+  background: #FFE4E1;
+  color: #D62027;
+}
+
+.home__pill {
+  position: relative;
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  background: #FFD166;
+  color: #2B1611;
+  font-size: calc(var(--fs-sm) * var(--text-scale));
+  font-weight: 900;
+}
+
+.home__hero-text {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-width: 60%;
+  padding-bottom: var(--space-2);
+}
+
+.home__hero-title {
+  font-size: calc(2rem * var(--text-scale));
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.home__hero-sub {
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.home__tiles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+
+.home__tile {
+  min-height: 128px;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: var(--space-4);
+}
+
+.home__tile-title {
+  font-size: calc(var(--fs-xl) * var(--text-scale));
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+/* Letra del dia (Aprende). */
+.home__learn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 78px;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--color-gold-soft);
+  border: 2px solid var(--color-gold-edge);
+  box-shadow: 0 5px 0 var(--color-gold-edge);
+  color: var(--color-gold-strong);
+}
+
+.home__learn-letter {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background: var(--color-gold);
+  color: #2B1611;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  font-weight: 900;
+}
+
+.home__learn-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  color: var(--color-text);
+}
+
+.home__learn-text strong {
+  font-size: calc(var(--fs-lg) * var(--text-scale));
+  font-weight: 900;
+}
+
+.home__learn-text span {
+  color: var(--color-text-muted);
+  font-size: calc(var(--fs-sm) * var(--text-scale));
+}

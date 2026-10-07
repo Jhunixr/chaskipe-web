@@ -1,0 +1,187 @@
+.conversation__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+/* Situaciones: fila desplazable de chips. */
+.conversation__situations {
+  display: flex;
+  gap: var(--space-2);
+  overflow-x: auto;
+  padding-bottom: var(--space-1);
+  scrollbar-width: none;
+}
+
+.conversation__situations::-webkit-scrollbar {
+  display: none;
+}
+
+.conversation__situations .chip {
+  flex-shrink: 0;
+}
+
+/* ---- Hilo de mensajes ---- */
+.conversation__thread {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-height: 180px;
+}
+
+.conversation__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: calc(var(--fs-sm) * var(--text-scale));
+  background: var(--color-surface);
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius-lg);
+}
+
+.conversation__bubble {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  max-width: 88%;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
+  border: 2px solid var(--color-border);
+  box-shadow: 0 4px 0 var(--color-border);
+}
+
+.conversation__bubble--sorda {
+  align-self: flex-start;
+  background: var(--color-primary-tint);
+  border-color: var(--color-primary-soft);
+  border-bottom-left-radius: var(--radius-sm);
+}
+
+.conversation__bubble--oyente {
+  align-self: flex-end;
+  background: var(--color-teal);
+  border-color: var(--color-teal);
+  box-shadow: 0 5px 0 var(--color-teal-edge);
+  border-bottom-right-radius: var(--radius-sm);
+}
+
+.conversation__bubble--oyente .conversation__bubble-text,
+.conversation__bubble--oyente .conversation__bubble-who,
+.conversation__bubble--oyente .conversation__bubble-actions button {
+  color: #fff;
+}
+
+.conversation__bubble-who {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: calc(var(--fs-xs) * var(--text-scale));
+  font-weight: 800;
+  color: var(--color-text-muted);
+}
+
+.conversation__bubble-text {
+  font-family: var(--font-display);
+  font-size: calc(var(--fs-lg) * var(--text-scale));
+  font-weight: 900;
+  color: var(--color-ink);
+  word-break: break-word;
+}
+
+/* Lo que dice la persona oyente se lee en grande: es lo que lee la persona sorda. */
+.conversation__bubble--oyente .conversation__bubble-text {
+  font-size: calc(var(--fs-2xl) * var(--text-scale));
+  line-height: 1.2;
+}
+
+.conversation__bubble-actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 2px 0;
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: calc(var(--fs-xs) * var(--text-scale));
+  font-weight: 700;
+  color: var(--color-primary);
+  cursor: pointer;
+}
+
+.conversation__bubble-actions button:disabled {
+  color: var(--color-text-faint);
+  cursor: default;
+}
+
+/* ---- Redactor ---- */
+.conversation__composer {
+  /* Fijo sobre la barra inferior, como el cuadro de un chat en el movil. */
+  position: sticky;
+  bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + var(--space-2));
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-radius: var(--radius-lg);
+  border: 2px solid var(--color-border);
+  box-shadow: 0 5px 0 var(--color-border);
+}
+
+.conversation__composer--sorda {
+  background: var(--color-primary-tint);
+  border-color: var(--color-primary-soft);
+}
+
+.conversation__composer--oyente {
+  background: var(--color-teal-soft);
+  border-color: var(--color-teal-soft);
+}
+
+.conversation__who {
+  align-self: stretch;
+  display: flex;
+}
+
+.conversation__who .segmented__option {
+  flex: 1;
+}
+
+.conversation__suggestions {
+  display: flex;
+  gap: var(--space-2);
+  overflow-x: auto;
+  scrollbar-width: none;
+  /* que la fila deslizable llegue al borde del cuadro */
+  margin: 0 calc(var(--space-3) * -1);
+  padding: 0 var(--space-3);
+}
+
+.conversation__suggestions::-webkit-scrollbar {
+  display: none;
+}
+
+.conversation__suggestions .chip {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* El ultimo mensaje no debe quedar debajo del cuadro de escribir. */
+.conversation__end {
+  scroll-margin-bottom: 300px;
+}
+
+.conversation__draft {
+  min-height: 48px;
+  padding: var(--space-3) var(--space-4);
+}
+
+.conversation__send-row {
+  display: flex;
+  gap: var(--space-2);
+}

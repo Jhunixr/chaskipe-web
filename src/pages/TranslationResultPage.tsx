@@ -1,0 +1,177 @@
+import { useEffect, useRef, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
+
+import { ROUTES } from '@/app/routes'
+import { Mascot } from '@/components/brand'
+import { Button, Card, DemoBadge, Icon, PageHeader, TextInput } from '@/components/ui'
+import { useSpeech } from '@/hooks/useSpeech'
+import { reportRecognition } from '@/services/api'
+import {
+  loadRecognition,
+  type RecognitionResult,
+} from '@/services/recognition'
+
+import './TranslationResultPage.css'
+import './pages.css'
+
+/**
+ * FASE 6: muestra el resultado real del modelo. La sena reconocida llega por
+ * el `state` de React Router (con respaldo en sessionStorage para el refresco).
+ */
+export function TranslationResultPage() {
+  const navigate = useNavigate()
+  const location = useLocation()
+  const { speak, speaking, cancel, supported } = useSpeech()
+  const [reporting, setReporting] = useState(false)
+  const [expected, setExpected] = useState('')
+  const [reportState, setReportState] = useState<'idle' | 'sending' | 'sent' | 'failed'>('idle')
+
+  const fromState = location.state as RecognitionResult | null
+  const result = fromState ?? loadRecognition()
+  // "Decir en voz alta" (deletreo): se lee apenas se abre el resultado.
+  const autoSpeak = (location.state as { autoSpeak?: boolean } | null)?.autoSpeak === true
+  const spokenRef = useRef(false)
+  useEffect(() => {
+    if (!autoSpeak || !result || spokenRef.current) return
+    spokenRef.current = true
+    speak(result.text)
+  }, [autoSpeak, result, speak])
+
+  if (!result) {
+    return (
+      <div className="page result result--empty">
+        <PageHeader title="Resultado" />
+        <p className="text-muted">
+          No hay un reconocimiento reciente. Vuelve a "Senas a texto".
+        </p>
+        <Button size="lg" icon="hands" onClick={() => navigate(ROUTES.signToText)}>
+          Ir a Senas a texto
+        </Button>
+      </div>
+    )
+  }
+
+  const confidencePct = Math.round(result.confidence * 100)
+
+  // "No era esa sena": el aviso llega al equipo para mejorar el modelo.
+  const sendReport = async () => {
+    setReportState('sending')
+    const ok = await reportRecognition({
+      recognized: result.text,
+      expected: expected.trim(),
+      confidence: result.confidence,
+      modelVersion: result.label === 'DELETREO' ? 'letras-v1' : undefined,
+    })
+    setReportState(ok ? 'sent' : 'failed')
+  }
+
+  return (
+    <div className="page result">
+      <PageHeader title="Resultado" />
+
+      <div className="result__hero">
+        <span className="result__check" aria-hidden="true">
+          <Icon name="check" size={40} />
+        </span>
+        <h2 className="result__text">{result.text}</h2>
+        <div className="result__status">
+          <span className="result__badge">
+            <Icon name="check" size={14} />
+            Reconocido · {confidencePct}%
+          </span>
+          <DemoBadge />
+        </div>
+      </div>
+
+      <div className="result__audio">
+        <button
+          type="button"
+          className="result__audio-btn"
+          onClick={() => (speaking ? cancel() : speak(result.text))}
+          disabled={!supported}
+          aria-label={speaking ? 'Pausar' : 'Reproducir'}
+        >
+          <Icon name={speaking ? 'pause' : 'volume'} size={20} />
+        </button>
+        <span className="result__audio-track" aria-hidden="true">
+          <span className="result__audio-fill" />
+        </span>
+        <span className="result__audio-time text-xs text-muted">
+          {supported ? 'Toca para escuchar' : 'Voz no disponible'}
+        </span>
+      </div>
+
+      <p className="demo-note">
+        {result.isSynthetic
+          ? 'Resultado de un modelo de prueba (datos sinteticos): no es una traduccion real.'
+          : 'Equivalencia demostrativa, no validada con personas usuarias de LSP ni interpretes.'}
+      </p>
+
+      <div className="stack-sm result__actions">
+        <Button
+          size="lg"
+          fullWidth
+          icon="volume"
+          onClick={() => speak(result.text)}
+          disabled={!supported}
+        >
+          Escuchar en voz alta
+        </Button>
+        <div className="result__actions-row">
+          <Button
+            variant="secondary"
+            fullWidth
+            icon="edit"
+            onClick={() => setReporting(true)}
+            disabled={reporting}
+          >
+            No era esto
+          </Button>
+          <Button
+            variant="secondary"
+            fullWidth
+            icon="refresh"
+            onClick={() => navigate(ROUTES.signToText)}
+          >
+            Nueva sena
+          </Button>
+        </div>
+      </div>
+
+      {reporting && (
+        <Card className="stack-sm">
+          {reportState === 'sent' ? (
+            <p className="text-sm">
+              Gracias. El aviso ayuda a mejorar el reconocimiento.
+            </p>
+          ) : (
+            <>
+              <TextInput
+                label="Que querias decir?"
+                value={expected}
+                onChange={setExpected}
+                placeholder="Por ejemplo: N"
+              />
+              {reportState === 'failed' && (
+                <p className="text-sm text-muted">
+                  No se pudo enviar el aviso. Revisa la conexion.
+                </p>
+              )}
+              <Button
+                icon="send"
+                onClick={() => void sendReport()}
+                disabled={reportState === 'sending'}
+              >
+                Enviar aviso
+              </Button>
+            </>
+          )}
+        </Card>
+      )}
+
+      <div className="result__mascot" aria-hidden="true">
+        <Mascot size={72} alt="" />
+      </div>
+    </div>
+  )
+}
