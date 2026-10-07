@@ -113,10 +113,14 @@
 
 /* ---- Redactor ---- */
 .conversation__composer {
+  /* Fijo sobre la barra inferior, como el cuadro de un chat en el movil. */
+  position: sticky;
+  bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + var(--space-2));
+  z-index: 5;
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
-  padding: var(--space-4);
+  gap: var(--space-2);
+  padding: var(--space-3);
   border-radius: var(--radius-lg);
   border: 1px solid var(--color-border);
   box-shadow: var(--shadow-card);
@@ -143,18 +147,31 @@
 
 .conversation__suggestions {
   display: flex;
-  flex-wrap: wrap;
   gap: var(--space-2);
+  overflow-x: auto;
+  scrollbar-width: none;
+  /* que la fila deslizable llegue al borde del cuadro */
+  margin: 0 calc(var(--space-3) * -1);
+  padding: 0 var(--space-3);
 }
 
-.conversation__mic {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
+.conversation__suggestions::-webkit-scrollbar {
+  display: none;
+}
+
+.conversation__suggestions .chip {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* El ultimo mensaje no debe quedar debajo del cuadro de escribir. */
+.conversation__end {
+  scroll-margin-bottom: 300px;
 }
 
 .conversation__draft {
-  min-height: 72px;
+  min-height: 48px;
+  padding: var(--space-3) var(--space-4);
 }
 
 .conversation__send-row {

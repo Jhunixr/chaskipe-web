@@ -163,7 +163,7 @@ export function ConversationPage() {
             </article>
           ))
         )}
-        <div ref={endRef} />
+        <div ref={endRef} className="conversation__end" />
       </section>
 
       <section className={`conversation__composer conversation__composer--${speaker}`}>
@@ -201,27 +201,6 @@ export function ConversationPage() {
           ))}
         </div>
 
-        {speaker === 'oyente' && (
-          <div className="conversation__mic">
-            {dictation.supported ? (
-              <Button
-                size="lg"
-                fullWidth
-                variant={dictation.listening ? 'dark' : 'primary'}
-                icon={dictation.listening ? 'pause' : 'mic'}
-                onClick={dictation.listening ? dictation.stop : dictation.start}
-              >
-                {dictation.listening ? 'Escuchando... toca para terminar' : 'Hablar'}
-              </Button>
-            ) : (
-              <p className="text-sm text-muted">
-                Este navegador no permite dictar por voz: escribe el mensaje.
-              </p>
-            )}
-            {dictation.error && <p className="text-sm text-muted">{dictation.error}</p>}
-          </div>
-        )}
-
         <textarea
           className="field__textarea conversation__draft"
           placeholder={
@@ -232,11 +211,17 @@ export function ConversationPage() {
           value={draft}
           onChange={(event) => setDraft(event.target.value)}
           aria-label="Escribe el mensaje"
-          rows={2}
+          rows={1}
         />
+        {speaker === 'oyente' && !dictation.supported && (
+          <p className="text-xs text-muted">
+            Este navegador no permite dictar por voz: escribe el mensaje.
+          </p>
+        )}
+        {dictation.error && <p className="text-xs text-muted">{dictation.error}</p>}
 
         <div className="conversation__send-row">
-          {speaker === 'sorda' && (
+          {speaker === 'sorda' ? (
             <Button
               variant="secondary"
               icon="camera"
@@ -244,6 +229,16 @@ export function ConversationPage() {
             >
               Deletrear
             </Button>
+          ) : (
+            dictation.supported && (
+              <Button
+                variant={dictation.listening ? 'dark' : 'secondary'}
+                icon={dictation.listening ? 'pause' : 'mic'}
+                onClick={dictation.listening ? dictation.stop : dictation.start}
+              >
+                {dictation.listening ? 'Escuchando' : 'Hablar'}
+              </Button>
+            )
           )}
           <Button
             icon={speaker === 'sorda' ? 'volume' : 'send'}
@@ -251,15 +246,11 @@ export function ConversationPage() {
             onClick={() => send(speaker, draft)}
             disabled={draft.trim() === ''}
           >
-            {speaker === 'sorda' ? 'Enviar y leer en voz alta' : 'Enviar'}
+            {speaker === 'sorda' ? 'Enviar y leer' : 'Enviar'}
           </Button>
         </div>
       </section>
 
-      <p className="demo-note">
-        La voz y el dictado usan el navegador. El avatar aun no hace senas
-        reales (gesto DEMO); el deletreo con camara reconoce el abecedario LSP.
-      </p>
     </div>
   )
 }

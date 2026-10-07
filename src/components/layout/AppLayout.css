@@ -5,7 +5,9 @@
   background: var(--color-bg);
   background-image: var(--paper-grain);
   position: relative;
-  overflow-x: hidden;
+  /* clip (no hidden): hidden convierte el contenedor en zona de scroll y
+     anula position: sticky en las paginas (p. ej. el cuadro del chat). */
+  overflow-x: clip;
 }
 
 .app-shell__content {

@@ -239,6 +239,8 @@
 }
 
 .segmented__option {
+  /* objetivo tactil comodo en el movil */
+  min-height: 42px;
   padding: var(--space-2) var(--space-4);
   border: none;
   background: transparent;
@@ -259,6 +261,7 @@
 .chip {
   display: inline-flex;
   align-items: center;
+  min-height: 40px;
   gap: var(--space-1);
   padding: var(--space-2) var(--space-3);
   background: var(--color-surface);
