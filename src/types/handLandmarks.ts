@@ -12,6 +12,11 @@ export interface HandFrame {
   hands: Landmark[][]
   /** 'Left' | 'Right' por cada mano (etiqueta de MediaPipe, desde la vista de la camara). */
   handedness: string[]
+  /**
+   * World landmarks de cada mano (metros, 3D, en el mismo orden que `hands`).
+   * No dependen de la proporcion del video; los usa el modelo de letras.
+   */
+  worldHands?: Landmark[][]
   /** Marca de tiempo del frame en ms. */
   timestamp: number
 }

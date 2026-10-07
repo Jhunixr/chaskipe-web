@@ -99,3 +99,18 @@
   background: var(--color-primary);
   border-radius: var(--radius-pill);
 }
+
+.sign-to-text__modes {
+  align-self: center;
+}
+
+.sign-to-text__spelled {
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+.sign-to-text__spell-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}

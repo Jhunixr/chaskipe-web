@@ -109,6 +109,7 @@ export function useHandLandmarker(
               handedness: (result.handedness ?? []).map(
                 (h) => h[0]?.categoryName ?? '',
               ),
+              worldHands: (result.worldLandmarks ?? EMPTY) as Landmark[][],
               timestamp: now,
             }
             setFrame(next)

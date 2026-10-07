@@ -1,6 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-import { loadSignModel, predictSign } from '@/services/signModel'
+import {
+  loadSignModel,
+  predictLetter,
+  predictSign,
+  type ModelKind,
+} from '@/services/signModel'
 import type { HandFrame } from '@/types/handLandmarks'
 
 export type RecognitionPhase =
@@ -21,6 +26,15 @@ export interface RecognitionOutput {
 }
 
 interface UseSignRecognitionOptions {
+  /**
+   * 'sign': senas con movimiento (resumen de la ventana completa).
+   * 'letters': letras estaticas del abecedario (pose por frame, promediada).
+   *   En este modo el analisis es continuo: cada letra confirmada se entrega
+   *   por `onConfirm` y se sigue analizando (deletreo).
+   */
+  mode?: ModelKind
+  /** Se invoca con cada sena/letra confirmada. */
+  onConfirm?: (output: RecognitionOutput) => void
   /** ventana deslizante de landmarks, en ms. */
   windowMs?: number
   /** cada cuanto se ejecuta una prediccion, en ms. */
@@ -29,6 +43,8 @@ interface UseSignRecognitionOptions {
   minConfidence?: number
   /** fraccion minima de frames con manos en la ventana. */
   minHandFrames?: number
+  /** frames minimos en la ventana para predecir. */
+  minFrames?: number
   /** ms que la misma clase debe mantenerse para confirmarse. */
   holdMs?: number
   /** ms de pausa tras confirmar antes de volver a analizar. */
@@ -57,15 +73,30 @@ interface UseSignRecognitionResult {
   resume: () => void
 }
 
-const DEFAULTS = {
+const DEFAULTS: Record<ModelKind, Required<Omit<UseSignRecognitionOptions, 'mode' | 'onConfirm'>>> = {
   // Ventana de 2.5 s: cubre senas con movimiento (HOLA, GRACIAS).
   // Se predice cada ~300 ms y se confirma cuando la sena se mantiene ~0.7 s.
-  windowMs: 2500,
-  intervalMs: 300,
-  minConfidence: 0.6,
-  minHandFrames: 0.35,
-  holdMs: 700,
-  cooldownMs: 1200,
+  sign: {
+    windowMs: 2500,
+    intervalMs: 300,
+    minConfidence: 0.6,
+    minHandFrames: 0.35,
+    minFrames: 5,
+    holdMs: 700,
+    cooldownMs: 1200,
+  },
+  // Letras: pose quieta. Se promedian los frames de los ultimos 0.8 s y se
+  // confirma cuando la misma letra se mantiene ~0.8 s. Basta con 2 frames:
+  // en moviles lentos MediaPipe puede ir a pocos fps.
+  letters: {
+    windowMs: 800,
+    intervalMs: 200,
+    minConfidence: 0.7,
+    minHandFrames: 0.6,
+    minFrames: 2,
+    holdMs: 800,
+    cooldownMs: 500,
+  },
 }
 
 /**
@@ -79,7 +110,14 @@ const DEFAULTS = {
 export function useSignRecognition(
   options: UseSignRecognitionOptions = {},
 ): UseSignRecognitionResult {
-  const cfg = { ...DEFAULTS, ...options }
+  const mode: ModelKind = options.mode ?? 'sign'
+  const continuous = mode === 'letters'
+  const cfg = { ...DEFAULTS[mode], ...options }
+
+  const onConfirmRef = useRef(options.onConfirm)
+  useEffect(() => {
+    onConfirmRef.current = options.onConfirm
+  }, [options.onConfirm])
 
   const [phase, setPhase] = useState<RecognitionPhase>('idle')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -96,6 +134,12 @@ export function useSignRecognition(
   /** clase candidata sostenida y desde cuando. */
   const holdRef = useRef<{ label: string; since: number } | null>(null)
   const cooldownUntilRef = useRef(0)
+  /**
+   * Ultima letra confirmada en modo continuo. No se vuelve a confirmar hasta
+   * que la mano cambie de letra o salga del cuadro: si no, mantener la pose
+   * escribiria "AAAA".
+   */
+  const lockedLabelRef = useRef<string | null>(null)
 
   const stopLoop = useCallback(() => {
     if (loopRef.current !== null) {
@@ -106,7 +150,7 @@ export function useSignRecognition(
 
   const loadModel = useCallback(() => {
     setPhase((p) => (p === 'idle' || p === 'error' ? 'loading-model' : p))
-    loadSignModel()
+    loadSignModel(mode)
       .then(() => setPhase((p) => (p === 'loading-model' ? 'watching' : p)))
       .catch((error: unknown) => {
         const msg = error instanceof Error ? error.message : ''
@@ -121,7 +165,7 @@ export function useSignRecognition(
             : 'No se pudo cargar el modelo de reconocimiento.',
         )
       })
-  }, [])
+  }, [mode])
 
   const pushFrame = useCallback(
     (frame: HandFrame) => {
@@ -141,7 +185,7 @@ export function useSignRecognition(
     if (performance.now() < cooldownUntilRef.current) return
 
     const window = bufferRef.current.map((e) => e.frame)
-    if (window.length < 5) {
+    if (window.length < cfg.minFrames) {
       setCandidate(null)
       holdRef.current = null
       setHoldProgress(0)
@@ -150,6 +194,7 @@ export function useSignRecognition(
     }
     const handFrames = window.filter((f) => f.hands.length > 0).length
     if (handFrames < window.length * cfg.minHandFrames) {
+      lockedLabelRef.current = null
       setCandidate(null)
       holdRef.current = null
       setHoldProgress(0)
@@ -158,9 +203,16 @@ export function useSignRecognition(
     }
 
     predictingRef.current = true
-    predictSign(window)
+    const prediction = mode === 'letters' ? predictLetter(window) : predictSign(window)
+    prediction
       .then((pred) => {
         if (!activeRef.current) return
+        if (!pred) {
+          setCandidate(null)
+          holdRef.current = null
+          setHoldProgress(0)
+          return
+        }
         const out: RecognitionOutput = {
           label: pred.label,
           confidence: pred.confidence,
@@ -168,7 +220,11 @@ export function useSignRecognition(
           isSynthetic: pred.isSynthetic,
         }
 
-        if (pred.confidence < cfg.minConfidence) {
+        if (lockedLabelRef.current !== null && pred.label !== lockedLabelRef.current) {
+          lockedLabelRef.current = null
+        }
+
+        if (pred.confidence < cfg.minConfidence || pred.label === lockedLabelRef.current) {
           setCandidate(null)
           holdRef.current = null
           setHoldProgress(0)
@@ -191,11 +247,19 @@ export function useSignRecognition(
         setHoldProgress(Math.min(1, elapsed / cfg.holdMs))
         if (elapsed >= cfg.holdMs) {
           setConfirmed(out)
-          setPhase('confirmed')
           holdRef.current = null
           setHoldProgress(0)
           cooldownUntilRef.current = now + cfg.cooldownMs
           bufferRef.current = []
+          onConfirmRef.current?.(out)
+          if (continuous) {
+            // Deletreo: se sigue analizando, sin repetir la misma letra.
+            lockedLabelRef.current = out.label
+            setCandidate(null)
+            setPhase('watching')
+          } else {
+            setPhase('confirmed')
+          }
         }
       })
       .catch((error: unknown) => {
@@ -211,8 +275,11 @@ export function useSignRecognition(
         predictingRef.current = false
       })
   }, [
+    mode,
+    continuous,
     cfg.minConfidence,
     cfg.minHandFrames,
+    cfg.minFrames,
     cfg.holdMs,
     cfg.cooldownMs,
   ])
@@ -226,6 +293,7 @@ export function useSignRecognition(
     setActive(true)
     bufferRef.current = []
     holdRef.current = null
+    lockedLabelRef.current = null
     setHoldProgress(0)
     stopLoop()
     loopRef.current = window.setInterval(tick, cfg.intervalMs)
@@ -256,6 +324,26 @@ export function useSignRecognition(
       stopLoop()
     }
   }, [stopLoop])
+
+  // Al cambiar de modo (senas <-> letras) se descarta todo y se vuelve a
+  // 'idle': quien use el hook carga el otro modelo y reanuda el analisis.
+  const modeRef = useRef(mode)
+  useEffect(() => {
+    if (modeRef.current === mode) return
+    modeRef.current = mode
+    activeRef.current = false
+    stopLoop()
+    bufferRef.current = []
+    holdRef.current = null
+    lockedLabelRef.current = null
+    cooldownUntilRef.current = 0
+    setActive(false)
+    setCandidate(null)
+    setConfirmed(null)
+    setHoldProgress(0)
+    setErrorMessage(null)
+    setPhase('idle')
+  }, [mode, stopLoop])
 
   return {
     phase,

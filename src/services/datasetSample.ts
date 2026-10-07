@@ -13,24 +13,26 @@ function shortId(): string {
   return Math.random().toString(16).slice(2, 10)
 }
 
+function round3(p: { x: number; y: number; z: number }, digits: number): [number, number, number] {
+  return [Number(p.x.toFixed(digits)), Number(p.y.toFixed(digits)), Number(p.z.toFixed(digits))]
+}
+
 /** Convierte los frames capturados del hook en frames del esquema del dataset. */
 export function toSampleFrames(
   captured: { frame: HandFrame; t: number }[],
 ): SampleFrame[] {
   return captured.map(({ frame, t }) => ({
     t: Math.round(t),
-    hands: frame.hands.map((landmarks, i) => ({
-      handedness: frame.handedness[i] ?? '',
-      score: 1,
-      landmarks: landmarks.map(
-        (p) =>
-          [
-            Number(p.x.toFixed(5)),
-            Number(p.y.toFixed(5)),
-            Number(p.z.toFixed(5)),
-          ] as [number, number, number],
-      ),
-    })),
+    hands: frame.hands.map((landmarks, i) => {
+      const world = frame.worldHands?.[i]
+      return {
+        handedness: frame.handedness[i] ?? '',
+        score: 1,
+        landmarks: landmarks.map((p) => round3(p, 5)),
+        // Opcional: lo usa el modelo de letras (ai/scripts/static_features.py).
+        ...(world ? { worldLandmarks: world.map((p) => round3(p, 6)) } : {}),
+      }
+    }),
   }))
 }
 

@@ -80,6 +80,11 @@ export interface SampleHand {
   score: number
   /** 21 landmarks, cada uno [x, y, z]. */
   landmarks: [number, number, number][]
+  /**
+   * 21 world landmarks de MediaPipe (metros) [x, y, z]. Opcional: las
+   * muestras antiguas no lo tienen. Los usa el modelo de letras estaticas.
+   */
+  worldLandmarks?: [number, number, number][]
 }
 
 /** Un frame de la grabacion. */

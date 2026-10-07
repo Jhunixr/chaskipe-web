@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { ROUTES } from '@/app/routes'
@@ -6,13 +6,14 @@ import { CameraView, HandOverlay } from '@/components/camera'
 import { Button, Icon, PageHeader } from '@/components/ui'
 import { useCamera } from '@/hooks/useCamera'
 import { useHandLandmarker } from '@/hooks/useHandLandmarker'
-import { useSignRecognition } from '@/hooks/useSignRecognition'
+import { useSignRecognition, type RecognitionOutput } from '@/hooks/useSignRecognition'
 import { addHistory } from '@/services/api'
 import {
   phraseForLabel,
   saveRecognition,
   type RecognitionResult,
 } from '@/services/recognition'
+import type { ModelKind } from '@/services/signModel'
 import type { HandFrame } from '@/types/handLandmarks'
 
 import './SignToTextPage.css'
@@ -25,6 +26,12 @@ import './pages.css'
  * el modelo (MLP) se ejecuta varias veces por segundo. La sena candidata se
  * muestra en vivo y se confirma cuando se mantiene estable ~0.7 s.
  *
+ * Dos modos:
+ * - "Abecedario": letras estaticas de la LSP, una pose por frame. Las letras
+ *   confirmadas se van sumando a una palabra (deletreo).
+ * - "Senas": senas con movimiento (HOLA, GRACIAS...), se confirma una y se
+ *   muestra el resultado.
+ *
  * La LSP tiene su propia gramatica y vocabulario. Las senas deben validarse
  * con personas usuarias o interpretes. Si aun no hay un modelo entrenado, la
  * pantalla lo avisa (ver `ai/README.md`).
@@ -32,7 +39,17 @@ import './pages.css'
 export function SignToTextPage() {
   const navigate = useNavigate()
   const camera = useCamera('user')
-  const recog = useSignRecognition()
+  const [mode, setMode] = useState<ModelKind>('letters')
+  const [spelled, setSpelled] = useState('')
+
+  const handleConfirm = useCallback(
+    (out: RecognitionOutput) => {
+      if (mode === 'letters') setSpelled((text) => text + phraseForLabel(out.label))
+    },
+    [mode],
+  )
+  const recog = useSignRecognition({ mode, onConfirm: handleConfirm })
+  const letters = mode === 'letters'
 
   const handleFrame = useCallback(
     (frame: HandFrame) => recog.pushFrame(frame),
@@ -40,15 +57,19 @@ export function SignToTextPage() {
   )
   const hands = useHandLandmarker({ onFrame: handleFrame })
 
-  // Activar camara + modelos una sola vez.
+  // Activar camara + detector una sola vez.
   const startedRef = useRef(false)
   useEffect(() => {
     if (startedRef.current) return
     startedRef.current = true
     camera.start()
     hands.load()
-    recog.loadModel()
-  }, [camera, hands, recog])
+  }, [camera, hands])
+
+  // Cargar el modelo del modo actual (al entrar y al cambiar de modo).
+  useEffect(() => {
+    if (recog.phase === 'idle') recog.loadModel()
+  }, [recog])
 
   // Iniciar deteccion de manos cuando la camara esta activa.
   const detStartedRef = useRef(false)
@@ -61,40 +82,57 @@ export function SignToTextPage() {
   }, [camera.status, camera.videoRef, hands])
 
   // Arrancar el analisis en vivo cuando camara + detector + modelo estan listos.
-  const watchStartedRef = useRef(false)
   useEffect(() => {
     const ready =
       camera.status === 'active' &&
       hands.status === 'running' &&
       (recog.phase === 'watching' || recog.phase === 'candidate')
-    if (ready && !watchStartedRef.current) {
-      watchStartedRef.current = true
-      recog.startWatching()
-    }
+    if (ready && !recog.active) recog.startWatching()
   }, [camera.status, hands.status, recog])
 
   const modelMissing = recog.phase === 'model-missing'
   const confirmed = recog.confirmed
   const candidate = recog.candidate
 
-  const goToResult = () => {
-    if (!confirmed) return
-    const text = phraseForLabel(confirmed.label)
-    const payload: RecognitionResult = {
-      label: confirmed.label,
-      text,
-      confidence: confirmed.confidence,
-      isSynthetic: confirmed.isSynthetic,
-      at: Date.now(),
-    }
+  const showResult = (payload: RecognitionResult) => {
     saveRecognition(payload)
     // Guardar en el historial (si el backend no responde, se ignora).
-    void addHistory({ direction: 'sign-to-text', text, isDemo: true })
+    void addHistory({ direction: 'sign-to-text', text: payload.text, isDemo: true })
     navigate(ROUTES.translationResult, { state: payload })
   }
 
+  const goToResult = () => {
+    if (!confirmed) return
+    showResult({
+      label: confirmed.label,
+      text: phraseForLabel(confirmed.label),
+      confidence: confirmed.confidence,
+      isSynthetic: confirmed.isSynthetic,
+      at: Date.now(),
+    })
+  }
+
+  const submitSpelled = () => {
+    const text = spelled.trim()
+    if (!text) return
+    showResult({
+      label: 'DELETREO',
+      text,
+      confidence: confirmed?.confidence ?? 1,
+      isSynthetic: false,
+      at: Date.now(),
+    })
+  }
+
+  const changeMode = (next: ModelKind) => {
+    if (next === mode) return
+    setMode(next)
+  }
+
   let overlayStatus: string | undefined
-  if (recog.phase === 'confirmed' && confirmed) {
+  if (letters && recog.phase === 'candidate' && candidate) {
+    overlayStatus = `${phraseForLabel(candidate.label)}...`
+  } else if (recog.phase === 'confirmed' && confirmed) {
     overlayStatus = `Reconocido: ${phraseForLabel(confirmed.label)}`
   } else if (recog.phase === 'candidate' && candidate) {
     overlayStatus = `${phraseForLabel(candidate.label)}...`
@@ -111,6 +149,27 @@ export function SignToTextPage() {
   return (
     <div className="page sign-to-text">
       <PageHeader title="Senas a texto" />
+
+      <div className="segmented sign-to-text__modes" role="tablist" aria-label="Que reconocer">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={letters}
+          className={`segmented__option${letters ? ' segmented__option--active' : ''}`}
+          onClick={() => changeMode('letters')}
+        >
+          Abecedario
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={!letters}
+          className={`segmented__option${!letters ? ' segmented__option--active' : ''}`}
+          onClick={() => changeMode('sign')}
+        >
+          Senas
+        </button>
+      </div>
 
       <CameraView
         status={camera.status}
@@ -149,7 +208,75 @@ export function SignToTextPage() {
         </p>
       )}
 
-      <section className="sign-to-text__panel">
+      {letters ? (
+        <section className="sign-to-text__panel">
+          <span className="section-title">Palabra deletreada</span>
+          <p className="sign-to-text__text sign-to-text__spelled" aria-live="polite">
+            {spelled}
+            {recog.phase === 'candidate' && candidate && (
+              <span className="sign-to-text__candidate">
+                {phraseForLabel(candidate.label)}
+              </span>
+            )}
+            {!spelled && !(recog.phase === 'candidate' && candidate) && (
+              <span className="text-muted">
+                {recog.phase === 'paused'
+                  ? 'Analisis en pausa'
+                  : recog.phase === 'watching'
+                    ? hands.handCount > 0
+                      ? 'Manten la letra quieta...'
+                      : 'Muestra una mano a la camara'
+                    : 'Preparando...'}
+              </span>
+            )}
+          </p>
+
+          {recog.phase === 'candidate' && candidate && (
+            <>
+              <div
+                className="sign-to-text__hold"
+                role="progressbar"
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuenow={Math.round(recog.holdProgress * 100)}
+                aria-label="Confirmando letra"
+              >
+                <span style={{ width: `${recog.holdProgress * 100}%` }} />
+              </div>
+              <p className="sign-to-text__confidence text-xs text-muted">
+                Manten la letra · {Math.round(candidate.confidence * 100)}%
+              </p>
+            </>
+          )}
+
+          <div className="sign-to-text__spell-actions">
+            <Button
+              variant="secondary"
+              onClick={() => setSpelled((t) => (t.endsWith(' ') || !t ? t : `${t} `))}
+              disabled={!spelled}
+            >
+              Espacio
+            </Button>
+            <Button
+              variant="secondary"
+              icon="back"
+              onClick={() => setSpelled((t) => t.slice(0, -1))}
+              disabled={!spelled}
+            >
+              Borrar
+            </Button>
+            <Button
+              variant="ghost"
+              icon="trash"
+              onClick={() => setSpelled('')}
+              disabled={!spelled}
+            >
+              Limpiar
+            </Button>
+          </div>
+        </section>
+      ) : (
+        <section className="sign-to-text__panel">
         <span className="section-title">Texto detectado</span>
         <p className="sign-to-text__text">
           {recog.phase === 'confirmed' && confirmed ? (
@@ -196,14 +323,45 @@ export function SignToTextPage() {
           </p>
         )}
       </section>
+      )}
 
-      <p className="demo-note">
-        Reconoce un vocabulario limitado de <strong>senas de la LSP</strong>.
-        La LSP tiene su propia gramatica y vocabulario; las senas deben
-        validarse con personas usuarias o interpretes.
-      </p>
+      {letters ? (
+        <p className="demo-note">
+          Reconoce las <strong>24 letras estaticas</strong> del abecedario de la
+          LSP (sin J, N con tilde ni Z, que llevan movimiento). Entrenado con un
+          dataset publico de imagenes; aun debe validarse con personas usuarias
+          de LSP o interpretes.
+        </p>
+      ) : (
+        <p className="demo-note">
+          Reconoce un vocabulario limitado de <strong>senas de la LSP</strong>.
+          La LSP tiene su propia gramatica y vocabulario; las senas deben
+          validarse con personas usuarias o interpretes.
+        </p>
+      )}
 
-      {recog.phase === 'confirmed' && confirmed ? (
+      {letters ? (
+        <div className="stack-sm">
+          <Button size="lg" fullWidth icon="check" onClick={submitSpelled} disabled={!spelled.trim()}>
+            Usar texto
+          </Button>
+          {recog.phase === 'paused' ? (
+            <Button variant="ghost" fullWidth icon="camera" onClick={recog.resume}>
+              Reanudar analisis
+            </Button>
+          ) : (
+            <Button
+              variant="ghost"
+              fullWidth
+              icon="pause"
+              onClick={recog.pause}
+              disabled={modelMissing || !recog.active}
+            >
+              Pausar analisis
+            </Button>
+          )}
+        </div>
+      ) : recog.phase === 'confirmed' && confirmed ? (
         <div className="stack-sm">
           <Button size="lg" fullWidth icon="check" onClick={goToResult}>
             Ver resultado
