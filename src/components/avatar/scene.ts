@@ -8,6 +8,7 @@
  * validadas. `playGesture` ya define la interfaz.
  */
 import * as THREE from 'three'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 
 import {
   applyGesture,
@@ -15,7 +16,7 @@ import {
   applyRest,
   type Gesture,
 } from './animation'
-import { textToSpelling, type SpellToken, type Vec3 } from './fingerspelling'
+import { LETTER_POSES, textToSpelling, type SpellToken, type Vec3 } from './fingerspelling'
 import { buildAvatar, type AvatarBones } from './rig'
 import { lerpPose, SpellingArm } from './spellingHand'
 
@@ -32,6 +33,22 @@ const SPELL_WRIST = new THREE.Vector3(-0.22, 0.74, 0.42)
 
 const CAMERA_FULL = { pos: new THREE.Vector3(0, 0.9, 4.9), target: new THREE.Vector3(0, 0.7, 0) }
 const CAMERA_HAND = { pos: new THREE.Vector3(-0.08, 1.0, 3.0), target: new THREE.Vector3(-0.1, 0.95, 0) }
+
+/**
+ * Modelo 3D del Chaski generado desde el logo (ver avatar/models/README.md).
+ * Se le quito la mano esculpida del brazo levantado; en su lugar va la mano
+ * articulada que forma las letras. `wrist` es el centro del puno de la manga.
+ */
+const CHASKI_MODEL = {
+  url: `${import.meta.env.BASE_URL}models/avatar/chaski.glb`,
+  wrist: new THREE.Vector3(-0.589, -0.3, 0.395),
+  handScale: 0.25,
+  skin: 0xe39a62,
+}
+const REAL_FULL = { pos: new THREE.Vector3(0, -0.1, 4.7), target: new THREE.Vector3(0, -0.18, 0) }
+const REAL_HAND = { pos: new THREE.Vector3(-0.12, -0.08, 4.0), target: new THREE.Vector3(-0.12, -0.16, 0) }
+/** Mano en reposo: la B (mano abierta), como saludando. */
+const REST_POSE = LETTER_POSES.B ?? null
 
 export interface SpellCallbacks {
   /** Indice del token (letra o espacio) que se esta mostrando. */
@@ -81,6 +98,10 @@ export class SignAvatarScene {
   /** Momento (performance.now) en que la mano baja tras terminar de deletrear. */
   private lowerHandAt = 0
 
+  // --- Modelo 3D del Chaski (si carga) ---
+  private avatarObject: THREE.Object3D
+  private realistic: { root: THREE.Group; hand: SpellingArm } | null = null
+
   constructor(canvas: HTMLCanvasElement) {
     this.renderer = new THREE.WebGLRenderer({
       canvas,
@@ -129,11 +150,46 @@ export class SignAvatarScene {
     // Avatar
     const { object, bones } = buildAvatar()
     this.bones = bones
+    this.avatarObject = object
     this.scene.add(object)
     this.scene.add(this.spellArm.group)
+    void this.loadChaskiModel()
 
     this.animate = this.animate.bind(this)
     this.frame = requestAnimationFrame(this.animate)
+  }
+
+  /**
+   * Carga el modelo 3D del Chaski. Si falla (sin conexion, archivo ausente),
+   * se queda el avatar geometrico, que tambien deletrea.
+   */
+  private async loadChaskiModel(): Promise<void> {
+    try {
+      const gltf = await new GLTFLoader().loadAsync(CHASKI_MODEL.url)
+      if (this.disposed) return
+      const root = new THREE.Group()
+      gltf.scene.traverse((obj) => {
+        if (obj instanceof THREE.Mesh) {
+          const m = obj.material as THREE.MeshStandardMaterial
+          m.roughness = 0.8
+          m.metalness = 0
+        }
+      })
+      root.add(gltf.scene)
+      const hand = new SpellingArm({
+        withArm: false,
+        handScale: CHASKI_MODEL.handScale,
+        skinColor: CHASKI_MODEL.skin,
+      })
+      hand.group.visible = true
+      root.add(hand.group)
+      this.scene.add(root)
+      this.avatarObject.visible = false
+      this.spellArm.group.visible = false
+      this.realistic = { root, hand }
+    } catch {
+      // se queda el avatar geometrico
+    }
   }
 
   /** Ajusta el tamano del render al contenedor. */
@@ -178,7 +234,7 @@ export class SignAvatarScene {
     this.spellCallbacks = callbacks
     this.spellIndex = -1
     this.spellElapsed = 0
-    this.fromPose = this.handPose
+    this.fromPose = this.handPose ?? (this.realistic ? REST_POSE : null)
     this.lowerHandAt = 0
     if (this.spellTokens.length === 0) {
       callbacks.onEnd?.()
@@ -195,6 +251,11 @@ export class SignAvatarScene {
     this.handPose = null
     this.spellArm.group.visible = false
     this.bones.shoulderR.visible = true
+  }
+
+  /** true si se esta mostrando el modelo 3D del Chaski (no el geometrico). */
+  get isRealistic(): boolean {
+    return this.realistic !== null
   }
 
   get isSpelling(): boolean {
@@ -220,7 +281,7 @@ export class SignAvatarScene {
       return
     }
     const token = this.spellTokens[this.spellIndex]!
-    this.fromPose = this.handPose
+    this.fromPose = this.handPose ?? (this.realistic ? REST_POSE : null)
     this.spellCallbacks.onToken?.(this.spellIndex, token)
   }
 
@@ -257,17 +318,27 @@ export class SignAvatarScene {
       this.lowerHandAt = 0
     }
 
-    // Mano de deletreo: visible mientras haya una pose que mostrar.
     const showHand = this.handPose !== null
-    this.spellArm.group.visible = showHand
-    this.bones.shoulderR.visible = !showHand
-    if (showHand) {
-      this.bones.shoulderR.getWorldPosition(this.shoulderWorld)
-      this.spellArm.update(this.handPose!, SPELL_WRIST, this.shoulderWorld)
+    let view = showHand ? CAMERA_HAND : CAMERA_FULL
+    if (this.realistic) {
+      // Modelo 3D: respira y se balancea; la mano siempre esta (en reposo, la B).
+      const { root, hand } = this.realistic
+      root.rotation.y = Math.sin(t * 0.5) * 0.04
+      root.position.y = Math.sin(t * 1.6) * 0.006
+      const pose = this.handPose ?? REST_POSE
+      if (pose) hand.update(pose, CHASKI_MODEL.wrist)
+      view = showHand ? REAL_HAND : REAL_FULL
+    } else {
+      // Avatar geometrico: el brazo de deletreo reemplaza al brazo derecho.
+      this.spellArm.group.visible = showHand
+      this.bones.shoulderR.visible = !showHand
+      if (showHand) {
+        this.bones.shoulderR.getWorldPosition(this.shoulderWorld)
+        this.spellArm.update(this.handPose!, SPELL_WRIST, this.shoulderWorld)
+      }
     }
 
     // Camara: se acerca a la mano mientras deletrea.
-    const view = showHand ? CAMERA_HAND : CAMERA_FULL
     const ease = 1 - Math.exp(-dt * 4)
     this.camera.position.lerp(view.pos, ease)
     this.cameraTarget.lerp(view.target, ease)
@@ -295,6 +366,7 @@ export class SignAvatarScene {
   dispose(): void {
     this.disposed = true
     this.spellArm.dispose()
+    this.realistic?.hand.dispose()
     cancelAnimationFrame(this.frame)
     this.scene.traverse((obj) => {
       if (obj instanceof THREE.Mesh) {

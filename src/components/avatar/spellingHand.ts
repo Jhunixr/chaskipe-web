@@ -59,9 +59,17 @@ export class SpellingArm {
   private readonly elbowBall: THREE.Mesh
   private readonly points = Array.from({ length: 21 }, () => new THREE.Vector3())
 
-  constructor(handScale = 0.15) {
-    this.handScale = handScale
-    const skin = new THREE.MeshStandardMaterial({ color: SKIN, roughness: 0.62 })
+  /** false = solo la mano (para el modelo 3D, que ya trae su brazo). */
+  private readonly withArm: boolean
+
+  constructor(options: { handScale?: number; withArm?: boolean; skinColor?: number } = {}) {
+    this.handScale = options.handScale ?? 0.15
+    this.withArm = options.withArm ?? true
+    const handScale = this.handScale
+    const skin = new THREE.MeshStandardMaterial({
+      color: options.skinColor ?? SKIN,
+      roughness: 0.6,
+    })
     const shirt = new THREE.MeshStandardMaterial({ color: SHIRT, roughness: 0.85 })
     const sphere = new THREE.SphereGeometry(1, 16, 12)
     const cylinder = new THREE.CylinderGeometry(1, 1, 1, 14, 1, true)
@@ -100,7 +108,7 @@ export class SpellingArm {
     const shoulderBall = new THREE.Mesh(sphere, shirt)
     shoulderBall.scale.setScalar(0.085)
     shoulderBall.name = 'shoulder'
-    this.group.add(this.upperArm, this.forearm, this.elbowBall, shoulderBall)
+    if (this.withArm) this.group.add(this.upperArm, this.forearm, this.elbowBall, shoulderBall)
 
     this.group.visible = false
   }
@@ -109,9 +117,9 @@ export class SpellingArm {
    * Coloca mano y brazo.
    * @param pose   21 puntos de la letra (mano centrada en la muneca, escala 1).
    * @param wrist  posicion de la muneca en la escena.
-   * @param shoulder posicion del hombro derecho del avatar en la escena.
+   * @param shoulder posicion del hombro derecho del avatar (solo con brazo).
    */
-  update(pose: Vec3[], wrist: THREE.Vector3, shoulder: THREE.Vector3): void {
+  update(pose: Vec3[], wrist: THREE.Vector3, shoulder?: THREE.Vector3): void {
     for (let i = 0; i < 21; i++) {
       const p = pose[i] ?? [0, 0, 0]
       this.points[i]!.set(p[0], p[1], p[2]).multiplyScalar(this.handScale).add(wrist)
@@ -119,7 +127,7 @@ export class SpellingArm {
     }
     FINGER_BONES.forEach(([a, b], k) => placeSegment(this.bones[k]!, this.points[a]!, this.points[b]!))
     this.updatePalm()
-    this.updateArm(shoulder, this.points[0]!)
+    if (this.withArm && shoulder) this.updateArm(shoulder, this.points[0]!)
   }
 
   private updatePalm(): void {
