@@ -171,3 +171,29 @@ Configuracion **estricta** (`strict: true` + `noUncheckedIndexedAccess`,
   historial via API (PostgreSQL), voz (Web Speech API), ajuste de texto.
 - Las equivalencias texto <-> sena son **demostrativas**; deben validarse con
   personas usuarias de LSP o interpretes.
+
+## Despliegue en Dokploy (VPS)
+
+El frontend se sirve con nginx desde un contenedor (`Dockerfile` de esta
+carpeta). La app llama a la API en `/backend` (mismo dominio) y nginx la
+reenvia al backend: sin CORS ni contenido mixto.
+
+1. Dokploy → proyecto **CHASKI_PE** → **Create Service → Application**.
+2. **Provider**: GitHub, repo `chaskipe`, la rama a presentar, **Build Type**
+   *Dockerfile*, **Build Path** `/frontend`.
+3. **Environment**:
+   ```env
+   BACKEND_URL=http://<App Name interno del backend>:8000
+   ```
+   El *App Name* esta en la pestana General del backend (algo como
+   `chaskipe-backend-xxxx`). Tambien vale la URL publica del backend
+   (`https://api.tu-dominio`). Si el backend no responde, la app funciona con
+   datos de ejemplo (sin cuentas).
+4. **Domains** → agregar el dominio con **HTTPS** (Let's Encrypt), puerto
+   **80**. Sin HTTPS el navegador no deja usar la camara.
+5. **Deploy** y abrir `https://<dominio>/backend/health`: debe responder
+   `"persistence": "postgresql"`.
+
+Probado en local con los tres contenedores (PostgreSQL, API y web): rutas de
+la SPA, `/backend`, modelo 3D, MediaPipe `.wasm`, reconocimiento con camara y
+avatar.
