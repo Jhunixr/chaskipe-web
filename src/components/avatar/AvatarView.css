@@ -37,7 +37,6 @@
 
 .avatar-view--compact .avatar-view__stage {
   aspect-ratio: auto;
-  height: 100%;
   max-height: none;
 }
 
@@ -180,4 +179,24 @@
 .avatar-view__sign--active {
   background: #D62027;
   color: #fff;
+}
+
+/* En pantallas a pantalla completa el escenario ocupa el alto disponible. */
+.avatar-view--compact {
+  height: 100%;
+  min-height: 0;
+}
+
+.avatar-view--compact .avatar-view__stage {
+  flex: 1;
+  min-height: 0;
+}
+
+/* Subtitulos debajo del escenario: las manos de Chaski quedan a la vista. */
+.avatar-view__below .avatar-view__caption {
+  position: static;
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 2px solid var(--color-border);
+  box-shadow: 0 4px 0 var(--color-border);
 }

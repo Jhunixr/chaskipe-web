@@ -29,6 +29,8 @@ interface AvatarViewProps {
   playing?: boolean
   /** Sin la nota aclaratoria (pantallas con poco espacio, p. ej. Cara a cara). */
   compact?: boolean
+  /** Subtitulos debajo del escenario, para no tapar las manos de Chaski. */
+  captionBelow?: boolean
 }
 
 /**
@@ -51,6 +53,7 @@ export function AvatarView({
   caption,
   playing = false,
   compact = false,
+  captionBelow = false,
 }: AvatarViewProps) {
   const inner = useRef<Avatar3DHandle | null>(null)
   const [mode, setMode] = useState<'idle' | 'demo' | 'spelling'>('idle')
@@ -119,6 +122,45 @@ export function AvatarView({
   const showCaption =
     !spelling && caption !== undefined && caption !== '' && (prefs.subtitles || mode !== 'idle')
 
+  const captions = (
+    <>
+      {spelling && (
+        <p className="avatar-view__caption avatar-view__spelling" aria-label={spell}>
+          {tokens.map((t, i) =>
+            t.kind === 'space' ? (
+              <span key={i} className="avatar-view__space" aria-hidden="true" />
+            ) : t.kind === 'sign' ? (
+              <span
+                key={i}
+                aria-hidden="true"
+                className={[
+                  'avatar-view__sign',
+                  i === current ? 'avatar-view__sign--active' : '',
+                ].join(' ')}
+              >
+                {t.char}
+              </span>
+            ) : (
+              <span
+                key={i}
+                aria-hidden="true"
+                className={[
+                  'avatar-view__letter',
+                  i === current ? 'avatar-view__letter--active' : '',
+                  i < current ? 'avatar-view__letter--done' : '',
+                  t.pose ? '' : 'avatar-view__letter--nopose',
+                ].join(' ')}
+              >
+                {t.char}
+              </span>
+            ),
+          )}
+        </p>
+      )}
+      {showCaption && <p className="avatar-view__caption">{caption}</p>}
+    </>
+  )
+
   return (
     <div className={`avatar-view${compact ? ' avatar-view--compact' : ''}`}>
       <div className="avatar-view__stage">
@@ -147,41 +189,10 @@ export function AvatarView({
           <Avatar3D ref={inner} onGestureEnd={() => setMode('idle')} />
         </Suspense>
 
-        {spelling && (
-          <p className="avatar-view__caption avatar-view__spelling" aria-label={spell}>
-            {tokens.map((t, i) =>
-              t.kind === 'space' ? (
-                <span key={i} className="avatar-view__space" aria-hidden="true" />
-              ) : t.kind === 'sign' ? (
-                <span
-                  key={i}
-                  aria-hidden="true"
-                  className={[
-                    'avatar-view__sign',
-                    i === current ? 'avatar-view__sign--active' : '',
-                  ].join(' ')}
-                >
-                  {t.char}
-                </span>
-              ) : (
-                <span
-                  key={i}
-                  aria-hidden="true"
-                  className={[
-                    'avatar-view__letter',
-                    i === current ? 'avatar-view__letter--active' : '',
-                    i < current ? 'avatar-view__letter--done' : '',
-                    t.pose ? '' : 'avatar-view__letter--nopose',
-                  ].join(' ')}
-                >
-                  {t.char}
-                </span>
-              ),
-            )}
-          </p>
-        )}
-        {showCaption && <p className="avatar-view__caption">{caption}</p>}
+        {!captionBelow && captions}
       </div>
+
+      {captionBelow && <div className="avatar-view__below">{captions}</div>}
 
       {!compact && (
       <p className="demo-note avatar-view__note">

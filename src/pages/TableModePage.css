@@ -1,0 +1,173 @@
+/* Modo mesa: pantalla completa, el celular mira a la persona sorda. */
+.mesa {
+  margin: calc(-1 * (env(safe-area-inset-top) + var(--space-5))) calc(-1 * var(--page-padding))
+    calc(-1 * (env(safe-area-inset-bottom) + var(--space-6)));
+  height: 100dvh;
+  min-height: 600px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: calc(env(safe-area-inset-top) + var(--space-4)) var(--page-padding)
+    calc(env(safe-area-inset-bottom) + var(--space-4));
+  background: var(--color-bg);
+}
+
+.mesa__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mesa__pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 38px;
+  padding: 0 14px;
+  border-radius: var(--radius-pill);
+  background: var(--color-teal-soft);
+  color: var(--color-teal);
+  font-weight: 900;
+}
+
+.mesa__close {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mesa__stage {
+  flex: 1;
+  min-height: 0;
+}
+
+.mesa__bottom {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.mesa__camera {
+  width: 42%;
+  flex-shrink: 0;
+}
+
+.mesa__side {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.mesa__card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: var(--space-3);
+  border-radius: var(--radius-lg);
+  border: 2px solid transparent;
+}
+
+.mesa__card--teal {
+  background: var(--color-teal-soft);
+  border-color: #bfe7e2;
+}
+
+.mesa__card--red {
+  background: var(--color-primary-soft);
+  border-color: #f7c3be;
+}
+
+.mesa__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: calc(var(--fs-xs) * var(--text-scale));
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.mesa__card--teal .mesa__label {
+  color: var(--color-teal);
+}
+
+.mesa__card--red .mesa__label {
+  color: var(--color-primary-ink);
+}
+
+.mesa__text {
+  font-weight: 800;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.mesa__text--big {
+  font-size: calc(var(--fs-xl) * var(--text-scale));
+  font-weight: 900;
+}
+
+.mesa__candidate {
+  color: var(--color-primary);
+}
+
+.mesa__mic,
+.mesa__say {
+  min-height: 46px;
+  border: none;
+  border-radius: var(--radius-md);
+  color: #fff;
+  font-weight: 900;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.mesa__mic {
+  background: var(--color-teal);
+  box-shadow: 0 4px 0 var(--color-teal-edge);
+}
+
+.mesa__mic--live {
+  background: #ffd166;
+  color: #2b1611;
+  box-shadow: 0 4px 0 #e0a92e;
+}
+
+.mesa__actions {
+  margin-top: auto;
+  display: flex;
+  gap: 6px;
+}
+
+.mesa__say {
+  flex: 1;
+  background: var(--color-primary);
+  box-shadow: 0 4px 0 var(--color-primary-edge);
+}
+
+.mesa__say:disabled,
+.mesa__mini:disabled {
+  opacity: 0.45;
+}
+
+.mesa__mini {
+  width: 46px;
+  min-height: 46px;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}

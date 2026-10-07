@@ -15,6 +15,8 @@ export const ROUTES = {
   textToSign: '/texto-a-senas',
   conversation: '/conversacion',
   faceToFace: '/cara-a-cara',
+  converse: '/conversar',
+  tableMode: '/modo-mesa',
   learn: '/aprende',
   quickPhrases: '/frases',
   history: '/historial',

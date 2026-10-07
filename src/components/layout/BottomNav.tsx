@@ -40,8 +40,8 @@ function Item({ item }: { item: NavItem }) {
 }
 
 /**
- * Barra inferior: cuatro secciones y, al centro, el boton rojo de señas
- * (la accion principal de la app) siempre a mano del pulgar.
+ * Barra inferior: cuatro secciones y, al centro, el boton rojo «Hablar»
+ * (conversar con una persona sorda), siempre a mano del pulgar.
  */
 export function BottomNav() {
   return (
@@ -50,7 +50,7 @@ export function BottomNav() {
         <Item key={item.to} item={item} />
       ))}
       <NavLink
-        to={ROUTES.signToText}
+        to={ROUTES.converse}
         className={({ isActive }) =>
           ['bottom-nav__item', 'bottom-nav__item--fab', isActive ? 'bottom-nav__item--active' : '']
             .filter(Boolean)
@@ -60,7 +60,7 @@ export function BottomNav() {
         <span className="bottom-nav__fab">
           <Icon name="hands" size={32} />
         </span>
-        <span className="bottom-nav__label">Señas</span>
+        <span className="bottom-nav__label">Hablar</span>
       </NavLink>
       {RIGHT.map((item) => (
         <Item key={item.to} item={item} />

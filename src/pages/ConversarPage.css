@@ -1,0 +1,392 @@
+/*
+ * Conversacion por turnos. Pantalla completa (sin barra inferior): ocupa
+ * tambien el relleno del layout.
+ */
+.conversar {
+  margin: calc(-1 * (env(safe-area-inset-top) + var(--space-5))) calc(-1 * var(--page-padding))
+    calc(-1 * (env(safe-area-inset-bottom) + var(--space-6)));
+  min-height: 100dvh;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: calc(env(safe-area-inset-top) + var(--space-4)) var(--page-padding)
+    calc(env(safe-area-inset-bottom) + var(--space-5));
+  background: var(--color-bg);
+}
+
+.conversar--habla {
+  background: #2b1611;
+}
+
+/* ---- Barra superior: salir + selector de turno ---- */
+.conversar__top {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.conversar__icon-btn {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: 0 4px 0 var(--color-border);
+  color: var(--color-text);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.conversar__icon-btn--dark {
+  border: none;
+  box-shadow: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+
+.conversar__switch {
+  flex: 1;
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 20px;
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  box-shadow: 0 4px 0 var(--color-border);
+}
+
+.conversar--habla .conversar__switch {
+  background: rgba(255, 255, 255, 0.18);
+  border: none;
+  box-shadow: none;
+}
+
+.conversar__turn {
+  flex: 1;
+  min-height: 46px;
+  border: none;
+  border-radius: 15px;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: calc(var(--fs-sm) * var(--text-scale));
+  font-weight: 900;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.conversar--habla .conversar__turn {
+  color: #fff;
+}
+
+.conversar__turn--habla {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.conversar__turn--respondes {
+  background: var(--color-teal);
+  color: #fff;
+}
+
+.conversar__hint {
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font-size: calc(var(--fs-sm) * var(--text-scale));
+  font-weight: 800;
+}
+
+.conversar--habla .sign-reader__modes {
+  background: rgba(255, 255, 255, 0.92);
+}
+
+/* ---- Panel «Te está diciendo» ---- */
+.conversar__panel {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-xl);
+  background: var(--color-bg);
+}
+
+.conversar__panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.conversar__chip-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 12px;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  font-size: calc(var(--fs-sm) * var(--text-scale));
+  font-weight: 900;
+}
+
+.conversar__chip-btn:disabled {
+  opacity: 0.5;
+}
+
+.conversar__said {
+  min-height: 2.6rem;
+  font-size: calc(2rem * var(--text-scale));
+  font-weight: 900;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+.conversar__candidate {
+  color: var(--color-primary);
+}
+
+.conversar__placeholder {
+  font-size: calc(var(--fs-lg) * var(--text-scale));
+  font-weight: 700;
+  color: var(--color-text-muted);
+}
+
+.conversar__edit {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.conversar__space {
+  display: block;
+  width: 22px;
+  height: 8px;
+  border: 3px solid currentColor;
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+}
+
+/* ---- Botones con relieve ---- */
+.conversar__square {
+  width: 60px;
+  height: 60px;
+  flex-shrink: 0;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: 0 5px 0 var(--color-border);
+  color: var(--color-text);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.conversar__square:disabled {
+  opacity: 0.45;
+}
+
+.conversar__square--red {
+  border: none;
+  background: var(--color-primary);
+  box-shadow: 0 5px 0 var(--color-primary-edge);
+  color: #fff;
+}
+
+.conversar__wide {
+  flex: 1;
+  min-height: 60px;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: 0 5px 0 var(--color-border);
+  color: var(--color-text);
+  font-size: calc(var(--fs-lg) * var(--text-scale));
+  font-weight: 900;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+.conversar__wide--on {
+  background: var(--color-ink);
+  border-color: var(--color-ink);
+  color: var(--color-bg);
+}
+
+.conversar__big {
+  flex: 1;
+  min-height: 64px;
+  border: none;
+  border-radius: var(--radius-lg);
+  color: #fff;
+  font-size: calc(var(--fs-lg) * var(--text-scale));
+  font-weight: 900;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+
+.conversar__big:active:not(:disabled),
+.conversar__square:active:not(:disabled),
+.conversar__wide:active {
+  transform: translateY(4px);
+  box-shadow: none;
+}
+
+.conversar__big:disabled {
+  opacity: 0.45;
+}
+
+.conversar__big--teal {
+  background: var(--color-teal);
+  box-shadow: 0 5px 0 var(--color-teal-edge);
+}
+
+.conversar__big--red {
+  background: var(--color-primary);
+  box-shadow: 0 6px 0 var(--color-primary-edge);
+}
+
+.conversar__big--gold {
+  flex: none;
+  background: #ffd166;
+  box-shadow: 0 5px 0 #e0a92e;
+  color: #2b1611;
+}
+
+.conversar__bottom {
+  flex: none;
+  margin-top: auto;
+}
+
+/* ---- Turno «Respondes» ---- */
+.conversar__deaf-said {
+  align-self: flex-start;
+  max-width: 90%;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-3) var(--space-4);
+  border-radius: 22px 22px 22px 6px;
+  background: var(--color-primary-soft);
+}
+
+.conversar__deaf-said span {
+  font-size: calc(var(--fs-xs) * var(--text-scale));
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-primary-ink);
+}
+
+.conversar__deaf-said strong {
+  font-size: calc(var(--fs-xl) * var(--text-scale));
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.conversar__mic-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4) 0 var(--space-2);
+}
+
+.conversar__mic {
+  width: 128px;
+  height: 128px;
+  border: none;
+  border-radius: 50%;
+  background: var(--color-teal);
+  color: #fff;
+  box-shadow: 0 0 0 12px var(--color-teal-soft), 0 7px 0 12px #bfe7e2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.conversar__mic--live {
+  background: #ffd166;
+  color: #2b1611;
+  animation: conversar-pulse 1.1s ease-in-out infinite;
+}
+
+@keyframes conversar-pulse {
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.conversar__mic-label {
+  margin-top: var(--space-2);
+  font-size: calc(var(--fs-lg) * var(--text-scale));
+  font-weight: 900;
+  text-align: center;
+}
+
+.conversar__draft {
+  width: 100%;
+  box-sizing: border-box;
+  padding: var(--space-3) var(--space-4);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 0 var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  font-size: calc(var(--fs-xl) * var(--text-scale));
+  font-weight: 900;
+  line-height: 1.2;
+  resize: none;
+}
+
+.conversar__draft:focus {
+  outline: none;
+  border-color: var(--color-teal);
+}
+
+/* ---- Chaski para la persona sorda ---- */
+.conversar--muestra {
+  height: 100dvh;
+}
+
+.conversar__pill {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: calc(var(--fs-base) * var(--text-scale));
+  font-weight: 900;
+}
+
+.conversar__stage {
+  flex: 1;
+  min-height: 260px;
+}
+
+.conversar__row {
+  display: flex;
+  gap: var(--space-3);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .conversar__mic--live {
+    animation: none;
+  }
+}
