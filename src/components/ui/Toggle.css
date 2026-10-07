@@ -1,0 +1,25 @@
+.toggle {
+  width: 60px;
+  height: 36px;
+  border-radius: var(--radius-pill);
+  border: none;
+  background: var(--color-border-strong);
+  padding: 3px;
+  display: inline-flex;
+  align-items: center;
+  transition: background-color 0.18s ease;
+  flex-shrink: 0;
+}
+
+.toggle--on {
+  background: var(--color-success);
+  justify-content: flex-end;
+}
+
+.toggle__thumb {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-pill);
+  background: #fff;
+  box-shadow: 0 2px 0 rgba(43, 22, 17, 0.18);
+}

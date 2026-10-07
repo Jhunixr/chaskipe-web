@@ -1,0 +1,47 @@
+# nginx para el frontend de Chaski Pe. ${BACKEND_URL} lo rellena la imagen
+# oficial de nginx al arrancar (envsubst).
+server {
+    listen 80;
+    server_name _;
+    root /usr/share/nginx/html;
+
+    # DNS interno de Docker: el backend se resuelve al pedirlo, no al
+    # arrancar (si no existe, nginx no se cae; la app usa datos de ejemplo).
+    resolver 127.0.0.11 valid=30s ipv6=off;
+
+    gzip on;
+    gzip_types text/css application/javascript application/json application/wasm model/gltf-binary image/svg+xml;
+    gzip_min_length 1024;
+
+    client_max_body_size 2m;
+
+    # API: /backend/... -> ${BACKEND_URL}/...
+    location /backend/ {
+        set $backend "${BACKEND_URL}";
+        rewrite ^/backend/(.*)$ /$1 break;
+        proxy_pass $backend;
+        proxy_set_header Host $proxy_host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_connect_timeout 5s;
+        proxy_read_timeout 30s;
+    }
+
+    # Archivos con hash en el nombre: cache larga.
+    location /assets/ {
+        add_header Cache-Control "public, max-age=31536000, immutable";
+        try_files $uri =404;
+    }
+
+    # Modelos (MediaPipe, letras, avatar 3D): cambian poco.
+    location ~ ^/(mediapipe|models)/ {
+        add_header Cache-Control "public, max-age=86400";
+        try_files $uri =404;
+    }
+
+    # SPA: cualquier ruta de la app devuelve index.html (sin cache).
+    location / {
+        add_header Cache-Control "no-cache";
+        try_files $uri $uri/ /index.html;
+    }
+}

@@ -1,0 +1,83 @@
+.bottom-nav {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 0;
+  z-index: 30;
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+  max-width: var(--app-max-width);
+  height: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom));
+  padding: 8px 6px env(safe-area-inset-bottom);
+  background: var(--color-surface);
+  border-top: 2px solid var(--color-border);
+  border-radius: 26px 26px 0 0;
+  box-shadow: var(--shadow-nav);
+}
+
+.bottom-nav__item {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  font-size: calc(var(--fs-xs) * var(--text-scale));
+  font-weight: 800;
+  color: var(--color-text-faint);
+  transition: color 0.16s ease;
+}
+
+.bottom-nav__icon {
+  width: 58px;
+  height: 36px;
+  border-radius: var(--radius-pill);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.16s ease;
+}
+
+.bottom-nav__item--active {
+  color: var(--color-primary);
+  font-weight: 900;
+}
+
+.bottom-nav__item--active .bottom-nav__icon {
+  background: var(--color-primary-soft);
+}
+
+.bottom-nav__label {
+  line-height: 1.1;
+}
+
+/* Boton central de señas: circulo rojo elevado con relieve. */
+.bottom-nav__item--fab {
+  margin-top: -36px;
+  gap: 9px;
+  color: var(--color-primary);
+  font-weight: 900;
+}
+
+.bottom-nav__fab {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 0 5px var(--color-surface), 0 5px 0 5px var(--color-primary-edge);
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+
+.bottom-nav__item--fab:active .bottom-nav__fab {
+  transform: translateY(4px);
+  box-shadow: 0 0 0 5px var(--color-surface), 0 1px 0 5px var(--color-primary-edge);
+}
+
+.bottom-nav__item--fab.bottom-nav__item--active .bottom-nav__fab {
+  background: var(--color-primary-active);
+}
