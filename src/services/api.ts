@@ -15,6 +15,7 @@ import {
   QUICK_PHRASE_GROUPS,
 } from '@/services/mockData'
 import type { AuthError, AuthUser } from '@/types/auth'
+import type { DatasetSample } from '@/types/dataset'
 import {
   coercePreferences,
   DEFAULT_PREFERENCES,
@@ -331,6 +332,69 @@ export async function addHistory(entry: {
     return { data: fromApiHistory(created), source: 'api' }
   } catch {
     return { data: null, source: 'mock' }
+  }
+}
+
+// ---- Dataset de senas ----
+
+export type UploadResult =
+  | { ok: true; id: string; file: string }
+  | { ok: false; message: string }
+
+/**
+ * Sube una grabacion al servidor (`POST /dataset/samples`). Requiere sesion
+ * con cuenta: cada muestra queda asociada a quien dio fe del consentimiento.
+ */
+export async function uploadSample(sample: DatasetSample): Promise<UploadResult> {
+  try {
+    const res = await request<{ id: string; file: string }>('/dataset/samples', {
+      method: 'POST',
+      body: JSON.stringify(sample),
+    })
+    return { ok: true, id: res.id, file: res.file }
+  } catch (error) {
+    if (error instanceof ApiError) {
+      if (error.status === 401) {
+        return { ok: false, message: 'Inicia sesion con una cuenta para enviar muestras.' }
+      }
+      return { ok: false, message: error.detail ?? `El servidor rechazo la muestra (${error.status}).` }
+    }
+    return { ok: false, message: 'No se pudo conectar con el servidor.' }
+  }
+}
+
+/** Muestras guardadas en el servidor por etiqueta, o null sin backend. */
+export async function getDatasetCounts(): Promise<Record<string, number> | null> {
+  try {
+    const res = await request<{ labels: { label: string; samples: number }[] }>(
+      '/dataset/summary',
+    )
+    return Object.fromEntries(res.labels.map((l) => [l.label, l.samples]))
+  } catch {
+    return null
+  }
+}
+
+/** "No era esa sena": avisa al servidor de un reconocimiento equivocado. */
+export async function reportRecognition(report: {
+  recognized: string
+  expected: string
+  confidence?: number | undefined
+  modelVersion?: string | undefined
+}): Promise<boolean> {
+  try {
+    await request('/recognition/reports', {
+      method: 'POST',
+      body: JSON.stringify({
+        recognized: report.recognized.slice(0, 200),
+        expected: report.expected.slice(0, 200),
+        confidence: report.confidence ?? null,
+        model_version: report.modelVersion ?? null,
+      }),
+    })
+    return true
+  } catch {
+    return false
   }
 }
 

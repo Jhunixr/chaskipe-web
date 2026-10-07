@@ -3,7 +3,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { CameraView, HandOverlay } from '@/components/camera'
 import { Button, Card, Icon, PageHeader } from '@/components/ui'
 import { useCamera } from '@/hooks/useCamera'
+import { useAuth } from '@/hooks/useAuth'
 import { useHandLandmarker } from '@/hooks/useHandLandmarker'
+import { getDatasetCounts, uploadSample } from '@/services/api'
 import {
   buildSample,
   downloadSample,
@@ -32,9 +34,10 @@ interface CapturedFrame {
 /**
  * Herramienta interna para capturar el dataset de **senas de la LSP**.
  * Elegir sena -> grabar (poses ~1 s, senas con movimiento ~2.5 s) con la
- * camara + MediaPipe -> descargar JSON.
+ * camara + MediaPipe -> enviar al servidor (con cuenta) o descargar JSON.
  *
- * El archivo va, manualmente, a `ai/data/raw/<ETIQUETA>/`.
+ * Enviadas: quedan en el backend (`GET /api/v1/dataset/export` las baja en zip).
+ * Descargadas: el archivo va, manualmente, a `ai/data/raw/<ETIQUETA>/`.
  * Ver `ai/data/DATASET_FORMAT.md`.
  *
  * Las senas capturadas NO estan validadas con personas usuarias de LSP ni
@@ -48,6 +51,21 @@ export function DatasetCollectorPage() {
   const [recState, setRecState] = useState<RecState>('idle')
   const [countdown, setCountdown] = useState(3)
   const [savedCount, setSavedCount] = useState<Record<string, number>>({})
+  const { isAuthenticated } = useAuth()
+  const [uploading, setUploading] = useState(false)
+  const [uploadError, setUploadError] = useState<string | null>(null)
+
+  // Partir del conteo del servidor: asi se ve que falta grabar aunque las
+  // muestras las haya subido otra persona u otro dispositivo.
+  useEffect(() => {
+    let cancelled = false
+    void getDatasetCounts().then((counts) => {
+      if (!cancelled && counts) setSavedCount(counts)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [])
   const [lastSummary, setLastSummary] = useState<string | null>(null)
   const [recorded, setRecorded] = useState<{
     frames: CapturedFrame[]
@@ -152,17 +170,34 @@ export function DatasetCollectorPage() {
   const savedForSign = savedCount[vocab.label] ?? 0
   const totalSaved = Object.values(savedCount).reduce((s, n) => s + n, 0)
 
-  const handleSave = () => {
-    if (!lastSample) return
-    downloadSample(lastSample)
+  const markSaved = (summary: string) => {
     setSavedCount((prev) => ({
       ...prev,
       [vocab.label]: (prev[vocab.label] ?? 0) + 1,
     }))
-    setLastSummary(
+    setLastSummary(summary)
+    setUploadError(null)
+    setRecState('idle')
+  }
+
+  const handleSave = () => {
+    if (!lastSample) return
+    downloadSample(lastSample)
+    markSaved(
       `${sampleFileName(lastSample)} · ${lastSample.frames.length} frames · ${withHands} con manos`,
     )
-    setRecState('idle')
+  }
+
+  const handleUpload = async () => {
+    if (!lastSample) return
+    setUploading(true)
+    const res = await uploadSample(lastSample)
+    setUploading(false)
+    if (res.ok) {
+      markSaved(`Enviada al servidor · ${res.file}`)
+    } else {
+      setUploadError(res.message)
+    }
   }
 
   const discard = () => {
@@ -298,8 +333,23 @@ export function DatasetCollectorPage() {
               manteniendola en el encuadre.
             </p>
           )}
+          {uploadError && <p className="demo-note">{uploadError}</p>}
           <div className="collector__review-actions">
-            <Button icon="check" onClick={handleSave} disabled={!goodSample}>
+            {isAuthenticated && (
+              <Button
+                icon="send"
+                onClick={() => void handleUpload()}
+                disabled={!goodSample || uploading}
+              >
+                {uploading ? 'Enviando...' : 'Enviar al servidor'}
+              </Button>
+            )}
+            <Button
+              variant={isAuthenticated ? 'secondary' : 'primary'}
+              icon="check"
+              onClick={handleSave}
+              disabled={!goodSample}
+            >
               Descargar JSON
             </Button>
             <Button variant="ghost" icon="refresh" onClick={discard}>
