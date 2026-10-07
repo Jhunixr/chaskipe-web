@@ -4,6 +4,7 @@ import { AppLayout } from '@/components/layout'
 import {
   AccessibilityPage,
   CameraPreparationPage,
+  ConversarPage,
   ConversationPage,
   DatasetCollectorPage,
   FaceToFacePage,
@@ -20,6 +21,7 @@ import {
   RegisterPage,
   SignToTextPage,
   SplashPage,
+  TableModePage,
   TextToSignPage,
   TranslationResultPage,
 } from '@/pages'
@@ -45,7 +47,11 @@ export const router = createBrowserRouter([
       {
         // Pantalla completa: el telefono queda en la mesa entre dos personas.
         element: <AppLayout hideNav />,
-        children: [{ path: ROUTES.faceToFace, element: <FaceToFacePage /> }],
+        children: [
+          { path: ROUTES.faceToFace, element: <FaceToFacePage /> },
+          { path: ROUTES.converse, element: <ConversarPage /> },
+          { path: ROUTES.tableMode, element: <TableModePage /> },
+        ],
       },
       {
         element: <AppLayout />,

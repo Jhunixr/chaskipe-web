@@ -1,0 +1,76 @@
+.sign-reader {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.sign-reader .camera-view {
+  max-height: 50vh;
+}
+
+.sign-reader__modes {
+  align-self: center;
+}
+
+.sign-reader--compact .camera-view {
+  aspect-ratio: 3 / 4;
+  max-height: none;
+  border-radius: var(--radius-lg);
+}
+
+/* Letra o seña candidata, con el anillo de confirmacion. */
+.sign-reader__live {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  transform: translate(-50%, -50%);
+  z-index: 4;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.sign-reader--compact .sign-reader__live {
+  width: 64px;
+  height: 64px;
+}
+
+.sign-reader__ring {
+  position: absolute;
+  inset: 0;
+  transform: rotate(-90deg);
+}
+
+.sign-reader__ring-bg {
+  fill: #ffe4e1;
+}
+
+.sign-reader__ring-fg {
+  fill: none;
+  stroke: #d62027;
+  stroke-width: 6;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.15s linear;
+}
+
+.sign-reader__live-text {
+  position: relative;
+  max-width: 84px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: #d62027;
+}
+
+.sign-reader--compact .sign-reader__live-text {
+  font-size: 1.5rem;
+}

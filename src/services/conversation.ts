@@ -208,3 +208,13 @@ export function clearSpelled(): void {
     // ignorar
   }
 }
+
+/**
+ * Une una pieza reconocida por la camara al texto en curso: las letras del
+ * deletreo se pegan; las señas completas son palabras separadas por espacio.
+ */
+export function appendPiece(text: string, piece: string, mode: 'letters' | 'sign'): string {
+  if (mode === 'letters') return text + piece
+  const base = text.trimEnd()
+  return `${base}${base ? ' ' : ''}${piece} `
+}

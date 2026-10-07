@@ -14,20 +14,6 @@
   line-height: 1;
 }
 
-.home__sos {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  min-height: 46px;
-  padding: 0 var(--space-4);
-  border-radius: var(--radius-pill);
-  background: var(--color-surface);
-  border: 2px solid var(--color-border);
-  box-shadow: 0 4px 0 var(--color-border);
-  color: var(--color-primary);
-  font-weight: 900;
-}
-
 /* Chaski saluda con un globo de dialogo. */
 .home__greeting {
   display: flex;
@@ -59,10 +45,12 @@
 /* Tarjeta principal: Cara a cara. */
 .home__hero {
   position: relative;
-  min-height: 188px;
+  min-height: 280px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-2);
   padding: var(--space-5);
   border-radius: var(--radius-xl);
   background: var(--color-primary);
@@ -81,75 +69,66 @@
   height: 34%;
 }
 
-.home__phone {
-  position: absolute;
-  right: 24px;
-  top: 20px;
-  width: 84px;
-  height: 136px;
-  border-radius: 18px;
-  background: #fff;
-  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.25);
-  transform: rotate(8deg);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
+.home__hero .hills__sun {
+  right: -6%;
+  top: -10%;
+  width: 34%;
 }
 
-.home__phone-top,
-.home__phone-bottom {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.home__phone-top {
-  background: var(--color-teal);
-  font-size: 1.4rem;
-  font-weight: 900;
-  transform: rotate(180deg);
-}
-
-.home__phone-bottom {
-  background: #FFE4E1;
-  color: #D62027;
-}
-
-.home__pill {
+.home__hero-icons {
   position: relative;
-  align-self: flex-start;
+  display: flex;
+  gap: var(--space-3);
+}
+
+.home__hero-icon {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 12px;
-  border-radius: var(--radius-pill);
-  background: #FFD166;
-  color: #2B1611;
-  font-size: calc(var(--fs-sm) * var(--text-scale));
-  font-weight: 900;
+  justify-content: center;
+  box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.22);
 }
 
-.home__hero-text {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  max-width: 60%;
-  padding-bottom: var(--space-2);
+.home__hero-icon--red {
+  background: #fff;
+  color: #d62027;
+}
+
+.home__hero-icon--teal {
+  background: #0c7c74;
+  color: #fff;
 }
 
 .home__hero-title {
-  font-size: calc(2rem * var(--text-scale));
+  position: relative;
+  font-size: calc(1.9rem * var(--text-scale));
   font-weight: 900;
   letter-spacing: -0.02em;
-  line-height: 1;
+  line-height: 1.05;
 }
 
 .home__hero-sub {
+  position: relative;
   font-weight: 700;
   line-height: 1.25;
+}
+
+.home__hero-cta {
+  position: relative;
+  margin-top: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 50px;
+  padding: 0 var(--space-5);
+  border-radius: var(--radius-md);
+  background: #fff;
+  color: #d62027;
+  font-size: calc(var(--fs-lg) * var(--text-scale));
+  font-weight: 900;
+  box-shadow: 0 4px 0 #8e0f14;
 }
 
 .home__tiles {
@@ -159,7 +138,8 @@
 }
 
 .home__tile {
-  min-height: 128px;
+  min-height: 140px;
+  gap: var(--space-2);
   flex-direction: column;
   justify-content: space-between;
   padding: var(--space-4);
@@ -171,47 +151,33 @@
   line-height: 1.1;
 }
 
-/* Letra del dia (Aprende). */
-.home__learn {
+.home__tile-sub {
+  margin-top: -6px;
+  font-size: calc(var(--fs-sm) * var(--text-scale));
+  color: var(--color-text-muted);
+  line-height: 1.2;
+}
+
+.home__phrases {
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  min-height: 78px;
-  padding: var(--space-3) var(--space-4);
+  min-height: 60px;
+  padding: 0 var(--space-4);
   border-radius: var(--radius-lg);
-  background: var(--color-gold-soft);
-  border: 2px solid var(--color-gold-edge);
-  box-shadow: 0 5px 0 var(--color-gold-edge);
-  color: var(--color-gold-strong);
-}
-
-.home__learn-letter {
-  flex-shrink: 0;
-  width: 48px;
-  height: 48px;
-  border-radius: var(--radius-md);
-  background: var(--color-gold);
-  color: #2B1611;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.6rem;
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  box-shadow: 0 5px 0 var(--color-border);
   font-weight: 900;
 }
 
-.home__learn-text {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  color: var(--color-text);
+.home__phrases > svg:first-child {
+  color: var(--color-teal);
 }
 
-.home__learn-text strong {
-  font-size: calc(var(--fs-lg) * var(--text-scale));
-  font-weight: 900;
+.home__phrases > svg:last-child {
+  margin-left: auto;
+  color: var(--color-text-faint);
 }
 
-.home__learn-text span {
-  color: var(--color-text-muted);
-  font-size: calc(var(--fs-sm) * var(--text-scale));
-}
+/* Letra del dia (Aprende). */
