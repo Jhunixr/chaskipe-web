@@ -145,3 +145,17 @@
     transition: none;
   }
 }
+
+/* Palabra con sena completa grabada (no se deletrea). */
+.avatar-view__sign {
+  padding: 0 0.35em;
+  border-radius: var(--radius-pill);
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.avatar-view__sign--active {
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+}

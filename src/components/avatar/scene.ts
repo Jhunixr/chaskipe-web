@@ -16,7 +16,7 @@ import {
   applyRest,
   type Gesture,
 } from './animation'
-import { LETTER_POSES, textToSpelling, type SpellToken, type Vec3 } from './fingerspelling'
+import { LETTER_POSES, textToSpelling, type SignClip, type SpellToken, type Vec3 } from './fingerspelling'
 import { buildAvatar, type AvatarBones } from './rig'
 import { lerpPose, SpellingArm } from './spellingHand'
 
@@ -97,6 +97,9 @@ export class SignAvatarScene {
   private shoulderWorld = new THREE.Vector3()
   /** Momento (performance.now) en que la mano baja tras terminar de deletrear. */
   private lowerHandAt = 0
+  /** Desplazamiento de la muneca (en "manos") durante una sena grabada. */
+  private wristOffset = new THREE.Vector3()
+  private wristTmp = new THREE.Vector3()
 
   // --- Modelo 3D del Chaski (si carga) ---
   private avatarObject: THREE.Object3D
@@ -249,6 +252,7 @@ export class SignAvatarScene {
     this.spellIndex = -1
     this.spellCallbacks = {}
     this.handPose = null
+    this.wristOffset.set(0, 0, 0)
     this.spellArm.group.visible = false
     this.bones.shoulderR.visible = true
   }
@@ -264,7 +268,24 @@ export class SignAvatarScene {
 
   private tokenDuration(token: SpellToken): number {
     if (token.kind === 'space') return SPELL_SPACE
+    if (token.kind === 'sign') return SPELL_TRANSITION + token.clip.durationMs / 1000 + SPELL_HOLD / 2
     return token.pose ? SPELL_TRANSITION + SPELL_HOLD : SPELL_NO_POSE
+  }
+
+  /** Cuadro de la sena grabada en `ms` (interpolado entre los dos vecinos). */
+  private sampleClip(clip: SignClip, ms: number): { pose: Vec3[]; wrist: Vec3 } {
+    const frames = clip.frames
+    let i = 0
+    while (i < frames.length - 2 && frames[i + 1]!.t <= ms) i++
+    const a = frames[i]!
+    const b = frames[Math.min(i + 1, frames.length - 1)]!
+    const k = b.t > a.t ? THREE.MathUtils.clamp((ms - a.t) / (b.t - a.t), 0, 1) : 0
+    const w: Vec3 = [
+      a.wrist[0] + (b.wrist[0] - a.wrist[0]) * k,
+      a.wrist[1] + (b.wrist[1] - a.wrist[1]) * k,
+      a.wrist[2] + (b.wrist[2] - a.wrist[2]) * k,
+    ]
+    return { pose: lerpPose(a.pose, b.pose, k), wrist: w }
   }
 
   private advanceSpelling(): void {
@@ -293,6 +314,15 @@ export class SignAvatarScene {
       const from = this.fromPose ?? token.pose
       const k = THREE.MathUtils.clamp(this.spellElapsed / SPELL_TRANSITION, 0, 1)
       this.handPose = lerpPose(from, token.pose, k * k * (3 - 2 * k))
+      this.wristOffset.multiplyScalar(1 - k)
+    } else if (token.kind === 'sign') {
+      // Entrada suave al primer cuadro y luego la grabacion tal cual.
+      const ms = Math.max(0, this.spellElapsed - SPELL_TRANSITION) * 1000
+      const frame = this.sampleClip(token.clip, Math.min(ms, token.clip.durationMs))
+      const k = THREE.MathUtils.clamp(this.spellElapsed / SPELL_TRANSITION, 0, 1)
+      const e = k * k * (3 - 2 * k)
+      this.handPose = this.fromPose ? lerpPose(this.fromPose, frame.pose, e) : frame.pose
+      this.wristOffset.set(frame.wrist[0] * e, frame.wrist[1] * e, frame.wrist[2] * e)
     }
     if (this.spellElapsed >= this.tokenDuration(token)) this.advanceSpelling()
   }
@@ -326,7 +356,9 @@ export class SignAvatarScene {
       root.rotation.y = Math.sin(t * 0.5) * 0.04
       root.position.y = Math.sin(t * 1.6) * 0.006
       const pose = this.handPose ?? REST_POSE
-      if (pose) hand.update(pose, CHASKI_MODEL.wrist)
+      if (!this.handPose) this.wristOffset.set(0, 0, 0)
+      this.wristTmp.copy(CHASKI_MODEL.wrist).addScaledVector(this.wristOffset, CHASKI_MODEL.handScale)
+      if (pose) hand.update(pose, this.wristTmp)
       view = showHand ? REAL_HAND : REAL_FULL
     } else {
       // Avatar geometrico: el brazo de deletreo reemplaza al brazo derecho.
@@ -334,7 +366,8 @@ export class SignAvatarScene {
       this.bones.shoulderR.visible = !showHand
       if (showHand) {
         this.bones.shoulderR.getWorldPosition(this.shoulderWorld)
-        this.spellArm.update(this.handPose!, SPELL_WRIST, this.shoulderWorld)
+        this.wristTmp.copy(SPELL_WRIST).addScaledVector(this.wristOffset, 0.15)
+        this.spellArm.update(this.handPose!, this.wristTmp, this.shoulderWorld)
       }
     }
 

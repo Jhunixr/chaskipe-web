@@ -113,7 +113,7 @@ export function AvatarView({ ref, spell, caption, playing = false }: AvatarViewP
         {mode === 'spelling' && (
           <span className="avatar-view__tag avatar-view__tag--lsp">
             <Icon name="hands" size={14} />
-            Deletreo LSP
+            {tokens[current]?.kind === 'sign' ? 'Sena LSP grabada' : 'Deletreo LSP'}
           </span>
         )}
         {mode === 'demo' && (
@@ -139,6 +139,17 @@ export function AvatarView({ ref, spell, caption, playing = false }: AvatarViewP
             {tokens.map((t, i) =>
               t.kind === 'space' ? (
                 <span key={i} className="avatar-view__space" aria-hidden="true" />
+              ) : t.kind === 'sign' ? (
+                <span
+                  key={i}
+                  aria-hidden="true"
+                  className={[
+                    'avatar-view__sign',
+                    i === current ? 'avatar-view__sign--active' : '',
+                  ].join(' ')}
+                >
+                  {t.char}
+                </span>
               ) : (
                 <span
                   key={i}
