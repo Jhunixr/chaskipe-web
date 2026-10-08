@@ -1,0 +1,11 @@
+{
+  "classes": [
+    "HOLA",
+    "GRACIAS",
+    "ADIOS",
+    "CUIDATE",
+    "REPOSO"
+  ],
+  "featureVersion": 1,
+  "includesSynthetic": false
+}

@@ -10,37 +10,25 @@ sign/
 └── labels.json   # clases + featureVersion
 ```
 
-## Como se genera
+## Modelo actual
+
+Entrenado con grabaciones reales de `/dev/dataset` (una persona, sin validar
+aun con LSP): **HOLA, GRACIAS, ADIOS, CUIDATE** y **REPOSO** (mano sin sena).
+Accuracy con grabaciones que el modelo no vio: **83 %**. Detalle y como
+regenerarlo: `chaskipe-ai/README.md` (seccion "Flujo de trabajo").
 
 ```bash
-cd ai
-py -m venv .venv && .venv\Scripts\activate      # (Windows)
-pip install -r requirements.txt
-
-# 1. (solo para probar sin datos reales) dataset sintetico
-py scripts/synth_dataset.py --per-class 40
-
-# 2. features -> ai/data/processed/
-py scripts/preprocess.py
-
-# 3. entrenar -> ai/models/
-py scripts/train.py
-
-# 4. evaluar (CV, matriz de confusion)
+# en chaskipe-ai
+py scripts/preprocess.py --only HOLA,GRACIAS,ADIOS,CUIDATE,REPOSO --augment 8
 py scripts/evaluate.py
-
-# 5. exportar aqui
+py scripts/train.py --val-split 0 --epochs 80
 py scripts/export_tfjs.py
 ```
 
 ## Importante
 
-- Estos archivos **no se versionan** (`.gitignore`). Cada quien los genera.
-- Si el modelo se entreno con `synth_dataset.py`, `labels.json` tiene
-  `"includesSynthetic": true` y **no reconoce senas reales**: sirve solo para
-  validar la integracion (FASE 6).
-- La extraccion de features del frontend (`src/services/signFeatures.ts`) debe
-  coincidir con la de Python (`ai/scripts/features.py`). Verificado: coinciden
-  con diferencia < 1e-6.
-- El modelo real solo sera valido tras entrenar con muestras validadas por
-  personas usuarias de LSP o interpretes.
+- La extraccion de features de la web (`src/services/signFeatures.ts`) debe
+  coincidir con la de Python (`ai/scripts/features.py`). Verificado: pasando
+  las 41 grabaciones por el codigo de la web, acierta las 41, igual que Python.
+- El modelo solo sera confiable tras entrenar con mas grabaciones, de varias
+  personas, validadas por personas usuarias de LSP o interpretes.

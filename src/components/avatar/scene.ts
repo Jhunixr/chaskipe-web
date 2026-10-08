@@ -379,10 +379,15 @@ export class SignAvatarScene {
       root.position.y = Math.sin(t * 1.6) * 0.006
       const pose = this.handPose ?? REST_POSE
       if (!this.handPose) this.wristOffset.set(0, 0, 0)
-      this.wristTmp.copy(CHASKI_MODEL.wrist).addScaledVector(this.wristOffset, CHASKI_MODEL.handScale)
-      if (pose) {
-        if (real.isLoaded) real.update(pose, this.wristTmp)
-        else hand.update(pose, this.wristTmp)
+      if (pose && real.isLoaded) {
+        // La mano realista refleja las poses (ver realHand.ts): el
+        // desplazamiento de la muneca tambien.
+        this.wristTmp.set(-this.wristOffset.x, this.wristOffset.y, this.wristOffset.z)
+        this.wristTmp.multiplyScalar(CHASKI_MODEL.realHandScale).add(CHASKI_MODEL.wrist)
+        real.update(pose, this.wristTmp)
+      } else if (pose) {
+        this.wristTmp.copy(CHASKI_MODEL.wrist).addScaledVector(this.wristOffset, CHASKI_MODEL.handScale)
+        hand.update(pose, this.wristTmp)
       }
       view = showHand ? REAL_HAND : REAL_FULL
     } else {
