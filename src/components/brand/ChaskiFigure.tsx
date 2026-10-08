@@ -11,7 +11,7 @@ interface ChaskiFigureProps {
 }
 
 /**
- * Chaski en 3D (el niño del logo, modelo generado con Hunyuan3D-2), recortado
+ * Chaski en 3D (el niño del logo, modelo generado con TRELLIS), recortado
  * con fondo transparente para ponerlo sobre los colores de la marca.
  */
 export function ChaskiFigure({ width, alt = '', className }: ChaskiFigureProps) {

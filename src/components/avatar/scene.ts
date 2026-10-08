@@ -34,18 +34,19 @@ const CAMERA_FULL = { pos: new THREE.Vector3(0, 0.9, 4.9), target: new THREE.Vec
 const CAMERA_HAND = { pos: new THREE.Vector3(-0.08, 1.0, 3.0), target: new THREE.Vector3(-0.1, 0.95, 0) }
 
 /**
- * Modelo 3D del Chaski generado desde el logo (ver avatar/models/README.md).
- * Se le quito la mano esculpida del brazo levantado; en su lugar va la mano
- * articulada que forma las letras. `wrist` es el centro del puno de la manga.
+ * Modelo 3D del Chaski generado con TRELLIS (ver avatar/models/README.md en
+ * chaskipe-ai). Se le quito la mano esculpida del brazo levantado; en su
+ * lugar va la mano articulada que forma las letras. `wrist` queda justo sobre
+ * el centro del puno de la manga y `skin` es el tono de piel de la textura.
  */
 const CHASKI_MODEL = {
   url: `${import.meta.env.BASE_URL}models/avatar/chaski.glb`,
-  wrist: new THREE.Vector3(-0.589, -0.3, 0.395),
-  handScale: 0.25,
-  skin: 0xe39a62,
+  wrist: new THREE.Vector3(-0.479, -0.3, 0.41),
+  handScale: 0.28,
+  skin: 0xbd6a40,
 }
 const REAL_FULL = { pos: new THREE.Vector3(0, -0.1, 4.7), target: new THREE.Vector3(0, -0.18, 0) }
-const REAL_HAND = { pos: new THREE.Vector3(-0.12, -0.08, 4.0), target: new THREE.Vector3(-0.12, -0.16, 0) }
+const REAL_HAND = { pos: new THREE.Vector3(-0.22, -0.02, 3.7), target: new THREE.Vector3(-0.22, -0.1, 0) }
 /** Mano en reposo: la B (mano abierta), como saludando. */
 const REST_POSE = LETTER_POSES.B ?? null
 
