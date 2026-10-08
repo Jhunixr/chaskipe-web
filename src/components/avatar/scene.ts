@@ -18,6 +18,7 @@ import {
 } from './animation'
 import { LETTER_POSES, textToSpelling, type SignClip, type SpellToken, type Vec3 } from './fingerspelling'
 import { buildAvatar, type AvatarBones } from './rig'
+import { RealHand } from './realHand'
 import { lerpPose, SpellingArm } from './spellingHand'
 
 
@@ -34,18 +35,25 @@ const CAMERA_FULL = { pos: new THREE.Vector3(0, 0.9, 4.9), target: new THREE.Vec
 const CAMERA_HAND = { pos: new THREE.Vector3(-0.08, 1.0, 3.0), target: new THREE.Vector3(-0.1, 0.95, 0) }
 
 /**
- * Modelo 3D del Chaski generado desde el logo (ver avatar/models/README.md).
- * Se le quito la mano esculpida del brazo levantado; en su lugar va la mano
- * articulada que forma las letras. `wrist` es el centro del puno de la manga.
+ * Modelo 3D del Chaski generado con TRELLIS (ver avatar/models/README.md en
+ * chaskipe-ai). Se le quito la mano esculpida del brazo levantado; en su
+ * lugar va la mano articulada que forma las letras. `wrist` queda justo sobre
+ * el centro del puno de la manga y `skin` es el tono de piel de la textura.
  */
 const CHASKI_MODEL = {
   url: `${import.meta.env.BASE_URL}models/avatar/chaski.glb`,
-  wrist: new THREE.Vector3(-0.589, -0.3, 0.395),
-  handScale: 0.25,
-  skin: 0xe39a62,
+  /** Mano realista con huesos (ver realHand.ts). */
+  handUrl: `${import.meta.env.BASE_URL}models/avatar/mano.glb`,
+  wrist: new THREE.Vector3(-0.479, -0.3, 0.41),
+  handScale: 0.28,
+  skin: 0xbd6a40,
+  /** Piel de la mano realista (sus colores por vertice la oscurecen un poco). */
+  realSkin: 0xc97a52,
+  /** La mano realista es mas fina que la del dibujo: un poco mas grande. */
+  realHandScale: 0.34,
 }
 const REAL_FULL = { pos: new THREE.Vector3(0, -0.1, 4.7), target: new THREE.Vector3(0, -0.18, 0) }
-const REAL_HAND = { pos: new THREE.Vector3(-0.12, -0.08, 4.0), target: new THREE.Vector3(-0.12, -0.16, 0) }
+const REAL_HAND = { pos: new THREE.Vector3(-0.22, -0.02, 3.7), target: new THREE.Vector3(-0.22, -0.1, 0) }
 /** Mano en reposo: la B (mano abierta), como saludando. */
 const REST_POSE = LETTER_POSES.B ?? null
 
@@ -102,7 +110,7 @@ export class SignAvatarScene {
 
   // --- Modelo 3D del Chaski (si carga) ---
   private avatarObject: THREE.Object3D
-  private realistic: { root: THREE.Group; hand: SpellingArm } | null = null
+  private realistic: { root: THREE.Group; hand: SpellingArm; real: RealHand } | null = null
 
   constructor(canvas: HTMLCanvasElement) {
     this.renderer = new THREE.WebGLRenderer({
@@ -187,10 +195,23 @@ export class SignAvatarScene {
       })
       hand.group.visible = true
       root.add(hand.group)
+      // Mano realista: reemplaza a la mano simple en cuanto carga.
+      const real = new RealHand({ handScale: CHASKI_MODEL.realHandScale, skinColor: CHASKI_MODEL.realSkin })
+      root.add(real.group)
       this.scene.add(root)
       this.avatarObject.visible = false
       this.spellArm.group.visible = false
-      this.realistic = { root, hand }
+      this.realistic = { root, hand, real }
+      real
+        .load(CHASKI_MODEL.handUrl)
+        .then(() => {
+          if (this.disposed) return
+          real.group.visible = true
+          hand.group.visible = false
+        })
+        .catch(() => {
+          // se queda la mano simple
+        })
     } catch {
       // se queda el avatar geometrico
     }
@@ -353,13 +374,21 @@ export class SignAvatarScene {
     let view = showHand ? CAMERA_HAND : CAMERA_FULL
     if (this.realistic) {
       // Modelo 3D: respira y se balancea; la mano siempre esta (en reposo, la B).
-      const { root, hand } = this.realistic
+      const { root, hand, real } = this.realistic
       root.rotation.y = Math.sin(t * 0.5) * 0.04
       root.position.y = Math.sin(t * 1.6) * 0.006
       const pose = this.handPose ?? REST_POSE
       if (!this.handPose) this.wristOffset.set(0, 0, 0)
-      this.wristTmp.copy(CHASKI_MODEL.wrist).addScaledVector(this.wristOffset, CHASKI_MODEL.handScale)
-      if (pose) hand.update(pose, this.wristTmp)
+      if (pose && real.isLoaded) {
+        // La mano realista refleja las poses (ver realHand.ts): el
+        // desplazamiento de la muneca tambien.
+        this.wristTmp.set(-this.wristOffset.x, this.wristOffset.y, this.wristOffset.z)
+        this.wristTmp.multiplyScalar(CHASKI_MODEL.realHandScale).add(CHASKI_MODEL.wrist)
+        real.update(pose, this.wristTmp)
+      } else if (pose) {
+        this.wristTmp.copy(CHASKI_MODEL.wrist).addScaledVector(this.wristOffset, CHASKI_MODEL.handScale)
+        hand.update(pose, this.wristTmp)
+      }
       view = showHand ? REAL_HAND : REAL_FULL
     } else {
       // Avatar geometrico: el brazo de deletreo reemplaza al brazo derecho.
@@ -401,6 +430,7 @@ export class SignAvatarScene {
     this.disposed = true
     this.spellArm.dispose()
     this.realistic?.hand.dispose()
+    this.realistic?.real.dispose()
     cancelAnimationFrame(this.frame)
     this.scene.traverse((obj) => {
       if (obj instanceof THREE.Mesh) {
