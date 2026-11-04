@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 
 import { type BackendHealth, checkBackend } from '@/services/api'
 
-/** Consulta /health del backend una vez al montar. */
+/** Consulta /actuator/health del backend una vez al montar. */
 export function useBackendHealth(): BackendHealth {
   const [health, setHealth] = useState<BackendHealth>({
     online: false,
