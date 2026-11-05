@@ -142,7 +142,7 @@ Configuracion **estricta** (`strict: true` + `noUncheckedIndexedAccess`,
 ## Backend (FASE 7 + 8)
 
 - `src/services/api.ts`: cliente REST hacia `VITE_API_URL` (por defecto
-  `http://localhost:8000`). **Fallback a mock**: si el backend no responde en
+  `http://localhost:8080`). **Fallback a mock**: si el backend no responde en
   4 s, se usan los datos de ejemplo y la app sigue funcionando.
 - `useApiResource` / `useBackendHealth`: hooks de carga y de estado del backend.
 - Conectados: **Historial** (lista, borrar), **Perfil** (ver, editar -> PUT),
@@ -183,7 +183,7 @@ reenvia al backend: sin CORS ni contenido mixto.
    *Dockerfile*, **Build Path** `/`.
 3. **Environment**:
    ```env
-   BACKEND_URL=http://<App Name interno del backend>:8000
+   BACKEND_URL=http://<App Name interno del backend>:8080
    ```
    El *App Name* esta en la pestana General del backend (algo como
    `chaskipe-backend-xxxx`). Tambien vale la URL publica del backend
@@ -191,8 +191,8 @@ reenvia al backend: sin CORS ni contenido mixto.
    datos de ejemplo (sin cuentas).
 4. **Domains** → agregar el dominio con **HTTPS** (Let's Encrypt), puerto
    **80**. Sin HTTPS el navegador no deja usar la camara.
-5. **Deploy** y abrir `https://<dominio>/backend/health`: debe responder
-   `"persistence": "postgresql"`.
+5. **Deploy** y abrir `https://<dominio>/backend/actuator/health`: debe
+   responder con `"status": "UP"`.
 
 Probado en local con los tres contenedores (PostgreSQL, API y web): rutas de
 la SPA, `/backend`, modelo 3D, MediaPipe `.wasm`, reconocimiento con camara y

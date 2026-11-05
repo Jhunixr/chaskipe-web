@@ -6,7 +6,7 @@
  * ejemplo y la app sigue funcionando.
  *
  * La URL base viene de `VITE_API_URL` (ver `.env`), por defecto
- * `http://localhost:8000`.
+ * `http://localhost:8080`.
  */
 import {
   DEMO_USER,
@@ -30,7 +30,7 @@ import type {
 const API_URL =
   (typeof import.meta.env?.VITE_API_URL === 'string' &&
     import.meta.env.VITE_API_URL) ||
-  'http://localhost:8000'
+  'http://localhost:8080'
 
 const BASE = `${API_URL.replace(/\/$/, '')}/api/v1`
 const TIMEOUT_MS = 4000
@@ -409,34 +409,50 @@ export async function deleteHistory(id: string): Promise<Result<boolean>> {
 // ---- Frases rapidas ----
 
 interface ApiPhrase {
-  id: string
-  text: string
-  category: QuickPhraseGroup['category']
-  is_demo: boolean
+  fraseFrecuenteId: number
+  texto: string
+  categoria: string | null
+  ordenUso: number
 }
 
-interface ApiPhraseGroup {
-  category: QuickPhraseGroup['category']
-  label: string
-  phrases: ApiPhrase[]
+const PHRASE_CATEGORY_LABELS: Record<QuickPhraseGroup['category'], string> = {
+  saludos: 'Saludos',
+  respuestas: 'Respuestas',
+  necesidades: 'Necesidades',
+  salud: 'Salud',
+  transporte: 'Transporte',
+  compras: 'Compras',
+  emergencias: 'Emergencias',
+}
+
+function isPhraseCategory(value: string | null): value is QuickPhraseGroup['category'] {
+  return value !== null && value in PHRASE_CATEGORY_LABELS
+}
+
+export function groupApiPhrases(rows: readonly ApiPhrase[]): QuickPhraseGroup[] {
+  const groups = new Map<QuickPhraseGroup['category'], QuickPhraseGroup['phrases']>()
+  for (const row of rows) {
+    const category = isPhraseCategory(row.categoria) ? row.categoria : 'necesidades'
+    const phrases = groups.get(category) ?? []
+    phrases.push({
+      id: String(row.fraseFrecuenteId),
+      text: row.texto,
+      category,
+      isDemo: true,
+    })
+    groups.set(category, phrases)
+  }
+  return [...groups.entries()].map(([category, phrases]) => ({
+    category,
+    label: PHRASE_CATEGORY_LABELS[category],
+    phrases,
+  }))
 }
 
 export async function getPhraseGroups(): Promise<Result<QuickPhraseGroup[]>> {
   try {
-    const groups = await request<ApiPhraseGroup[]>('/phrases')
-    return {
-      data: groups.map((g) => ({
-        category: g.category,
-        label: g.label,
-        phrases: g.phrases.map((p) => ({
-          id: p.id,
-          text: p.text,
-          category: p.category,
-          isDemo: p.is_demo,
-        })),
-      })),
-      source: 'api',
-    }
+    const phrases = await request<ApiPhrase[]>('/frases-frecuentes')
+    return { data: groupApiPhrases(phrases), source: 'api' }
   } catch {
     return { data: QUICK_PHRASE_GROUPS, source: 'mock' }
   }
@@ -452,22 +468,20 @@ export interface BackendHealth {
 }
 
 export async function checkBackend(): Promise<BackendHealth> {
+  const controller = new AbortController()
+  const timer = window.setTimeout(() => controller.abort(), 2000)
   try {
-    const controller = new AbortController()
-    const timer = window.setTimeout(() => controller.abort(), 2000)
-    const res = await fetch(`${API_URL.replace(/\/$/, '')}/health`, {
+    const res = await fetch(`${API_URL.replace(/\/$/, '')}/actuator/health`, {
       signal: controller.signal,
     })
-    window.clearTimeout(timer)
     if (!res.ok) return { online: false, persistence: 'unknown' }
-    const body = (await res.json()) as { persistence?: string }
-    const p =
-      body.persistence === 'postgresql' || body.persistence === 'memory'
-        ? body.persistence
-        : 'unknown'
-    return { online: true, persistence: p }
+    const body = (await res.json()) as { status?: string }
+    if (body.status !== 'UP') return { online: false, persistence: 'unknown' }
+    return { online: true, persistence: 'postgresql' }
   } catch {
     return { online: false, persistence: 'unknown' }
+  } finally {
+    window.clearTimeout(timer)
   }
 }
 

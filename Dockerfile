@@ -22,5 +22,5 @@ COPY nginx.conf.template /etc/nginx/templates/default.conf.template
 COPY --from=build /app/dist /usr/share/nginx/html
 # Direccion interna o publica del backend (sin barra final). Si no responde,
 # la app sigue funcionando con datos de ejemplo.
-ENV BACKEND_URL=http://127.0.0.1:8000
+ENV BACKEND_URL=http://127.0.0.1:8080
 EXPOSE 80
